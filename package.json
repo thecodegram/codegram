@@ -1,0 +1,12 @@
+{
+  "name": "codegram",
+  "version": "1.0.0",
+  "description": "social networking app for competitive programmers",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
+}
