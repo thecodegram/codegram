@@ -1,0 +1,20 @@
+# Dependency directories
+node_modules/
+
+# Built output
+dist/
+
+# TypeScript compilation artifacts
+*.js
+*.js.map
+
+# Editor and IDE files
+.vscode/
+.idea/
+
+# Environment configuration files
+.env
+
+# Logs
+logs/
+*.log
