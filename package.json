@@ -18,6 +18,7 @@
     "typescript": "^5.0.4"
   },
   "devDependencies": {
+    "@types/cron": "^2.0.1",
     "@types/express": "^4.17.17"
   }
 }
