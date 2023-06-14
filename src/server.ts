@@ -64,7 +64,7 @@ app.post('/api/addUser/:userId', (req: Request, res: Response ) => {
 })
 
 // Define an endpoint to trigger the GraphQL requests manually
-app.get('/api/trigger-requests/', async (req: any, res: any ) => {
+app.get('/api/trigger-requests/', async (req: Request, res: Response ) => {
   const promises: Promise<ReturnType<typeof makeGraphQLRequest>>[] = 
     Array.from(userIds).map(async (id) => {
       const cur = await makeGraphQLRequest(id);
@@ -79,7 +79,7 @@ app.get('/api/trigger-requests/', async (req: any, res: any ) => {
 });
 
 // trigger for specific user
-app.get('/api/trigger-requests/:userId', async (req: any, res: any ) => {
+app.get('/api/trigger-requests/:userId', async (req: Request, res: Response ) => {
   const { userId } = req.params;
   
   const data = await makeGraphQLRequest(userId);
