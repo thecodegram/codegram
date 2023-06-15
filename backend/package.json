@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "tsc && jest --passWithNoTests"
   },
   "keywords": [],
   "author": "",
@@ -14,10 +15,13 @@
     "axios": "^1.4.0",
     "cron": "^2.3.1",
     "express": "^4.18.2",
+    "express-validator": "^7.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17"
+    "@types/cron": "^2.0.1",
+    "@types/express": "^4.17.17",
+    "jest": "^29.5.0"
   }
 }

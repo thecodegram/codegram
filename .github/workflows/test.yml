@@ -1,0 +1,60 @@
+name: "Test"
+
+# This workflow runs on every push to the repository and for every pull request
+on: [pull_request]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install Dependencies backend
+      run: |
+        cd backend/
+        rm -rf package-lock.json 
+        rm -rf node_modules
+        npm cache clean --force
+        npm i --save-dev
+
+    - name: Build backend
+      run: |
+        cd backend/ 
+        npm run build
+
+    - name: Install Dependencies frontend
+      run: |
+        cd client/ 
+        rm -rf package-lock.json 
+        rm -rf node_modules
+        npm cache clean --force
+        npm i --save-dev
+
+    - name: Build frontend
+      run: |
+        cd client/ 
+        npm run build
+    
+    
+
+    - name: Test frontend
+      run: |
+        cd client/
+        npm run test
+    
+    - name: Test backend
+      run: |
+        cd backend/
+        npm run test
