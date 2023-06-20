@@ -8,8 +8,11 @@ CodeGram is a competitive social networking app similar to apps such as [Strava]
 ## User workflow
 A user will create an account and login to the app with their unique LeetCode User ID. They will be able to add friends or follow other users by User ID. The user's CodeGram newsfeed will show the most recent updates including their friends activities (e.g. "🔔 janedoe123 has complete a new LeetCode Hard problem!"). They can click on their friends usernames to view their profile which will show stats like how many Easy, Medium, and Hard problems the user has completed. We will explore and implement various gamification and social networking components such as scoreboards, challenges, and rewards. 
 
-## Internal, External Service, Database
-<img width="487" alt="image" src="https://github.com/dannyl1u/codegram/assets/45186464/da3f7c78-0166-414a-92f9-02007b885319">
+## Internal, External Service(s) and Database(s)
+
+![CodeGram_architecture_and_models drawio (1)](https://github.com/peyz21/codegram/assets/64120482/68fe5c6b-59bd-48f7-88a3-386f871dfeb6)
+
+
 
 ## Technology Stack
 ### Frontend framework
