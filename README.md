@@ -1,4 +1,18 @@
 # CodeGram
+
+- [Problem Statement](#problem-statement)
+- [Solution](#solution)
+- [User workflow](#user-workflow)
+- [Internal, External Service(s) and Database(s)](#internal-external-services-and-databases)
+- [Technology Stack](#technology-stack)
+  - [Frontend framework](#frontend-framework)
+  - [Backend](#backend)
+  - [Internal Service](#internal-service)
+  - [External Services](#external-services)
+  - [Database](#database)
+- [Authentication](#authentication)
+
+
 ## Problem Statement
 Different platforms for technical interview preparation and competitive programming, such as [leetcode.com](https://leetcode.com) or [vjudge.net](https://vjudge.net) offer internal statistics on their users, but there is no unified way to view one's progress and achievements across all platforms. Further, many of those platforms lack social or competitive aspects to improving one's skills. Studies show that gamification boosts retention, meaning CodeGram will help programmers improve their skills.
 
@@ -14,16 +28,16 @@ A user will create an account and link external platforms they are using to Code
 
 ## Technology Stack
 ### Frontend framework
-React will be used. We are considering using Chart.js for chart visualizations.
+React will be used. We are considering using Chart.js for data visualizations such as user stats, etc.
 
 ### Backend
-We will use Nodejs+Express for both services (see internal service)
+We will use Node.js + Express on GCP as a PaaS for both services (see [Internal Service](#internal-service)).
 
 ### Internal Service
-Unfortunately, most platforms like LeetCode do not provide webhooks for user updates, so we wish to explore the option of having a microservice alongside the "main" back-end, which would be responsible for continuously (scheduled job) pulling the user data from other platforms and sending update messages when a person has solved a new problem. As update workflows are event-driven, we are considering using a Pub/Sub system or message queues, which also gives us an easy way to expose our own webhooks. Both our servers will access their databases (more on that in the DB section).
+Unfortunately, most platforms like LeetCode do not provide webhooks for user updates, so we wish to explore the option of having a microservice alongside the "main" back-end, which would be responsible for continuously (scheduled job) pulling the user data from other platforms (see [External Services](#external-services)) and sending update messages when a person has solved a new problem. As update workflows are event-driven, we are considering using a Pub/Sub system or message queues, which also gives us an easy way to expose our own webhooks. Both our servers will access their databases (more on that in the DB section).
 
 ### External Services
-We will use the Leetcode and VJudge APIs to get users' stats and explore other external services to help bootstrap our application, including but not limited to services for authentication and integration with other social media apps (Instagram, Facebook, etc.).
+We will use the [LeetCode GraphQL API](https://leetcode.com/graphql) and VJudge APIs to get users' stats and explore other external services to help bootstrap our application, including but not limited to services for authentication and integration with other social media apps (Instagram, Facebook, etc.).
 
 ### Database
 The current architecture plan involves having a NoSQL MongoDB for data coming from external API. This grants a flexible data model, which is crucial as the external data format is prone to change, and this allows for easy expansion to more algorithm platforms, like CodeForces or Kattis. We are also expecting a high read/write load as we will be continuously getting all user data from external services and NoSQL is designed for horizontal scalability. We will also use an RDB for Events, Groups and Friends (internal data) for efficient joins. We are debating using a search engine like ElasticSearch or an in-memory db like Redis for faster data retrieval; MongoDB also offers in-memory/hybrid options.
