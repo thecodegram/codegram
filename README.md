@@ -42,6 +42,6 @@ We will use the [LeetCode GraphQL API](https://leetcode.com/graphql) and VJudge 
 ### Database
 The current architecture plan involves having a NoSQL MongoDB for data coming from external API. This grants a flexible data model, which is crucial as the external data format is prone to change, and this allows for easy expansion to more algorithm platforms, like CodeForces or Kattis. We are also expecting a high read/write load as we will be continuously getting all user data from external services and NoSQL is designed for horizontal scalability. We will also use an RDB for Events, Groups and Friends (internal data) for efficient joins. We are debating using a search engine like ElasticSearch or an in-memory db like Redis for faster data retrieval; MongoDB also offers in-memory/hybrid options.
 
-## Authentication
+### Authentication
 Users will need to create an account and log in to access the CodeGram functionality. As there is no way for us to verify if the person is not linking their CodeGram account to someone else's external profile, we are adding admin/moderator users with the ability to unlink a CodeGram user from an external platform.
 
