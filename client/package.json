@@ -42,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.22.5",
     "typescript-plugin-css-modules": "^5.0.1"
   }
 }
