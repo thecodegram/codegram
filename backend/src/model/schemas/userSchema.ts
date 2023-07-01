@@ -1,5 +1,6 @@
 import mongoose, {Schema} from 'mongoose';
 import { leetcodeStatsSchema } from './leetcodeStatsSchema';
+import { vjudgeStatsSchema } from './vjudgeStatsSchema';
 
 const userSchema = new Schema({
   username: String,
@@ -13,10 +14,13 @@ const userSchema = new Schema({
     required: true,
   },
   leetcode: {
-    type: leetcodeStatsSchema
+    type: leetcodeStatsSchema,
+    required: false
+  },
+  vjudge: {
+    type: vjudgeStatsSchema,
+    required: false
   }
 });
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+export const User = mongoose.model('User', userSchema);

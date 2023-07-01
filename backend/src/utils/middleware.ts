@@ -2,8 +2,20 @@ import { Request, Response, NextFunction } from 'express';
 import { param, validationResult } from 'express-validator'
 import { validUsername } from './utils';
 
-
-
+declare module "express-session" {
+  interface SessionData {
+      username: string // whatever property you like
+  }
+}
+export const enforceLoggedIn = (req: Request, res: Response, next: NextFunction) => {
+  if(req.session.username == null) {
+    res.status(401).send("Not authorized!");
+    throw new Error("Not logged in!");
+  }
+  else {
+    next();
+  }
+}
 // Make sure an incoming parameter does not have invalid symbols, propagate error
 export const validateUsername = (paramName: string) => param(paramName).escape().matches(validUsername);
 

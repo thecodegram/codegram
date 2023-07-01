@@ -1,0 +1,87 @@
+import express, { Request, Response } from 'express'
+import {User} from '../model/schemas/userSchema'
+import session from 'express-session'
+
+const router = express.Router();
+
+// Add some parameters to the session
+declare module "express-session" {
+    interface SessionData {
+        username: string // whatever property you like
+    }
+}
+
+
+router.post('/login', async (req: Request, res: Response) => {
+    const username: String = req.body.username;
+    const password: String = req.body.password;
+    try {
+        const user = await User.findOne({username: username, password:password});
+        console.log(user);
+
+        if(user === null) {
+            res.status(400).send();
+        }
+        else {
+            console.log(user);
+            req.session.username = user.username;
+            req.session.save()
+
+            res.status(200).send("Logged in successfully");
+        }
+
+    } catch(e : any) {
+        res.status(400).end();
+    }
+})
+
+
+router.post('/signup', async (req: Request, res: Response) => {
+    const {username, password, email} = req.body;
+    console.log(username, password, email)
+    try {
+    const user = await User.findOne({ $or: [{username: username}, {email: email}]});
+
+    if(user !== null) {
+        res.status(400).send("User already exists!");
+        console.log(user);
+        return;
+    }
+    else {
+    const newUser = new User({
+        username: username,
+        password: password,
+        email: email
+    })
+
+    await newUser.save();
+
+    // Init the user session
+    req.session.username = newUser.username;
+    req.session.save()
+
+
+    res.status(200).send("Registered");
+    }
+    } catch(e: any) {
+        console.log(e);
+        // Not sure if we should specify what went wrong with login/signup
+        // For security reasons
+        res.status(400).end("Error signing in");
+    }
+})
+
+router.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+          console.error('Error logging out:', err);
+          res.status(500).send('Internal Server Error');
+        } else {
+          // Redirect the user to the login page or any other desired destination
+          res.redirect('/login');
+        }
+      });
+})
+
+
+module.exports = router;
