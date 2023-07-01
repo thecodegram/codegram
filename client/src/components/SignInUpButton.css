@@ -1,0 +1,10 @@
+.button-class {
+    height: 52px;
+    margin-top: 62px;
+    margin-right: 1px;
+    display: flex;
+    padding: 0 44px;
+    align-items: center;
+    min-width: 485px;
+    background-color: #0b6cff;
+}

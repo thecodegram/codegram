@@ -1,8 +1,130 @@
-.container-center-horizontal{
+.containerCenterHorizontal{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  pointer-events: none;
+  width: 100%;
+  background-color: blue;
+}
+
+.loginPage {
+  display: grid;
+  place-content: center;
+  background-color: #1B1B1A;
+  width: 100vw;
+  height: 100vh;
+  padding: 1rem;
+  
+  &, a {   
+    color: #fff;
+  }
+
+  .header h1 {
+    font-size: 2rem;      
+  }
+
+  .header span {
+    color: #FFA115;
+  }
+
+  .header p {
+    font-size: 1.5rem;
+    font-weight: 200;
+  }
+  
+  .header {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
-    pointer-events: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+    text-align: center;
+  }
+}
+
+.logo {
+  background-color: #D48611;
+  color: #000;
+  aspect-ratio: 1/1;
+  width: 6.56rem;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  font-size: 2rem;
+  box-shadow: 0 0 100px 0 rgba(255, 161, 21, 0.25);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 100%; 
+}
+
+.form > div, span, input, button {
+  width: 100%;
+}
+
+.form button {
+  cursor: pointer;
+}
+
+.btn {
+  background-color: #FFA115;
+  border: none;
+  border-radius: 0.75rem;
+  color: #151515;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  height: 3.5rem;
+  font-weight: 600;
+}
+
+.googleLoginBtn {
+  background-color: #0B6CFF;
+  color: #fff;
+}
+
+.orLine {
+  font-size: 1rem;
+  font-weight: 200;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+
+  &::before, &::after {
+    content: "";
+    display: block;
     width: 100%;
-    background-color: blue;
+    height: 1px;
+    background-color: #fff;
+  }
+}
+
+.inputText {
+  background-color: #444240;
+  height: 3.5rem;
+  border-radius: 0.75rem;
+  border: none;
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.inputText[name="Password"], 
+.btn[type="submit"]  {
+  margin-bottom: 0.5rem;
+}
+
+.btn[type="submit"] + p {
+  text-align: center;
+}
+
+.btn[type="submit"] + p a {
+  color: #FFA115;
+  font-weight: 600;
 }
