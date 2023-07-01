@@ -26,7 +26,7 @@ const LoginPage = () => {
     try {
         console.log(payload);
       const response = await axios.post(
-        "http://localhost:8080/api/login",
+        "http://localhost:8080/api/auth/login",
         payload
       );
       console.log(response.data);

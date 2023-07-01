@@ -7,6 +7,7 @@ import { enforceLoggedIn } from './utils/middleware';
 const triggerRequestsRouter = require('./routes/test/trigger-requests-route')
 const usersRouter = require('./routes/users/users-route')
 const authRouter = require('./routes/auth-route')
+const cors = require('cors');
 
 // Create an Express.js app
 const app = express();
@@ -15,7 +16,9 @@ const port = 8080;
 // environment variables
 dotenv.config();
 
-app.use(express.json())
+app.use(express.json());
+app.use(cors());
+
 // Request logging
 app.use('/', (req, _, next) => {
   console.log(`${req.method} for ${req.url} with body ${JSON.stringify(req.body)}`);
