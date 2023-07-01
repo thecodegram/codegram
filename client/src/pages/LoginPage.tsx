@@ -24,6 +24,7 @@ const LoginPage = () => {
     };
 
     try {
+        console.log(payload);
       const response = await axios.post(
         "http://localhost:8080/api/login",
         payload
@@ -43,7 +44,7 @@ const LoginPage = () => {
           Welcome to <span>Codegram</span>
         </h1>
         <p>Please Log In with your email to continue</p>
-        {error && <p>{error}</p>}
+        {error && <p style={{color: "red"}}>{error}</p>}
       </header>
       <form onSubmit={handleSubmit} className={styles.form}>
         <button
