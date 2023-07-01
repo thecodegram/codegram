@@ -42,9 +42,7 @@ const LoginPage = () => {
         setError("Invalid username or password. Please try again.");
       }
     } catch (error) {
-      console.error(error);
-      // Handle error, such as displaying an error message
-      setError("Failed to login. Please try again.");
+        setError("Failed to login. Please try again.");
     }
   };
   
@@ -58,7 +56,6 @@ const LoginPage = () => {
           Welcome to <span>Codegram</span>
         </h1>
         <p>Please Log In with your email to continue</p>
-        {error && <p style={{color: "red"}}>{error}</p>}
       </header>
       <form onSubmit={handleSubmit} className={styles.form}>
         <button
@@ -86,6 +83,7 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+            {error && <p className={styles.error}>{error}</p>}
           <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">
             <p>Forgot your password?</p>
           </a>
