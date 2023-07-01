@@ -7,18 +7,22 @@ import { getUserIDs } from '../../model/users';
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
-  const userIds = getUserIDs();
-  const promises: Promise<ReturnType<typeof makeGraphQLRequest>>[] =
-    Array.from(userIds).map(async (id) => {
+  try {
+    const userIds = getUserIDs();
+    const promises: Promise<ReturnType<typeof makeGraphQLRequest>>[] = Array.from(userIds).map(async (id) => {
       const cur = await makeGraphQLRequest(id);
       console.log("cur:", cur);
       return cur;
     });
 
-  const data = await Promise.all(promises);
-  console.log(data);
+    const data = await Promise.all(promises);
+    console.log(data);
 
-  res.send(data);
+    res.send(data);
+  } catch(e: any) {
+      console.log(e);
+      res.status(500).end();
+  }
 });
 
 // trigger for specific user
