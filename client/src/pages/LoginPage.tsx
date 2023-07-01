@@ -72,7 +72,7 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <a href="/">
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">
             <p>Forgot your password?</p>
           </a>
         </div>
@@ -81,7 +81,7 @@ const LoginPage = () => {
             Login
           </button>
           <p>
-            Don't have an account? <a href="/">Sign Up</a>
+            Don't have an account? <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">Sign Up</a>
           </p>
         </div>
       </form>
