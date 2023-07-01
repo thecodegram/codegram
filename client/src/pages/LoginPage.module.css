@@ -1,0 +1,8 @@
+.container-center-horizontal{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    pointer-events: none;
+    width: 100%;
+    background-color: blue;
+}
