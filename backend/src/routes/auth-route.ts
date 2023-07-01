@@ -46,7 +46,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
 router.post('/signup', async (req: Request, res: Response) => {
     const { username, password, email } = req.body;
-    console.log(username, password, email)
+    console.log(username, email)
     try {
         const user = await User.findOne({ $or: [{ username: username }, { email: email }] });
 
