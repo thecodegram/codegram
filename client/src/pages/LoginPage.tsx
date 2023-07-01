@@ -17,24 +17,38 @@ const LoginPage = () => {
       setError("Please enter all fields");
       return;
     }
-
+  
     const payload = {
       username: email,
       password: password,
     };
-
+  
     try {
-        console.log(payload);
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
         payload
       );
-      console.log(response.data);
-      // Handle login logic here
+  
+      if (response.status === 200) {
+        // Successful login
+        // Perform actions based on the response
+        // For example, you can store the authentication status in local storage
+        localStorage.setItem("isLoggedIn", "true");
+  
+        // Redirect the user to youtube.com
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley";
+      } else {
+        // Invalid login
+        setError("Invalid username or password. Please try again.");
+      }
     } catch (error) {
       console.error(error);
+      // Handle error, such as displaying an error message
+      setError("Failed to login. Please try again.");
     }
   };
+  
+  
   //   console.log(styles);
   return (
     <main className={styles.loginPage}>
