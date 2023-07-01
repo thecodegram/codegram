@@ -12,6 +12,9 @@ const authRouter = require('./routes/auth-route')
 const app = express();
 const port = 8080;
 
+// environment variables
+dotenv.config();
+
 app.use(express.json())
 // Request logging
 app.use('/', (req, _, next) => {
@@ -45,8 +48,7 @@ app.get('/api/protected', [enforceLoggedIn], (req: Request, res: Response) => {
 })
 
 
-// environment variables
-dotenv.config();
+
 
 const DB_CONNECTION_STRING = process.env.MONGODB_CONNECTION_STRING!!;
 console.log(DB_CONNECTION_STRING, {});
