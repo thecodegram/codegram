@@ -4,7 +4,7 @@
   "description": "[leetcode.com](leetcode.com) offers a great platform to gain programming skills, but there is little to none social or competitive aspects to it. Studies show that gamification boosts retention, meaning CodeGram will help programmers improve their skills.",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "test": "tsc && jest --passWithNoTests"
   },
