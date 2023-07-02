@@ -10,6 +10,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 // so we do x pixels / 16 to get the rem value
 
 const SignupPage = () => {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,7 +27,8 @@ const SignupPage = () => {
     }
 
     const payload = {
-      username: email,
+      username: username,
+      email: email,
       password: password,
     };
 
@@ -79,6 +81,14 @@ const SignupPage = () => {
           Sign up with Google
         </button>
         <span className={styles.orLine}>OR</span>
+          <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          className={styles.inputText}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
         <input
           type="text"
           name="email"
