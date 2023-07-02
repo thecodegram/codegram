@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import styles from "./LoginPage.module.css";
-import { IconGoogleLogo } from "./icon-google-logo";
-
-// 16 px is 1 rem whcih is the original size of the font for most stuff, base on that most of the sizes are calculated
-// so we do x pixels / 16 to get the rem value
+import { IconGoogleLogo } from "../icons/icon-google-logo";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -17,36 +14,36 @@ const LoginPage = () => {
       setError("Please enter all fields");
       return;
     }
-  
+
     const payload = {
       username: email,
       password: password,
     };
-  
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
         payload
       );
-  
+
       if (response.status === 200) {
         // Successful login
         // Perform actions based on the response
         // For example, you can store the authentication status in local storage
         localStorage.setItem("isLoggedIn", "true");
-  
+
         // Redirect the user to youtube.com
-        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley";
+        window.location.href =
+          "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley";
       } else {
         // Invalid login
         setError("Invalid username or password. Please try again.");
       }
     } catch (error) {
-        setError("Failed to login. Please try again.");
+      setError("Failed to login. Please try again.");
     }
   };
-  
-  
+
   //   console.log(styles);
   return (
     <main className={styles.loginPage}>
@@ -83,17 +80,20 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-            {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error}>{error}</p>}
           <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">
             <p>Forgot your password?</p>
           </a>
         </div>
         <div>
           <button type="submit" className={styles.btn}>
-            Login
+            Log In
           </button>
           <p>
-            Don't have an account? <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">Sign Up</a>
+            Don't have an account?{" "}
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">
+              Sign Up
+            </a>
           </p>
         </div>
       </form>
