@@ -115,6 +115,7 @@ button {
   padding: 1.5rem;
   font-size: 1.5rem;
   color: #fff;
+  padding-right: 2.5rem;
 }
 
 .inputText[name="Password"],
@@ -135,4 +136,17 @@ button {
   color: red;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
+}
+
+.passwordWrapper {
+  position: relative;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 15px;
+  top: calc(50% - 0.75rem); /* Adjust this value to move the icon up or down. + down - up */
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #fff; 
 }
