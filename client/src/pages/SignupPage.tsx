@@ -99,7 +99,7 @@ const SignupPage = () => {
         />
         <div className={styles.passwordWrapper}>
           <input
-            type="password"
+            type={passwordType}
             name="password"
             placeholder="Password"
             className={styles.inputText}
