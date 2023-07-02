@@ -13,7 +13,7 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Please enter all fields");
@@ -28,16 +28,13 @@ const LoginPage = () => {
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
-        payload
+        payload,
+        { withCredentials: true }
       );
 
-      if (response.status === 200) {
-        // store the authentication status in local storage?
-        localStorage.setItem("isLoggedIn", "true");
+      if (await response.status === 200) {
+        // localStorage.setItem("isLoggedIn", "true");
         navigate("/dashboard");
-        // Redirect the user to youtube.com DANNY??
-        window.location.href =
-          "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley";
       } else {
         setError("Invalid username or password. Please try again.");
       }
@@ -46,9 +43,7 @@ const LoginPage = () => {
     }
   };
 
-  const handleSignupClick = (
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-  ) => {
+  const handleSignupClick = (event: any) => {
     event.preventDefault();
     navigate("/signup");
   };
