@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import styles from "./LoginPage.module.css";
-import { IconGoogleLogo } from "./icon-google-logo";
-
-// 16 px is 1 rem whcih is the original size of the font for most stuff, base on that most of the sizes are calculated
-// so we do x pixels / 16 to get the rem value
+import { IconGoogleLogo } from "../icons/icon-google-logo";
+import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [passwordType, setPasswordType] = useState("password");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,37 +19,44 @@ const LoginPage = () => {
       setError("Please enter all fields");
       return;
     }
-  
+
     const payload = {
       username: email,
       password: password,
     };
-  
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
         payload
       );
-  
+
       if (response.status === 200) {
-        // Successful login
-        // Perform actions based on the response
-        // For example, you can store the authentication status in local storage
+        // store the authentication status in local storage?
         localStorage.setItem("isLoggedIn", "true");
-  
-        // Redirect the user to youtube.com
-        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley";
+        navigate("/dashboard");
+        // Redirect the user to youtube.com DANNY??
+        window.location.href =
+          "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley";
       } else {
-        // Invalid login
         setError("Invalid username or password. Please try again.");
       }
     } catch (error) {
-        setError("Failed to login. Please try again.");
+      setError("Failed to login. Please try again.");
     }
   };
-  
-  
-  //   console.log(styles);
+
+  const handleSignupClick = (
+    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    navigate("/signup");
+  };
+
+  const togglePassword = () => {
+    setPasswordType(passwordType === "password" ? "text" : "password");
+  };
+
   return (
     <main className={styles.loginPage}>
       <header className={styles.header}>
@@ -74,28 +83,34 @@ const LoginPage = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <div>
+        <div className={styles.passwordWrapper}>
           <input
             className={styles.inputText}
-            type="password"
+            type={passwordType}
             name="Password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-            {error && <p className={styles.error}>{error}</p>}
+          <i className={styles.eyeIcon} onClick={togglePassword}>
+            {passwordType === "password" ? <FaEye /> : <FaEyeSlash />}
+          </i>
           <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">
             <p>Forgot your password?</p>
           </a>
         </div>
         <div>
           <button type="submit" className={styles.btn}>
-            Login
+            Log In
           </button>
           <p>
-            Don't have an account? <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">Sign Up</a>
+            Don't have an account?{" "}
+            <a href="/signup" onClick={handleSignupClick}>
+              Sign Up
+            </a>
           </p>
         </div>
+        {error && <p className={styles.error}>{error}</p>}
       </form>
     </main>
   );
