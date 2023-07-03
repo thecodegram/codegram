@@ -35,7 +35,10 @@ const SignupPage = () => {
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/signup",
-        payload
+        payload,
+        {
+          withCredentials: true,
+        }
       );
 
       if (response.status === 200) {

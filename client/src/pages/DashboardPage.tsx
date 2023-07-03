@@ -1,7 +1,24 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
+
+interface leetcodeData {
+  usename?: String,
+  submitStats: {
+    acSubmissionNum: {
+      difficulty: String,
+      count: Number,
+      submissions: Number
+    }[]
+  }
+}
+
 const DashboardPage = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<leetcodeData>(
+    {
+      submitStats: {
+      acSubmissionNum: []
+  }});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -10,8 +27,10 @@ const DashboardPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/trigger-requests/dannyliu0421');
-      const jsonData = await response.json();
+      const response = await axios.get('http://localhost:8080/api/trigger-requests/dannyliu0421',{
+        withCredentials: true,
+      });
+      const jsonData = await response.data;
       setData(jsonData);
       setLoading(false);
     } catch (error) {
@@ -25,8 +44,8 @@ const DashboardPage = () => {
         <p>Loading...</p>
       ) : (
         <ul>
-          {data.map((item) => (
-            <li>{item}</li>
+          {data.submitStats.acSubmissionNum.map((item) => (
+            <li>{item.difficulty} {item.count.toString()}</li>
           ))}
         </ul>
       )}
