@@ -1,13 +1,14 @@
 import express, {Request, Response} from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv'
+import cors, {CorsOptions} from 'cors'
 import session from 'express-session'
 import { enforceLoggedIn } from './utils/middleware';
 
 const triggerRequestsRouter = require('./routes/test/trigger-requests-route')
 const usersRouter = require('./routes/users/users-route')
 const authRouter = require('./routes/auth-route')
-const cors = require('cors');
+
 
 // Create an Express.js app
 const app = express();
@@ -17,6 +18,20 @@ const port = 8080;
 dotenv.config();
 
 app.use(express.json());
+const whitelist = ['','http://localhost:3000', 'http://localhost:8080/'];
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    console.log(origin);
+    if (whitelist.includes(origin || '')) {
+      callback(null, true);
+    } else {
+      console.log("Not allowed by CORS")
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(
   cors({
@@ -66,8 +81,7 @@ app.get('/api/protected', [enforceLoggedIn], (req: Request, res: Response) => {
 
 
 const DB_CONNECTION_STRING = process.env.MONGODB_CONNECTION_STRING!!;
-console.log(DB_CONNECTION_STRING, {});
-// mongoose.set('strictQuery', false);
+mongoose.set('strictQuery', false);
 
 async function startServer() {
   try {
