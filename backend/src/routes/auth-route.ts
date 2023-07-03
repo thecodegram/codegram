@@ -91,5 +91,13 @@ router.post('/logout', (req, res) => {
     });
 })
 
+router.get('/check', (req: Request, res: Response) => {
+    if (req.session && req.session.username) {
+        res.status(200).end();
+    } else {
+        res.status(401).end();
+    }
+});
+
 
 module.exports = router;
