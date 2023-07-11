@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface leetcodeData {
   usename?: string;
-  submitStats: {
+  submitStats?: {
     acSubmissionNum: {
       difficulty: string;
       count: number;
@@ -20,6 +20,7 @@ const DashboardPage = () => {
     },
   });
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,11 +30,12 @@ const DashboardPage = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/trigger-requests/dannyliu0421`,
+        `${process.env.REACT_APP_API_URL}/api/trigger-requests/${username}`,
         {
           withCredentials: true,
-        });
-      const jsonData = await response.data;
+        }
+      );
+      const jsonData: leetcodeData = await response.data;
       setData(jsonData);
       setLoading(false);
     } catch (error) {
@@ -55,15 +57,28 @@ const DashboardPage = () => {
     }
   };
 
+  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(event.target.value);
+  };
+
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    fetchData();
+  };
+
   return (
     <div>
+      <form onSubmit={handleFormSubmit}>
+      <button onClick={handleLogout}>Logout</button>
+        <input type="text" value={username} onChange={handleUsernameChange} placeholder="Enter LeetCode username" />
+        <button type="submit">Check stats</button>
+      </form>
       {loading ? (
         <p>Loading...</p>
       ) : (
         <div>
-          <button onClick={handleLogout}>Logout</button>
           <ul>
-            {data.submitStats.acSubmissionNum.map((item, index) => (
+            {data.submitStats?.acSubmissionNum.map((item, index) => (
               <li key={index}>
                 {item.difficulty} {item.count.toString()}
               </li>
