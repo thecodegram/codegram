@@ -12,7 +12,7 @@ async function connectToMongo() {
       maxConnecting: 30
     });
 
-    
+    console.log("Connected to MongoDb");
     return true;
     
   } catch (error) {
@@ -29,9 +29,9 @@ async function connectToPostgresAndCreateTables(){
     const dbInitQuery = await fs.promises.readFile(path.join(__dirname,'db_init.sql'), 'utf8');
     await pool.query(dbInitQuery);
 
-    console.log('Connected to the database!');
+    console.log('Connected to postgres!');
   } catch(e) {
-    console.log("Encountered error during db init");
+    console.log("Encountered error during postgres setup");
     console.error(e);
     return false;
   }
@@ -39,12 +39,15 @@ async function connectToPostgresAndCreateTables(){
   return true;
 }
 export async function setUpDB(){
-    const isConnectedToMongo = await connectToMongo();
-    const isConnectedToPostgres = await connectToPostgresAndCreateTables();
+    // connect to both databases concurrently
+    const connectToMonoDB = connectToMongo();
+    const connectToPostgres = connectToPostgresAndCreateTables();
 
+    const isConnectedToMongo = await connectToMonoDB;
+    const isConnectedToPostgres = await connectToPostgres;
     
     if(isConnectedToMongo && isConnectedToPostgres) {
-      console.log('Connected to the database!');
+      console.log('Databases are setup!');
       return true;
     }
 
