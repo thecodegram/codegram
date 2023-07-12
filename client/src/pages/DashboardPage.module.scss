@@ -1,0 +1,105 @@
+.header {
+  background-color: #202020;
+  display: flex;
+  align-items: center;
+  height: 4rem;
+  padding: 1rem;
+  justify-content: space-between;
+  color: #B0AEAA;
+
+  & > section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  h1 {
+    color: #FFA115;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .avatar {
+    height: 2rem;
+    width: 2rem;
+    aspect-ratio: 1/1;
+    display: grid;
+    place-items: center;
+    background-color: #FFA115;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+  }
+}
+
+.main {
+  background-color: #1B1B1A;
+  min-height: calc(100vh - 4rem);
+  padding: 1rem;
+
+  .feed {
+    display: grid;
+    gap: 1rem;
+  }
+}
+
+.feedItem {
+  background-color: #202020;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: grid;
+  gap: 2rem;
+
+  button {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    gap: 0.5rem;
+    height: 2rem;
+    border-radius: 4rem;
+    border: none;
+    background-color: #2C2C2C;
+    width: fit-content;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    color: #D7D6D5;
+    cursor: pointer;
+  }
+
+  .header {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: unset;
+    padding: unset;
+    flex-wrap: wrap;
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .detailText {
+      font-size: 0.88rem;
+    }
+
+    .dot {
+      height: 2px;
+      width: 2px;
+      border-radius: 50%;
+      background-color: #9C9995;
+    }
+  }
+
+  .body {
+    p {
+      color: #fff;
+      line-height: 150%;
+    }
+
+    a {
+      color: #FFA115;
+      font-weight: 600;
+    }
+  }
+}
