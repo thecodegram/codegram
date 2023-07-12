@@ -131,15 +131,14 @@ const DashboardPage = () => {
 
   return (
     <div>
-      <form onSubmit={handleFormSubmit}>
+      {/* <form onSubmit={handleFormSubmit}>
       <button onClick={handleLogout}>Logout</button>
         <input type="text" value={username} onChange={handleUsernameChange} placeholder="Enter LeetCode username" />
         <button type="submit">Check stats</button>
-      </form>
+      </form> */}
       {loading ? (
         <p>Loading...</p>
       ) : (
-
         <>
           <header className={styles.header}>
             <section className={styles.left}><h1>Codegram</h1></section>
@@ -165,16 +164,6 @@ const DashboardPage = () => {
           ))}
         </ul> */}
         </>
-
-        <div>
-          <ul>
-            {data.submitStats?.acSubmissionNum.map((item, index) => (
-              <li key={index}>
-                {item.difficulty} {item.count.toString()}
-              </li>
-            ))}
-          </ul>
-        </div>
       )}
     </div>
   );
