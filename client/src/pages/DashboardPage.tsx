@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { IconInbox, IconFollowBtnPlus, IconVerifiedBadge, IconLikeBtnHeart } from '../icons';
 import styles from "./DashboardPage.module.scss"
@@ -82,7 +82,7 @@ const DashboardPage = () => {
     },
   });
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState('');
+  // const [username, setUsername] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,14 +120,14 @@ const DashboardPage = () => {
     }
   };
 
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
-  };
+  // const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setUsername(event.target.value);
+  // };
 
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    fetchData();
-  };
+  // const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   fetchData();
+  // };
 
   return (
     <div>
@@ -147,11 +147,12 @@ const DashboardPage = () => {
               <article className={styles.avatar}>
                 U
               </article>
+              <button className={styles.btnText} onClick={handleLogout}>Logout</button>
             </section>
           </header>
           <main className={styles.main}>
             <article className={styles.feed}>
-              {feedItemDummyData.map(f => <FeedItem {...f} />)}
+              {feedItemDummyData.map((f, index) => <FeedItem key={index} {...f} />)}
             </article>
             <article className={styles.relationships}>
               <RelationshipList title='Friends' relationships={friendsDummyData} />
@@ -211,8 +212,8 @@ const RelationshipList = ({ title, relationships }: RelationshipListProps) => {
   return <article className={styles.relationshipList}>
     <h2>{title}</h2>
     <ul className={styles.list}>
-      {relationships.map(({name, handle}) => 
-        <li>
+      {relationships.map(({name, handle}, index) => 
+        <li key={index}>
           <div className={styles.avatar}>{name[0]}</div>
           <div className={styles.info}>
             <h3>{name}</h3>
