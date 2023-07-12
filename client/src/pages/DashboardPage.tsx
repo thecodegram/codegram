@@ -151,6 +151,22 @@ const DashboardPage = () => {
             </section>
           </header>
           <main className={styles.main}>
+            <article className={styles.stats}>
+              <div className={styles.avatar}>U</div>
+              <div className={styles.userInfo}>
+                <h2>Usertest</h2>
+                <IconVerifiedBadge />
+                <p>@usertest</p>
+              </div>
+              <div className={styles.statsGrid}>
+                {data && data?.submitStats?.acSubmissionNum.map((item) => (
+                  <div>
+                    <p>{item.count.toString()}</p>
+                    <h3>{item.difficulty}</h3>
+                  </div>
+                ))}
+              </div>
+            </article>
             <article className={styles.feed}>
               {feedItemDummyData.map((f, index) => <FeedItem key={index} {...f} />)}
             </article>
@@ -159,11 +175,7 @@ const DashboardPage = () => {
               <RelationshipList title='Groups' relationships={groupsDummyData} />
             </article>
           </main>
-        {/* <ul>
-          {data.submitStats.acSubmissionNum.map((item) => (
-            <li>{item.difficulty} {item.count.toString()}</li>
-          ))}
-        </ul> */}
+        
         </>
       )}
     </div>
