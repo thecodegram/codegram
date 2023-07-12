@@ -4,6 +4,8 @@ import dotenv from 'dotenv'
 import cors, {CorsOptions} from 'cors'
 import session from 'express-session'
 import { enforceLoggedIn } from './utils/middleware';
+import { getSubmissionStats } from './api/vjudge';
+import { UserNameNotFoundError } from './errors/username-not-found-error';
 
 const triggerRequestsRouter = require('./routes/test/trigger-requests-route')
 const usersRouter = require('./routes/users/users-route')
@@ -89,6 +91,18 @@ async function startServer() {
       maxConnecting: 30
     });
     console.log('Connected to MongoDB');
+
+    try {
+    const result = await getSubmissionStats("shaygeko1");
+
+    console.log(result);
+    }
+    catch(e){
+      if(e instanceof UserNameNotFoundError){
+        console.error(e.message);
+      }
+      else throw e;
+    }
 
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
