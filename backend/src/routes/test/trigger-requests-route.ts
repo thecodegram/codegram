@@ -3,6 +3,9 @@ import express, { Request, Response} from 'express'
 import { makeGraphQLRequest } from '../../api/leetcode'
 import { validateUsername, handleValidationErrors } from '../../utils/middleware'
 import { getUserIDs } from '../../model/users';
+import { getSubmissionStats } from '../../api/vjudge';
+import { UserNameNotFoundError } from '../../errors/username-not-found-error';
+import { ExternalApiError } from '../../errors/external-api-error';
 
 const router = express.Router()
 
@@ -26,7 +29,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // trigger for specific user
-router.get('/:userId', [
+router.get('/leetcode/:userId', [
     // Sanitize the userId variable
     validateUsername('userId'),
     handleValidationErrors
@@ -38,5 +41,29 @@ router.get('/:userId', [
   
     res.send(data);
   });
+
+// trigger for specific user
+router.get('/vjudge/:username', [
+  // Sanitize the userId variable
+  validateUsername('username'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { username } = req.params;
+  
+  try {
+    const data = await getSubmissionStats(username);
+    console.log("data:", data);
+
+    res.send(data);
+  } catch(e) {
+    if(e instanceof UserNameNotFoundError){
+      res.status(404).send("Username not found");
+    } else if( e instanceof ExternalApiError) {
+      res.status(e.statusCode).send(e.message)
+    } else{
+      console.error(e);
+    }
+  }
+});
 
 module.exports = router;

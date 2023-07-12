@@ -30,12 +30,13 @@ const DashboardPage = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/trigger-requests/${username}`,
+        `${process.env.REACT_APP_API_URL}/api/trigger-requests/leetcode/dannyliu0421`,
         {
           withCredentials: true,
         }
       );
-      const jsonData: leetcodeData = await response.data;
+      const jsonData = await response.data;
+
       setData(jsonData);
       setLoading(false);
     } catch (error) {
