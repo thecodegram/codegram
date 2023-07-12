@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const OnBoardingPage = () => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null); 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [leetCodeUsername, setLeetCodeUsername] = useState("");
   const [vJudgeUsername, setVJudgeUsername] = useState("");
@@ -21,7 +22,7 @@ const OnBoardingPage = () => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileUploaded = event.target.files?.[0];
     if (fileUploaded) {
-      console.log(fileUploaded);
+      setImageFile(fileUploaded); 
       setImageUrl(URL.createObjectURL(fileUploaded));
     }
   };
@@ -34,16 +35,27 @@ const OnBoardingPage = () => {
       return;
     }
 
-    const payload = {
-      leetCodeUsername,
-      vJudgeUsername,
-      imageUrl,
+    const formData = new FormData(); 
+    formData.append("leetCodeUsername", leetCodeUsername);
+    formData.append("vJudgeUsername", vJudgeUsername);
+    if (imageFile) {
+      formData.append("image", imageFile);
     }
+
+    console.log(formData.get("image"));
 
     setErrorMsg("");
 
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", payload);
+      const response = await axios.post(
+        "http://localhost:8080/api/auth/login",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.status === 200) {
         navigate("/dashboard");
@@ -92,8 +104,8 @@ const OnBoardingPage = () => {
                 type="text"
                 placeholder="LeetCode Username"
                 className={styles.inputText}
-                value={leetCodeUsername} 
-                onChange={(e) => setLeetCodeUsername(e.target.value)} 
+                value={leetCodeUsername}
+                onChange={(e) => setLeetCodeUsername(e.target.value)}
               />
             </div>
             <div className={styles.miniCard}>
@@ -102,8 +114,8 @@ const OnBoardingPage = () => {
                 type="text"
                 placeholder="VJudge Username"
                 className={styles.inputText}
-                value={vJudgeUsername} 
-                onChange={(e) => setVJudgeUsername(e.target.value)} 
+                value={vJudgeUsername}
+                onChange={(e) => setVJudgeUsername(e.target.value)}
               />
             </div>
           </div>
