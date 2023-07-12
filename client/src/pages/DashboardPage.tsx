@@ -39,6 +39,40 @@ const feedItemDummyData: FeedItemProps[] = [
   },
 ]
 
+const friendsDummyData: RelationshipProps[] = [
+  {
+    name: "Peyz",
+    handle: "peyz"
+  },
+  {
+    name: "Danny",
+    handle: "dannyl1u"
+  },
+  {
+    name: "George",
+    handle: "shaygeko"
+  },
+  {
+    name: "Bobby",
+    handle: "bobbychan"
+  },
+]
+
+const groupsDummyData: RelationshipProps[] = [
+  {
+    name: "372 Group",
+    handle: "372group"
+  },
+  {
+    name: "Bobby's Class",
+    handle: "bobbychan372"
+  },
+  {
+    name: "SFU Competitive Programming club",
+    handle: "sfucpc"
+  },
+]
+
 const DashboardPage = () => {
   const [data, setData] = useState<leetcodeData>(
     {
@@ -84,7 +118,10 @@ const DashboardPage = () => {
             <article className={styles.feed}>
               {feedItemDummyData.map(f => <FeedItem {...f} />)}
             </article>
-            <article className={styles.relationships}></article>
+            <article className={styles.relationships}>
+              <RelationshipList title='Friends' relationships={friendsDummyData} />
+              <RelationshipList title='Groups' relationships={groupsDummyData} />
+            </article>
           </main>
         {/* <ul>
           {data.submitStats.acSubmissionNum.map((item) => (
@@ -122,6 +159,34 @@ const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps
     <section className={styles.footer}>
       <button><IconLikeBtnHeart />{numOfLikes}</button>
     </section>
+  </article>
+}
+
+interface RelationshipProps {
+  name: string,
+  handle: string
+}
+
+interface RelationshipListProps {
+  title: string,
+  relationships: RelationshipProps[]
+}
+
+const RelationshipList = ({ title, relationships }: RelationshipListProps) => {
+  return <article className={styles.relationshipList}>
+    <h2>{title}</h2>
+    <ul className={styles.list}>
+      {relationships.map(({name, handle}) => 
+        <li>
+          <div className={styles.avatar}>{name[0]}</div>
+          <div className={styles.info}>
+            <h3>{name}</h3>
+            <IconVerifiedBadge />
+            <p>@{handle}</p>
+          </div>
+        </li>
+      )}
+    </ul>
   </article>
 }
 

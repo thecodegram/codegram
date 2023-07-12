@@ -18,28 +18,37 @@
     font-size: 1rem;
     font-weight: 500;
   }
+}
 
-  .avatar {
-    height: 2rem;
-    width: 2rem;
-    aspect-ratio: 1/1;
-    display: grid;
-    place-items: center;
-    background-color: #FFA115;
-    border-radius: 50%;
-    color: #fff;
-    cursor: pointer;
-  }
+.avatar {
+  height: 2rem;
+  width: 2rem;
+  aspect-ratio: 1/1;
+  display: grid;
+  place-items: center;
+  background-color: #FFA115;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
 }
 
 .main {
   background-color: #1B1B1A;
   min-height: calc(100vh - 4rem);
   padding: 1rem;
+  display: grid;
+  gap: 1rem;
 
-  .feed {
-    display: grid;
+  .feed, .relationships {
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
+  }
+
+  @media screen and (min-width: 768px) {
+    grid-template-columns: 1fr 20rem;
+    gap: 2.5rem;
+    padding: 2rem 4rem;
   }
 }
 
@@ -100,6 +109,61 @@
     a {
       color: #FFA115;
       font-weight: 600;
+    }
+  }
+}
+
+.relationshipList {
+  display: grid;
+  gap: 1rem;
+  
+  h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #B0AEAA;
+  }
+  
+  ul.list {
+    background-color: #202020;
+    border-radius: 1rem;
+    padding: 0.5rem 1.5rem;
+    list-style-type: none;
+
+    & > li + li {
+      border-top: 1px solid #2C2C2C;
+    }
+
+    li {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem;
+      cursor: pointer;
+
+      .info {
+        display: grid;
+        gap: 0.25rem;
+        grid-template-areas: 
+          "name badge"
+          "username username";
+
+        h3 {
+          grid-area: name;
+          font-size: 1rem;
+          font-weight: 600;
+          color: #fff;
+        }
+  
+        p {
+          grid-area: username;
+          font-size: 0.88rem;
+          color: #9C9995;
+        }
+
+        svg {
+          grid-area: badge;
+        }
+      }
+
     }
   }
 }
