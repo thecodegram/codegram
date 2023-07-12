@@ -58,6 +58,7 @@ span {
   cursor: pointer;
   transform: translateY(-3rem);
   overflow: hidden; 
+  box-shadow: 0 0 100px 0 rgba(199, 199, 199, 0.15);
   &:hover {
     background-color: #aaa9a5;
   }
