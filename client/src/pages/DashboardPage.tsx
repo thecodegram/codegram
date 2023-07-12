@@ -27,7 +27,7 @@ const DashboardPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/trigger-requests/dannyliu0421',{
+      const response = await axios.get('http://localhost:8080/api/trigger-requests/leetcode/dannyliu0421',{
         withCredentials: true,
       });
       const jsonData = await response.data;
