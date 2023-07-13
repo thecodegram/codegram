@@ -32,7 +32,7 @@ const LoginPage = () => {
         { withCredentials: true }
       );
 
-      if (await response.status === 200) {
+      if ((await response.status) === 200) {
         // localStorage.setItem("isLoggedIn", "true");
         navigate("/dashboard");
       } else {
@@ -70,6 +70,7 @@ const LoginPage = () => {
           Continue with Google
         </button>
         <span className={styles.orLine}>OR</span>
+        {error && <p className={styles.error}>{error}</p>}
         <input
           className={styles.inputText}
           type="text"
@@ -105,7 +106,6 @@ const LoginPage = () => {
             </a>
           </p>
         </div>
-        {error && <p className={styles.error}>{error}</p>}
       </form>
     </main>
   );

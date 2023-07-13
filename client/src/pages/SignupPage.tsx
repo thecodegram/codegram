@@ -34,7 +34,7 @@ const SignupPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/signup",
+        `${process.env.REACT_APP_API_URL}/api/auth/signup`,
         payload,
         {
           withCredentials: true,
@@ -45,8 +45,8 @@ const SignupPage = () => {
         // Successful signup? do i still show this?
         localStorage.setItem("isLoggedIn", "true");
 
-        // Redirect the user using navigate idk what it is now Maybe onboarding page
-        navigate("/onboarding");
+        navigate("/onboarding", { state: { username } });
+
       } else {
         setError("Invalid signup information. Please try again.");
       }
@@ -84,7 +84,8 @@ const SignupPage = () => {
           Sign up with Google
         </button>
         <span className={styles.orLine}>OR</span>
-          <input
+        {error && <p className={styles.error}>{error}</p>}
+        <input
           type="text"
           name="username"
           placeholder="Username"
@@ -124,7 +125,6 @@ const SignupPage = () => {
             </a>
           </p>
         </div>
-        {error && <p className={styles.error}>{error}</p>}
       </form>
     </main>
   );

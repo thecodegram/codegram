@@ -1,8 +1,8 @@
 .OnBoardingPage {
   display: grid;
   place-content: center;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  min-width: 100vw;
   padding: 1rem;
   background-color: #1b1b1a;
   &,
@@ -23,7 +23,7 @@
   font-size: 2rem;
 }
 
-span {
+.form span {
   color: #ffa115;
 }
 
@@ -79,7 +79,7 @@ span {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 3.5rem;
+  height: 3rem;
   font-weight: 600;
   cursor: pointer;
   
@@ -90,7 +90,7 @@ span {
 
 .inputText {
   background-color: #716f6b;
-  height: 3.5rem;
+  height: 2.5rem;
   border-radius: 0.75rem;
   border: none;
   padding: 1.5rem;
@@ -111,6 +111,7 @@ span {
   background-color: #444240;
   border-radius: 12px;
   max-width: 17rem;
+  padding-top: 0.5rem;
 }
 
 .miniCardHolder {

@@ -4,16 +4,18 @@ import { IconLeetCodeLogo } from "../icons/icon-leetcode-logo";
 import { IconVJudgeLogo } from "../icons/icon-vjudge-logo";
 import { IconAddPhoto } from "../icons/import-photo-icon";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const OnBoardingPage = () => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null); 
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [leetCodeUsername, setLeetCodeUsername] = useState("");
   const [vJudgeUsername, setVJudgeUsername] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const { username } = location.state || { username: "" };
 
   const handleClick = () => {
     hiddenFileInput.current?.click();
@@ -22,7 +24,7 @@ const OnBoardingPage = () => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileUploaded = event.target.files?.[0];
     if (fileUploaded) {
-      setImageFile(fileUploaded); 
+      setImageFile(fileUploaded);
       setImageUrl(URL.createObjectURL(fileUploaded));
     }
   };
@@ -35,20 +37,20 @@ const OnBoardingPage = () => {
       return;
     }
 
-    const formData = new FormData(); 
+    const formData = new FormData();
     formData.append("leetCodeUsername", leetCodeUsername);
     formData.append("vJudgeUsername", vJudgeUsername);
     if (imageFile) {
       formData.append("image", imageFile);
     }
 
-    console.log(formData.get("image"));
+    
 
     setErrorMsg("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/users/${username}`,
         formData,
         {
           headers: {
@@ -97,6 +99,7 @@ const OnBoardingPage = () => {
             One of the Two
             <span> Usernames</span>
           </p>
+          {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
           <div className={styles.miniCardHolder}>
             <div className={styles.miniCard}>
               <IconLeetCodeLogo />
@@ -122,7 +125,6 @@ const OnBoardingPage = () => {
           <button type="submit" className={styles.btn}>
             Continue
           </button>
-          {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
         </form>
       </div>
     </main>
