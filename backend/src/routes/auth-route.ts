@@ -35,18 +35,6 @@ router.post("/login", async (req: Request, res: Response) => {
         req.session.username = user.username;
         req.session.save();
 
-        res.cookie("mysession", req.session.id, {
-          maxAge: 3600000, // 1 hour in milliseconds
-          httpOnly: true,
-          secure: true, // Set this to 'true' if using HTTPS
-        });
-
-        const currentDomain = req.hostname; // Extract the current domain from the request
-        res.cookie("mysession", req.session.id, {
-          domain: currentDomain,
-          // Other cookie options...
-        });
-
         res.status(200).send("Logged in successfully");
       }
     } catch (e: any) {
@@ -81,18 +69,6 @@ router.post("/signup", async (req: Request, res: Response) => {
       // Init the user session
       req.session.username = newUser.username;
       req.session.save();
-
-      res.cookie("mysession", req.session.id, {
-        maxAge: 3600000, // 1 hour in milliseconds
-        httpOnly: true,
-        secure: true, // Set this to 'true' if using HTTPS
-      });
-
-      const currentDomain = req.hostname; // Extract the current domain from the request
-      res.cookie("mysession", req.session.id, {
-        domain: currentDomain,
-        // Other cookie options...
-      });
 
       res.status(200).send("Registered");
     }
