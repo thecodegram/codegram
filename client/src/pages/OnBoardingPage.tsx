@@ -50,12 +50,14 @@ const OnBoardingPage = () => {
 
     try {
       const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/users/${username}`,
+        `${process.env.REACT_APP_API_URL}/api/user/${username}`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            
           },
+            withCredentials: true,
         }
       );
 
