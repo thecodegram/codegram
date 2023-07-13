@@ -1,11 +1,11 @@
 import { CronJob } from "cron";
-import { makeGraphQLRequest } from "../api/leetcode";
+import { getSubmitStats } from "../api/leetcode";
 import { getUserIDs } from "../model/users";
 
 
 const job = new CronJob('*/2 * * * *', () => {
     for (const userId of getUserIDs()) {
-      makeGraphQLRequest(userId);
+      getSubmitStats(userId);
     }
   });
 

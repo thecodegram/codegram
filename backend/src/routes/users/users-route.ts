@@ -5,9 +5,41 @@ import { getUserIDs, addUserID } from '../../model/users';
 import { User } from '../../model/schemas/userSchema';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { getSubmissionStats } from '../../api/vjudge';
-import { makeGraphQLRequest } from '../../api/leetcode';
+import { getLatestSubmits, getSubmitStats } from '../../api/leetcode';
 
 const router = express.Router()
+
+router.get('/:username/latestSubmits', [
+  // Sanitize the userId variable
+  validateUsername('username'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { username } = req.params;
+
+  const userData = await User.findOne(
+    {username: username},
+    {
+      password: false,
+      'leetcode._id':false,
+      vjudge: false
+    });
+  
+  if(!userData?.username){
+     res.status(404).send("User not found");
+  } else {
+
+    const leetcodeUsername = userData.username;
+    const submitStats = await getLatestSubmits(leetcodeUsername);
+  
+    if(!submitStats){
+      res.status(404).send("User not found on leetcode");
+    }
+    else {
+      res.status(200).json(submitStats);
+    }
+
+  }
+});
 
 router.post('/:userId', [
   // Sanitize the userId variable
@@ -73,7 +105,7 @@ router.put('/:username', [
           // ensure this is a valid name
           // update the vjudge username and latest data
           const updateLeetcode = (async() => {if(data.leetcodeUsername) {
-            const leetcodeStats = await makeGraphQLRequest(data.leetcodeUsername);
+            const leetcodeStats = await getSubmitStats(data.leetcodeUsername);
             user.leetcode = leetcodeStats;
           }})();
           
@@ -118,9 +150,10 @@ router.get('/:username', [
     res.status(404).send("User not found");
   }
   else {
-    console.log(userData);
     res.status(200).json(userData);
   }
 })
+
+
 
 module.exports = router;
