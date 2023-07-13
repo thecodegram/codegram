@@ -1,6 +1,6 @@
 import express, { Request, Response} from 'express'
 
-import { makeGraphQLRequest } from '../../api/leetcode'
+import { getSubmitStats } from '../../api/leetcode'
 import { validateUsername, handleValidationErrors } from '../../utils/middleware'
 import { getUserIDs } from '../../model/users';
 import { getSubmissionStats } from '../../api/vjudge';
@@ -12,8 +12,8 @@ const router = express.Router()
 router.get('/', async (req: Request, res: Response) => {
   try {
     const userIds = getUserIDs();
-    const promises: Promise<ReturnType<typeof makeGraphQLRequest>>[] = Array.from(userIds).map(async (id) => {
-      const cur = await makeGraphQLRequest(id);
+    const promises: Promise<ReturnType<typeof getSubmitStats>>[] = Array.from(userIds).map(async (id) => {
+      const cur = await getSubmitStats(id);
       console.log("cur:", cur);
       return cur;
     });
@@ -36,7 +36,7 @@ router.get('/leetcode/:userId', [
   ], async (req: Request, res: Response) => {
     const { userId } = req.params;
     
-    const data = await makeGraphQLRequest(userId);
+    const data = await getSubmitStats(userId);
     console.log("data:", data);
   
     res.send(data);
