@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import { useUserContext } from '../components/UserContext';
 
 import { IconInbox, IconFollowBtnPlus, IconVerifiedBadge, IconLikeBtnHeart } from '../icons';
 import styles from "./DashboardPage.module.scss"
@@ -75,36 +76,40 @@ const groupsDummyData: RelationshipProps[] = [
   },
 ]
 
-const DashboardPage = () => {
-  const [data, setData] = useState<leetcodeData>({
+const DashboardPage = ({}) => {
+  const [statsData, setStatsData] = useState<leetcodeData>({
     submitStats: {
       acSubmissionNum: [],
     },
   });
+  const [feedData, setFeedData] = useState(feedItemDummyData)
   const [loading, setLoading] = useState(true);
-  // const [username, setUsername] = useState('');
   const navigate = useNavigate();
+  const { username } = useUserContext();
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${username}`,
+          {
+            withCredentials: true,
+          }
+        );
+        console.log(response)
+        const jsonData = await response.data;
+  
+        setStatsData(jsonData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
     fetchData();
-  }, []);
+  }, [username]);
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/trigger-requests/leetcode/dannyliu0421`,
-        {
-          withCredentials: true,
-        }
-      );
-      const jsonData = await response.data;
-
-      setData(jsonData);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  
 
   const handleLogout = async () => {
     try {
@@ -159,7 +164,7 @@ const DashboardPage = () => {
                 <p>@usertest</p>
               </div>
               <div className={styles.statsGrid}>
-                {data && data?.submitStats?.acSubmissionNum.map((item) => (
+                {statsData && statsData?.submitStats?.acSubmissionNum.map((item) => (
                   <div>
                     <p>{item.count.toString()}</p>
                     <h3>{item.difficulty}</h3>
@@ -168,7 +173,7 @@ const DashboardPage = () => {
               </div>
             </article>
             <article className={styles.feed}>
-              {feedItemDummyData.map((f, index) => <FeedItem key={index} {...f} />)}
+              {feedData && feedData.map((f, index) => <FeedItem key={index} {...f} />)}
             </article>
             <article className={styles.relationships}>
               <RelationshipList title='Friends' relationships={friendsDummyData} />
