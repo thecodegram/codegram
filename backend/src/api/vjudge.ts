@@ -9,8 +9,6 @@ export async function getSubmissionStats(username: string) {
 
     try {
         const response = await axios.get(`https://vjudge.net/user/solveDetail/${username}`);
-
-        console.log(response.data);
         return response.data; 
     } catch(err) {
         if(err instanceof AxiosError){
