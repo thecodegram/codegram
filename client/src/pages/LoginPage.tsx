@@ -91,7 +91,7 @@ const LoginPage = () => {
           <i className={styles.eyeIcon} onClick={togglePassword}>
             {passwordType === "password" ? <FaEye /> : <FaEyeSlash />}
           </i>
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley">
+          <a href="/">
             <p>Forgot your password?</p>
           </a>
         </div>
