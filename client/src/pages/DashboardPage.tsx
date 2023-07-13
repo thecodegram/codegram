@@ -20,6 +20,15 @@ interface leetcodeData {
   }
 }
 
+interface feedData {
+  "title": string,
+  "titleSlug": string,
+  "timestamp": string,
+  "statusDisplay": string,
+  "lang": string,
+  "__typename": string
+}
+
 const feedItemDummyData: FeedItemProps[] = [
   {
     name: "Peyz",
@@ -86,7 +95,7 @@ const DashboardPage = () => {
       }
     }
   });
-  const [feedData, setFeedData] = useState(feedItemDummyData)
+  const [feedData, setFeedData] = useState<feedData[]>([])
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { username } = useUserContext();
@@ -112,7 +121,26 @@ const DashboardPage = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${username}/latestSubmits`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
   
+        setFeedData(jsonData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -155,14 +183,14 @@ const DashboardPage = () => {
             <section className={styles.right}>
               <IconInbox />
               <article className={styles.avatar}>
-                {username && username[0]}
+                {username && username[0].toUpperCase()}
               </article>
               <button className={styles.btnText} onClick={handleLogout}>Logout</button>
             </section>
           </header>
           <main className={styles.main}>
             <article className={styles.stats}>
-              <div className={styles.avatar}>{username && username[0]}</div>
+              <div className={styles.avatar}>{username && username[0].toUpperCase()}</div>
               <div className={styles.userInfo}>
                 <h2>{username}</h2>
                 <IconVerifiedBadge />
@@ -178,7 +206,16 @@ const DashboardPage = () => {
               </div>
             </article>
             <article className={styles.feed}>
-              {feedData && feedData.map((f, index) => <FeedItem key={index} {...f} />)}
+              {feedData && feedData.map(({title, timestamp}, index) => 
+                <FeedItem 
+                  key={index}
+                  name={username || ""}
+                  username={username || ""}
+                  body={`${username} just solved ${title} on LeetCode!`} 
+                  numOfLikes={Math.floor(Math.random() * 20) + 1}
+                  createdTime={new Date(+timestamp * 1000)}
+                />)
+              }
             </article>
             <article className={styles.relationships}>
               <RelationshipList title='Friends' relationships={friendsDummyData} />
@@ -201,14 +238,15 @@ interface FeedItemProps {
 }
 
 const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps) => {
+
   return <article className={styles.feedItem}>
     <section className={styles.header}>
-      <div className={styles.avatar}>{name[0]}</div>
+      <div className={styles.avatar}>{name[0].toUpperCase()}</div>
       <h3>{name}</h3>
       <IconVerifiedBadge />
       <p className={styles.detailText}>@{username}</p>
       <div className={styles.dot}></div>
-      <p className={styles.detailText}>3 mins ago</p>
+      <p className={styles.detailText}>{createdTime.toDateString()}</p>
       <button><IconFollowBtnPlus />Follow</button>
     </section>
     <section className={styles.body}>
