@@ -53,10 +53,6 @@ export async function getLatestSubmits(userId: string) {
       }
       `
     });
-
-    // Handle the response
-    console.log(`User ID: ${userId}`);
-    console.log(JSON.stringify(response.data.data.recentSubmissionList));
     return response.data.data.recentSubmissionList;
   } catch (error) {
     console.error(`Error fetching data for user ID ${userId}:`, error);
