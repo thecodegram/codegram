@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-
+import { useUserContext } from '../components/UserContext';
+import Cookies from 'js-cookie';
 import { IconInbox, IconFollowBtnPlus, IconVerifiedBadge, IconLikeBtnHeart } from '../icons';
 import styles from "./DashboardPage.module.scss"
 import { useNavigate } from 'react-router-dom';
@@ -8,38 +9,25 @@ import { useNavigate } from 'react-router-dom';
 
 interface leetcodeData {
   usename?: string;
-  submitStats?: {
-    acSubmissionNum: {
-      difficulty: string;
-      count: number;
-      submissions: number;
-    }[];
-  };
+  leetcode: {
+    submitStats?: {
+      acSubmissionNum: {
+        difficulty: string;
+        count: number;
+        submissions: number;
+      }[];
+    }
+  }
 }
 
-const feedItemDummyData: FeedItemProps[] = [
-  {
-    name: "Peyz",
-    username: "peyz",
-    body: "PeyZ just solved Threesum on Leetcode!",
-    numOfLikes: 12,
-    createdTime: new Date()
-  },
-  {
-    name: "George",
-    username: "shaygeko",
-    body: "George just solved a hard question on Leetcode!",
-    numOfLikes: 24,
-    createdTime: new Date()
-  },
-  {
-    name: "Danny",
-    username: "dannyl1u",
-    body: "Danny just solved a hard question on Leetcode!",
-    numOfLikes: 12,
-    createdTime: new Date()
-  },
-]
+interface feedData {
+  "title": string,
+  "titleSlug": string,
+  "timestamp": string,
+  "statusDisplay": string,
+  "lang": string,
+  "__typename": string
+}
 
 const friendsDummyData: RelationshipProps[] = [
   {
@@ -76,45 +64,71 @@ const groupsDummyData: RelationshipProps[] = [
 ]
 
 const DashboardPage = () => {
-  const [data, setData] = useState<leetcodeData>({
-    submitStats: {
-      acSubmissionNum: [],
-    },
+  const [statsData, setStatsData] = useState<leetcodeData>({
+    leetcode: {
+      submitStats: {
+        acSubmissionNum: []
+      }
+    }
   });
+  const [feedData, setFeedData] = useState<feedData[]>([])
   const [loading, setLoading] = useState(true);
-  // const [username, setUsername] = useState('');
   const navigate = useNavigate();
+  const { username } = useUserContext();
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${username}`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
+  
+        setStatsData(jsonData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [username]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${username}/latestSubmits`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
+  
+        setFeedData(jsonData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
     fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/trigger-requests/leetcode/dannyliu0421`,
-        {
-          withCredentials: true,
-        }
-      );
-      const jsonData = await response.data;
-
-      setData(jsonData);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  }, [username]);
 
   const handleLogout = async () => {
     try {
-      // Perform logout request using axios or your preferred method
-      // For example:
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {
-        withCredentials: true,
-      });
-      // Redirect the user to the login page
-      navigate('/login');
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {}, { withCredentials: true });
+  
+      if (response.status === 200) {
+        Cookies.remove('mysession'); // replace 'cookie-name' with the name of the cookie you want to delete
+        // Redirect the user to the login page
+        navigate('/login');
+      } else {
+        console.error('Error logging out: Invalid response status');
+      }
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -145,21 +159,21 @@ const DashboardPage = () => {
             <section className={styles.right}>
               <IconInbox />
               <article className={styles.avatar}>
-                U
+                {username && username[0].toUpperCase()}
               </article>
               <button className={styles.btnText} onClick={handleLogout}>Logout</button>
             </section>
           </header>
           <main className={styles.main}>
             <article className={styles.stats}>
-              <div className={styles.avatar}>U</div>
+              <div className={styles.avatar}>{username && username[0].toUpperCase()}</div>
               <div className={styles.userInfo}>
-                <h2>Usertest</h2>
+                <h2>{username}</h2>
                 <IconVerifiedBadge />
-                <p>@usertest</p>
+                <p>@{username}</p>
               </div>
               <div className={styles.statsGrid}>
-                {data && data?.submitStats?.acSubmissionNum.map((item) => (
+                {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
                   <div>
                     <p>{item.count.toString()}</p>
                     <h3>{item.difficulty}</h3>
@@ -168,7 +182,16 @@ const DashboardPage = () => {
               </div>
             </article>
             <article className={styles.feed}>
-              {feedItemDummyData.map((f, index) => <FeedItem key={index} {...f} />)}
+              {feedData && feedData.map(({title, timestamp}, index) => 
+                <FeedItem 
+                  key={index}
+                  name={username || ""}
+                  username={username || ""}
+                  body={`${username} just solved ${title} on LeetCode!`} 
+                  numOfLikes={Math.floor(Math.random() * 20) + 1}
+                  createdTime={new Date(+timestamp * 1000)}
+                />)
+              }
             </article>
             <article className={styles.relationships}>
               <RelationshipList title='Friends' relationships={friendsDummyData} />
@@ -191,14 +214,15 @@ interface FeedItemProps {
 }
 
 const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps) => {
+
   return <article className={styles.feedItem}>
     <section className={styles.header}>
-      <div className={styles.avatar}>{name[0]}</div>
+      <div className={styles.avatar}>{name[0].toUpperCase()}</div>
       <h3>{name}</h3>
       <IconVerifiedBadge />
       <p className={styles.detailText}>@{username}</p>
       <div className={styles.dot}></div>
-      <p className={styles.detailText}>3 mins ago</p>
+      <p className={styles.detailText}>{createdTime.toDateString()}</p>
       <button><IconFollowBtnPlus />Follow</button>
     </section>
     <section className={styles.body}>
