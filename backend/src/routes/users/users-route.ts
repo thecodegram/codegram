@@ -6,7 +6,9 @@ import { User } from '../../model/schemas/userSchema';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { getSubmissionStats } from '../../api/vjudge';
 import { getLatestSubmits, getSubmitStats } from '../../api/leetcode';
+import multer from 'multer';
 
+const upload = multer({ dest: 'uploads/' });
 const router = express.Router()
 
 router.get('/:username/latestSubmits', [
@@ -60,7 +62,7 @@ router.post('/:userId', [
   res.sendStatus(200)
 })
 
-router.put('/:username', [
+router.put('/:username', upload.single('file'), [
   // Sanitize the userId variable
   validateUsername('username'),
   handleValidationErrors
@@ -74,7 +76,7 @@ router.put('/:username', [
     res.status(403).send("Forbidden");
   } else {
     const data = req.body;
-    console.log(data);
+    console.log("this is body"+ data.vjudgeUsername);
     if(!data) {
       res.send(400);
     }
