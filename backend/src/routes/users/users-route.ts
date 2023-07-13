@@ -81,7 +81,7 @@ router.put('/:username', [
           await updateVjudge;
           await updateLeetcode;
 
-          user.save();
+          await user.save();
 
           res.sendStatus(200);
         } catch(err) {
@@ -98,15 +98,15 @@ router.put('/:username', [
   }
 })
 
-router.get('/:userId', [
+router.get('/:username', [
   // Sanitize the userId variable
-  validateUsername('userId'),
+  validateUsername('username'),
   handleValidationErrors
 ], async (req: Request, res: Response) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   
   const userData = await User.findOne(
-    {username: userId},
+    {username: username},
     {
       password: false,
       'leetcode._id':false,
@@ -119,8 +119,6 @@ router.get('/:userId', [
   }
   else {
     console.log(userData);
-
-    addUserID(userId)
     res.status(200).json(userData);
   }
 })
