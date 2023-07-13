@@ -9,38 +9,25 @@ import { useNavigate } from 'react-router-dom';
 
 interface leetcodeData {
   usename?: string;
-  submitStats?: {
-    acSubmissionNum: {
-      difficulty: string;
-      count: number;
-      submissions: number;
-    }[];
-  };
+  leetcode: {
+    submitStats?: {
+      acSubmissionNum: {
+        difficulty: string;
+        count: number;
+        submissions: number;
+      }[];
+    }
+  }
 }
 
-const feedItemDummyData: FeedItemProps[] = [
-  {
-    name: "Peyz",
-    username: "peyz",
-    body: "PeyZ just solved Threesum on Leetcode!",
-    numOfLikes: 12,
-    createdTime: new Date()
-  },
-  {
-    name: "George",
-    username: "shaygeko",
-    body: "George just solved a hard question on Leetcode!",
-    numOfLikes: 24,
-    createdTime: new Date()
-  },
-  {
-    name: "Danny",
-    username: "dannyl1u",
-    body: "Danny just solved a hard question on Leetcode!",
-    numOfLikes: 12,
-    createdTime: new Date()
-  },
-]
+interface feedData {
+  "title": string,
+  "titleSlug": string,
+  "timestamp": string,
+  "statusDisplay": string,
+  "lang": string,
+  "__typename": string
+}
 
 const friendsDummyData: RelationshipProps[] = [
   {
@@ -76,17 +63,19 @@ const groupsDummyData: RelationshipProps[] = [
   },
 ]
 
-const DashboardPage = ({}) => {
+const DashboardPage = () => {
   const [statsData, setStatsData] = useState<leetcodeData>({
-    submitStats: {
-      acSubmissionNum: [],
-    },
+    leetcode: {
+      submitStats: {
+        acSubmissionNum: []
+      }
+    }
   });
-  const [feedData, setFeedData] = useState(feedItemDummyData)
+  const [feedData, setFeedData] = useState<feedData[]>([])
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { username } = useUserContext();
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -96,7 +85,6 @@ const DashboardPage = ({}) => {
             withCredentials: true,
           }
         );
-        console.log(response)
         const jsonData = await response.data;
   
         setStatsData(jsonData);
@@ -109,7 +97,26 @@ const DashboardPage = ({}) => {
     fetchData();
   }, [username]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${username}/latestSubmits`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
   
+        setFeedData(jsonData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [username]);
 
   const handleLogout = async () => {
     try {
@@ -152,21 +159,21 @@ const DashboardPage = ({}) => {
             <section className={styles.right}>
               <IconInbox />
               <article className={styles.avatar}>
-                U
+                {username && username[0].toUpperCase()}
               </article>
               <button className={styles.btnText} onClick={handleLogout}>Logout</button>
             </section>
           </header>
           <main className={styles.main}>
             <article className={styles.stats}>
-              <div className={styles.avatar}>U</div>
+              <div className={styles.avatar}>{username && username[0].toUpperCase()}</div>
               <div className={styles.userInfo}>
                 <h2>{username}</h2>
                 <IconVerifiedBadge />
                 <p>@{username}</p>
               </div>
               <div className={styles.statsGrid}>
-                {statsData && statsData?.submitStats?.acSubmissionNum.map((item) => (
+                {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
                   <div>
                     <p>{item.count.toString()}</p>
                     <h3>{item.difficulty}</h3>
@@ -175,7 +182,16 @@ const DashboardPage = ({}) => {
               </div>
             </article>
             <article className={styles.feed}>
-              {feedData && feedData.map((f, index) => <FeedItem key={index} {...f} />)}
+              {feedData && feedData.map(({title, timestamp}, index) => 
+                <FeedItem 
+                  key={index}
+                  name={username || ""}
+                  username={username || ""}
+                  body={`${username} just solved ${title} on LeetCode!`} 
+                  numOfLikes={Math.floor(Math.random() * 20) + 1}
+                  createdTime={new Date(+timestamp * 1000)}
+                />)
+              }
             </article>
             <article className={styles.relationships}>
               <RelationshipList title='Friends' relationships={friendsDummyData} />
@@ -198,14 +214,15 @@ interface FeedItemProps {
 }
 
 const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps) => {
+
   return <article className={styles.feedItem}>
     <section className={styles.header}>
-      <div className={styles.avatar}>{name[0]}</div>
+      <div className={styles.avatar}>{name[0].toUpperCase()}</div>
       <h3>{name}</h3>
       <IconVerifiedBadge />
       <p className={styles.detailText}>@{username}</p>
       <div className={styles.dot}></div>
-      <p className={styles.detailText}>3 mins ago</p>
+      <p className={styles.detailText}>{createdTime.toDateString()}</p>
       <button><IconFollowBtnPlus />Follow</button>
     </section>
     <section className={styles.body}>

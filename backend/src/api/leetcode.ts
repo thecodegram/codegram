@@ -2,7 +2,7 @@ import axios from 'axios';
 import { isValidUsername } from '../utils/utils';
 
 // Function to make GraphQL requests for a specific user ID
-export async function makeGraphQLRequest(userId: string) {
+export async function getSubmitStats(userId: string) {
     if(!isValidUsername(userId)) return;
     try {
       // Make the GraphQL request
@@ -33,4 +33,28 @@ export async function makeGraphQLRequest(userId: string) {
     } catch (error) {
       console.error(`Error fetching data for user ID ${userId}:`, error);
     }
+}
+
+export async function getLatestSubmits(userId: string) {
+  if(!isValidUsername(userId)) return;
+  try {
+    // Make the GraphQL request
+    const response = await axios.post('https://leetcode.com/graphql', {
+      query: `
+      {     
+        recentSubmissionList(username: "${userId}") {
+          title
+          titleSlug
+          timestamp
+          statusDisplay
+          lang
+          __typename
+          }
+      }
+      `
+    });
+    return response.data.data.recentSubmissionList;
+  } catch (error) {
+    console.error(`Error fetching data for user ID ${userId}:`, error);
+  }
 }
