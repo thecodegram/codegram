@@ -86,8 +86,9 @@ const DashboardPage = ({}) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { username } = useUserContext();
-
+  
   useEffect(() => {
+    setFeedData(feedItemDummyData)
     const fetchData = async () => {
       try {
         const response = await axios.get(
