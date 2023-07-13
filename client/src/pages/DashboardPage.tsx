@@ -9,13 +9,15 @@ import { useNavigate } from 'react-router-dom';
 
 interface leetcodeData {
   usename?: string;
-  submitStats?: {
-    acSubmissionNum: {
-      difficulty: string;
-      count: number;
-      submissions: number;
-    }[];
-  };
+  leetcode: {
+    submitStats?: {
+      acSubmissionNum: {
+        difficulty: string;
+        count: number;
+        submissions: number;
+      }[];
+    }
+  }
 }
 
 const feedItemDummyData: FeedItemProps[] = [
@@ -78,9 +80,11 @@ const groupsDummyData: RelationshipProps[] = [
 
 const DashboardPage = () => {
   const [statsData, setStatsData] = useState<leetcodeData>({
-    submitStats: {
-      acSubmissionNum: [],
-    },
+    leetcode: {
+      submitStats: {
+        acSubmissionNum: []
+      }
+    }
   });
   const [feedData, setFeedData] = useState(feedItemDummyData)
   const [loading, setLoading] = useState(true);
@@ -88,7 +92,6 @@ const DashboardPage = () => {
   const { username } = useUserContext();
   
   useEffect(() => {
-    setFeedData(feedItemDummyData)
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -97,7 +100,6 @@ const DashboardPage = () => {
             withCredentials: true,
           }
         );
-        console.log(response)
         const jsonData = await response.data;
   
         setStatsData(jsonData);
@@ -108,7 +110,7 @@ const DashboardPage = () => {
     };
 
     fetchData();
-  }, [username]);
+  }, []);
 
   
 
@@ -153,21 +155,21 @@ const DashboardPage = () => {
             <section className={styles.right}>
               <IconInbox />
               <article className={styles.avatar}>
-                U
+                {username && username[0]}
               </article>
               <button className={styles.btnText} onClick={handleLogout}>Logout</button>
             </section>
           </header>
           <main className={styles.main}>
             <article className={styles.stats}>
-              <div className={styles.avatar}>U</div>
+              <div className={styles.avatar}>{username && username[0]}</div>
               <div className={styles.userInfo}>
                 <h2>{username}</h2>
                 <IconVerifiedBadge />
                 <p>@{username}</p>
               </div>
               <div className={styles.statsGrid}>
-                {statsData && statsData?.submitStats?.acSubmissionNum.map((item) => (
+                {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
                   <div>
                     <p>{item.count.toString()}</p>
                     <h3>{item.difficulty}</h3>
