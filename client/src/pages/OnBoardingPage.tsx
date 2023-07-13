@@ -32,6 +32,7 @@ const OnBoardingPage = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
+
     if (leetCodeUsername === "" && vJudgeUsername === "") {
       setErrorMsg("Please ensure at least one of the usernames is provided");
       return;
@@ -44,7 +45,6 @@ const OnBoardingPage = () => {
       formData.append("image", imageFile);
     }
 
-    
 
     setErrorMsg("");
 
