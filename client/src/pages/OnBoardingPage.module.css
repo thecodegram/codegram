@@ -1,0 +1,127 @@
+.OnBoardingPage {
+  display: grid;
+  place-content: center;
+  min-height: 100vh;
+  min-width: 100vw;
+  padding: 1rem;
+  background-color: #1b1b1a;
+  &,
+  a {
+    color: #fff;
+  }
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 5rem;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2rem;
+}
+
+.form span {
+  color: #ffa115;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  max-width: 41.25rem;
+  background-color: #2d2c2b;
+  border-radius: 12px;
+  padding: 0rem 2rem;
+  padding-bottom: 1rem;
+}
+.form p {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 400;
+    padding-bottom: 1rem;
+  }
+
+.UploadPhoto {
+  background-color: #c3c2bf;
+  color: #000;
+  aspect-ratio: 1/1; 
+  border-radius: 50%;
+  width: 8rem;
+  height: 8rem; 
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transform: translateY(-3rem);
+  overflow: hidden; 
+  box-shadow: 0 0 100px 0 rgba(199, 199, 199, 0.15);
+  &:hover {
+    background-color: #aaa9a5;
+  }
+}
+
+.profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+}
+
+.btn {
+  background-color: #ffa115;
+  border: none;
+  border-radius: 0.75rem;
+  color: #151515;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  font-weight: 600;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #d48611;
+  }
+}
+
+.inputText {
+  background-color: #716f6b;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  border: none;
+  padding: 1.5rem;
+  font-size: 1rem;
+  color: #ffffff;
+  padding-right: 2.5rem;
+  max-width: 15rem;
+  margin: 1rem 2rem;
+}
+.inputText::placeholder {
+  color: #bdbcbc;
+}
+
+.miniCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #444240;
+  border-radius: 12px;
+  max-width: 17rem;
+  padding-top: 0.5rem;
+}
+
+.miniCardHolder {
+  display: flex;
+  flex-direction: row;
+  gap: 3.25rem;
+  max-width: 100%;
+}
+
+.errorMsg {
+    color: red;
+    font-size: 1rem !important;
+  }

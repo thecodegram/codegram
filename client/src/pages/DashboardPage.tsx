@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useUserContext } from '../components/UserContext';
-
+import Cookies from 'js-cookie';
 import { IconInbox, IconFollowBtnPlus, IconVerifiedBadge, IconLikeBtnHeart } from '../icons';
 import styles from "./DashboardPage.module.scss"
 import { useNavigate } from 'react-router-dom';
@@ -76,7 +76,7 @@ const groupsDummyData: RelationshipProps[] = [
   },
 ]
 
-const DashboardPage = ({}) => {
+const DashboardPage = () => {
   const [statsData, setStatsData] = useState<leetcodeData>({
     submitStats: {
       acSubmissionNum: [],
@@ -86,8 +86,9 @@ const DashboardPage = ({}) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { username } = useUserContext();
-
+  
   useEffect(() => {
+    setFeedData(feedItemDummyData)
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -113,13 +114,15 @@ const DashboardPage = ({}) => {
 
   const handleLogout = async () => {
     try {
-      // Perform logout request using axios or your preferred method
-      // For example:
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {
-        withCredentials: true,
-      });
-      // Redirect the user to the login page
-      navigate('/login');
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {}, { withCredentials: true });
+  
+      if (response.status === 200) {
+        Cookies.remove('mysession'); // replace 'cookie-name' with the name of the cookie you want to delete
+        // Redirect the user to the login page
+        navigate('/login');
+      } else {
+        console.error('Error logging out: Invalid response status');
+      }
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -159,9 +162,9 @@ const DashboardPage = ({}) => {
             <article className={styles.stats}>
               <div className={styles.avatar}>U</div>
               <div className={styles.userInfo}>
-                <h2>Usertest</h2>
+                <h2>{username}</h2>
                 <IconVerifiedBadge />
-                <p>@usertest</p>
+                <p>@{username}</p>
               </div>
               <div className={styles.statsGrid}>
                 {statsData && statsData?.submitStats?.acSubmissionNum.map((item) => (

@@ -1,7 +1,7 @@
 .SignupPage {
   display: grid;
   place-content: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   padding: 1rem;
   background-color: #1b1b1a;
@@ -54,7 +54,7 @@
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  height: 3.5rem;
+  height: 3rem;
   font-weight: 600;
   &:hover {
     background-color: #d48611;
@@ -121,7 +121,7 @@
 
 .inputText {
   background-color: #444240;
-  height: 3.5rem;
+  height: 2.5rem;
   border-radius: 0.75rem;
   border: none;
   padding: 1.5rem;
@@ -133,7 +133,7 @@
 .inputText[name="Password"],
 .btn[type="submit"] {
   margin-bottom: 0.5rem;
-  margin-top: 1.75rem;
+  margin-top: 1rem;
 }
 .btn[type="submit"] + p {
   text-align: center;
@@ -146,8 +146,6 @@
 
 .error {
   color: red;
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
 }
 
 .passwordWrapper {

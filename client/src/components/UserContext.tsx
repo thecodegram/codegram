@@ -1,4 +1,3 @@
-
 import { createContext, useContext } from 'react';
 
 type UserContextProps = {
