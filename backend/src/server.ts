@@ -3,7 +3,6 @@ import cors from 'cors'
 import session from 'express-session'
 import { enforceLoggedIn } from './utils/middleware';
 import { setUpDB } from './db/db';
-import { corsOptions } from './config/corsConfig';
 import { sessionOptions } from './config/sessionConfig';
 import { env } from './config/env';
 
@@ -17,7 +16,7 @@ const port = env.PORT || 8080;
 
 // middleware
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(session(sessionOptions));
 
 // request logging
