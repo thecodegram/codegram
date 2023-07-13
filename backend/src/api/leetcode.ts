@@ -3,7 +3,11 @@ import { isValidUsername } from '../utils/utils';
 
 // Function to make GraphQL requests for a specific user ID
 export async function getSubmitStats(userId: string) {
-    if(!isValidUsername(userId)) return;
+  console.log(userId);
+    if(!isValidUsername(userId)) {
+      console.log("invalid username")
+      return;
+    }
     try {
       // Make the GraphQL request
       const response = await axios.post('https://leetcode.com/graphql', {
