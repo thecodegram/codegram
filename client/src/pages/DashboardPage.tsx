@@ -76,7 +76,7 @@ const groupsDummyData: RelationshipProps[] = [
   },
 ]
 
-const DashboardPage = ({}) => {
+const DashboardPage = () => {
   const [statsData, setStatsData] = useState<leetcodeData>({
     submitStats: {
       acSubmissionNum: [],
