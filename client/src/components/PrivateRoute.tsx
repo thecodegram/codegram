@@ -15,7 +15,7 @@ const PrivateRoute: FC<PrivateRouteProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/auth/check', { withCredentials: true })
+    axios.get(`${process.env.REACT_APP_API_URL}/api/auth/check`, { withCredentials: true })
       .then(response => {
         setIsAuthenticated(response.status === 200);
         setUsername(response.data);

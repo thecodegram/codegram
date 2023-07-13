@@ -89,6 +89,7 @@ const DashboardPage = () => {
   
         setStatsData(jsonData);
         setLoading(false);
+        console.log(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }

@@ -38,7 +38,7 @@ const OnBoardingPage = () => {
     }
 
     const formData = new FormData();
-    formData.append("leetCodeUsername", leetCodeUsername);
+    formData.append("leetcodeUsername", leetCodeUsername);
     formData.append("vJudgeUsername", vJudgeUsername);
     if (imageFile) {
       formData.append("image", imageFile);
