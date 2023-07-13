@@ -29,30 +29,6 @@ interface feedData {
   "__typename": string
 }
 
-const feedItemDummyData: FeedItemProps[] = [
-  {
-    name: "Peyz",
-    username: "peyz",
-    body: "PeyZ just solved Threesum on Leetcode!",
-    numOfLikes: 12,
-    createdTime: new Date()
-  },
-  {
-    name: "George",
-    username: "shaygeko",
-    body: "George just solved a hard question on Leetcode!",
-    numOfLikes: 24,
-    createdTime: new Date()
-  },
-  {
-    name: "Danny",
-    username: "dannyl1u",
-    body: "Danny just solved a hard question on Leetcode!",
-    numOfLikes: 12,
-    createdTime: new Date()
-  },
-]
-
 const friendsDummyData: RelationshipProps[] = [
   {
     name: "Peyz",
@@ -119,7 +95,7 @@ const DashboardPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,7 +116,7 @@ const DashboardPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [username]);
 
   const handleLogout = async () => {
     try {
