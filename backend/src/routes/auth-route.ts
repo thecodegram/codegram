@@ -80,6 +80,20 @@ router.post("/signup", async (req: Request, res: Response) => {
   }
 });
 
+})
+
+router.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error logging out:', err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            // Redirect the user to the login page or any other desired destination
+            res.status(200).send('Logged out');
+        }
+    });
+})
+
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {

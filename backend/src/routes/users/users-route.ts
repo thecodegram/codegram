@@ -6,7 +6,9 @@ import { User } from '../../model/schemas/userSchema';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { getSubmissionStats } from '../../api/vjudge';
 import { getLatestSubmits, getSubmitStats } from '../../api/leetcode';
+import multer from 'multer';
 
+const upload = multer({ dest: 'uploads/' });
 const router = express.Router()
 
 router.get('/:username/latestSubmits', [
@@ -24,11 +26,11 @@ router.get('/:username/latestSubmits', [
       vjudge: false
     });
   
-  if(!userData?.username){
-     res.status(404).send("User not found");
+  if(!userData?.leetcode?.username){
+     res.status(404).send("Leetcode username not found");
   } else {
 
-    const leetcodeUsername = userData.username;
+    const leetcodeUsername = userData.leetcode.username;
     const submitStats = await getLatestSubmits(leetcodeUsername);
   
     if(!submitStats){
@@ -60,7 +62,7 @@ router.post('/:userId', [
   res.sendStatus(200)
 })
 
-router.put('/:username', [
+router.put('/:username', upload.single('file'), [
   // Sanitize the userId variable
   validateUsername('username'),
   handleValidationErrors
@@ -74,7 +76,7 @@ router.put('/:username', [
     res.status(403).send("Forbidden");
   } else {
     const data = req.body;
-
+    console.log("this is body"+ data.vjudgeUsername);
     if(!data) {
       res.send(400);
     }
@@ -96,7 +98,7 @@ router.put('/:username', [
           const updateVjudge = (async () => {
             if(data.vjudgeUsername) {
                 const vjudgeStats = await getSubmissionStats(data.vjudgeUsername);
-                console.log(vjudgeStats);
+                // console.log(vjudgeStats);
                 vjudgeStats.username = data.vjudgeUsername;
                 user.vjudge = vjudgeStats;
             }
@@ -104,8 +106,11 @@ router.put('/:username', [
           // if update request has a new vjudge name
           // ensure this is a valid name
           // update the vjudge username and latest data
-          const updateLeetcode = (async() => {if(data.leetcodeUsername) {
+          const updateLeetcode = (async() => {
+            console.log(data.leetcodeUsername);
+            if(data.leetcodeUsername) {
             const leetcodeStats = await getSubmitStats(data.leetcodeUsername);
+            console.log(leetcodeStats);
             user.leetcode = leetcodeStats;
           }})();
           
