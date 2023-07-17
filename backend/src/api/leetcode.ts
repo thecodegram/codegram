@@ -39,25 +39,23 @@ export async function getSubmitStats(userId: string) {
     }
 }
 
-export async function getLatestSubmits(userId: string) {
+export async function getLatestAcceptedSubmits(userId: string, limit: number = 10) {
   if(!isValidUsername(userId)) return;
   try {
     // Make the GraphQL request
     const response = await axios.post('https://leetcode.com/graphql', {
       query: `
       {     
-        recentSubmissionList(username: "${userId}") {
+        recentAcSubmissionList(username: "${userId}", limit: ${limit}) {
           title
           titleSlug
           timestamp
-          statusDisplay
           lang
-          __typename
           }
       }
       `
     });
-    return response.data.data.recentSubmissionList;
+    return response.data.data.recentAcSubmissionList;
   } catch (error) {
     console.error(`Error fetching data for user ID ${userId}:`, error);
   }

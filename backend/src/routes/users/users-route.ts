@@ -5,7 +5,7 @@ import { getUserIDs, addUserID } from '../../model/users';
 import { User } from '../../model/schemas/userSchema';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { getSubmissionStats } from '../../api/vjudge';
-import { getLatestSubmits, getSubmitStats } from '../../api/leetcode';
+import { getLatestAcceptedSubmits, getSubmitStats } from '../../api/leetcode';
 import multer from 'multer';
 
 const upload = multer({ dest: 'uploads/' });
@@ -31,7 +31,7 @@ router.get('/:username/latestSubmits', [
   } else {
 
     const leetcodeUsername = userData.leetcode.username;
-    const submitStats = await getLatestSubmits(leetcodeUsername);
+    const submitStats = await getLatestAcceptedSubmits(leetcodeUsername);
   
     if(!submitStats){
       res.status(404).send("User not found on leetcode");
