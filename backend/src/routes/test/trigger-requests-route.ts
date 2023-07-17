@@ -1,11 +1,14 @@
 import express, { Request, Response} from 'express'
 
-import { getSubmitStats } from '../../api/leetcode'
+import { getLatestAcceptedSubmits, getSubmitStats } from '../../api/leetcode'
 import { validateUsername, handleValidationErrors } from '../../utils/middleware'
 import { getUserIDs } from '../../model/users';
 import { getSubmissionStats } from '../../api/vjudge';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { ExternalApiError } from '../../errors/external-api-error';
+import { User } from '../../model/schemas/userSchema';
+import { UpdateEventData, userUpdateEventEmitter } from '../../events/UserUpdateEventEmitter';
+import { getLeetcodeUpdates, getUpdates } from '../../services/UpdatesCollectorService';
 
 const router = express.Router()
 
@@ -62,6 +65,33 @@ router.get('/vjudge/:username', [
       res.status(e.statusCode).send(e.message)
     } else{
       console.error(e);
+    }
+  }
+});
+
+router.get('/updatesList/:username', [
+  // Sanitize the userId variable
+  validateUsername('username'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const {username} = req.params;
+
+  if(!username) {
+    res.status(400).send();
+  }
+  else {
+    try {
+      const updates = await getUpdates(username);
+
+      res.json(updates).send();
+    }
+    catch(err){
+      if(err instanceof UserNameNotFoundError){
+        res.status(404).send("user not found");
+      }
+      else {
+        res.status(500).send("Oops! Something went wrong");
+      }
     }
   }
 });
