@@ -80,8 +80,6 @@ router.post("/signup", async (req: Request, res: Response) => {
   }
 });
 
-})
-
 router.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
