@@ -1,0 +1,69 @@
+.feedItem {
+  background-color: #202020;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: grid;
+  gap: 2rem;
+  color: #B0AEAA;
+
+  button {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    gap: 0.5rem;
+    height: 2rem;
+    border-radius: 4rem;
+    border: none;
+    background-color: #2C2C2C;
+    width: fit-content;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    color: #D7D6D5;
+    cursor: pointer;
+  }
+
+  .header {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: unset;
+    padding: unset;
+    flex-wrap: wrap;
+    align-items: center;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+
+      h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+      }
+    }
+
+    .detailText {
+      font-size: 0.88rem;
+    }
+
+    .dot {
+      height: 2px;
+      width: 2px;
+      border-radius: 50%;
+      background-color: #9C9995;
+    }
+  }
+
+  .body {
+    p {
+      color: #fff;
+      line-height: 150%;
+    }
+
+    a {
+      color: #FFA115;
+      font-weight: 600;
+    }
+  }
+}

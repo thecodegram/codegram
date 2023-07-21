@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useUserContext } from '../components/UserContext';
-import { IconFollowBtnPlus, IconLikeBtnHeart } from '../icons';
 import { HeaderNav } from '../components/HeaderNav';
 import { UserInfoHeader, UserInfoHeaderVariant } from '../components/UserInfoHeader';
 import { AvatarSize } from '../components/Avatar';
 import { ListGroup } from '../components/ListGroup';
+import { FeedItem } from '../components/FeedItem';
 
 import styles from "./DashboardPage.module.scss"
 
@@ -29,6 +29,11 @@ interface feedData {
   "statusDisplay": string,
   "lang": string,
   "__typename": string
+}
+
+interface RelationshipProps {
+  name: string,
+  handle: string
 }
 
 const friendsDummyData: RelationshipProps[] = [
@@ -168,8 +173,8 @@ const DashboardPage = () => {
                   body={`${username} just solved ${title} on LeetCode!`} 
                   numOfLikes={Math.floor(Math.random() * 20) + 1}
                   createdTime={new Date(+timestamp * 1000)}
-                />)
-              }
+                />
+              )}
             </article>
             <article className={styles.relationships}>
               <ListGroup title='Friends'>
@@ -199,40 +204,5 @@ const DashboardPage = () => {
     </div>
   );
 };
-
-interface FeedItemProps {
-  name: string,
-  username: string,
-  body: string,
-  numOfLikes: number,
-  createdTime: Date
-}
-
-const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps) => {
-
-  return <article className={styles.feedItem}>
-    <section className={styles.header}>
-      <UserInfoHeader 
-        username={username} 
-        name={username} 
-        variant={UserInfoHeaderVariant.row}
-      />
-      <div className={styles.dot}></div>
-      <p className={styles.detailText}>{createdTime.toDateString()}</p>
-      <button><IconFollowBtnPlus />Follow</button>
-    </section>
-    <section className={styles.body}>
-      <p>{body}</p>
-    </section>
-    <section className={styles.footer}>
-      <button><IconLikeBtnHeart />{numOfLikes}</button>
-    </section>
-  </article>
-}
-
-interface RelationshipProps {
-  name: string,
-  handle: string
-}
 
 export default DashboardPage;
