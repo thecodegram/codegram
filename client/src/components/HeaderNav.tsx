@@ -28,12 +28,11 @@ export const HeaderNav = () => {
   };
 
   return (<header className={styles.header}>
-    <section className={styles.left}><h1>Codegram</h1></section>
+    <section className={styles.left}><h1><Link to="/dashboard" relative='path'>Codegram</Link></h1></section>
     <section className={styles.right}>
       <IconInbox />
       <Link to={`/${username}`} relative='path'>
         <Avatar username={username || ""} />
-        {/* {username && username[0].toUpperCase()} */}
       </Link>
       <button className={styles.btnText} onClick={handleLogout}>Logout</button>
     </section>
