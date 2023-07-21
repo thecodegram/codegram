@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useUserContext } from '../components/UserContext';
-import { IconFollowBtnPlus, IconVerifiedBadge, IconLikeBtnHeart } from '../icons';
-import { HeaderNav } from './HeaderNav';
-import { Link } from 'react-router-dom';
+import { IconFollowBtnPlus, IconLikeBtnHeart } from '../icons';
+import { HeaderNav } from '../components/HeaderNav';
+import { UserInfoHeader, UserInfoHeaderVariant } from '../components/UserInfoHeader';
+import { AvatarSize } from '../components/Avatar';
 
 import styles from "./DashboardPage.module.scss"
 
@@ -142,14 +143,12 @@ const DashboardPage = () => {
           <HeaderNav />
           <main className={styles.main}>
             <article className={styles.stats}>
-              <Link to={`/${username}`} relative='path'>
-                <div className={styles.avatar}>{username && username[0].toUpperCase()}</div>
-                <div className={styles.userInfo}>
-                  <h2>{username}</h2>
-                  <IconVerifiedBadge />
-                  <p>@{username}</p>
-                </div>
-              </Link>
+              <UserInfoHeader 
+                username={username || ""} 
+                name={username || ""} 
+                variant={UserInfoHeaderVariant.column} 
+                avatarSize={AvatarSize.medium}
+              />
               <div className={styles.statsGrid}>
                 {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
                   <div>
@@ -194,12 +193,11 @@ const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps
 
   return <article className={styles.feedItem}>
     <section className={styles.header}>
-      <Link to={`/${username}`} relative='path'>
-        <div className={styles.avatar}>{name[0].toUpperCase()}</div>
-        <h3>{name}</h3>
-      </Link>
-      <IconVerifiedBadge />
-      <p className={styles.detailText}>@{username}</p>
+      <UserInfoHeader 
+        username={username} 
+        name={username} 
+        variant={UserInfoHeaderVariant.row}
+      />
       <div className={styles.dot}></div>
       <p className={styles.detailText}>{createdTime.toDateString()}</p>
       <button><IconFollowBtnPlus />Follow</button>
@@ -229,14 +227,10 @@ const RelationshipList = ({ title, relationships }: RelationshipListProps) => {
     <ul className={styles.list}>
       {relationships.map(({name, handle}, index) => 
         <li key={index}>
-          <Link to={`/${handle}`} relative='path'>
-            <div className={styles.avatar}>{name[0]}</div>
-            <div className={styles.info}>
-              <h3>{name}</h3>
-              <IconVerifiedBadge />
-              <p>@{handle}</p>
-            </div>
-          </Link>
+          <UserInfoHeader 
+            username={name} 
+            name={handle} 
+          />
         </li>
       )}
     </ul>

@@ -1,0 +1,23 @@
+.avatar {
+  height: 2rem;
+  width: 2rem;
+  aspect-ratio: 1/1;
+  display: grid;
+  place-items: center;
+  background-color: #FFA115;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+
+  &.size-large {
+    height: 4.5rem;
+    width: 4.5rem;
+    font-size: 1.5rem;
+  }
+
+  &.size-medium {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+}

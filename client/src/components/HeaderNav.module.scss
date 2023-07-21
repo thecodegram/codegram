@@ -18,6 +18,10 @@
     font-size: 1rem;
     font-weight: 500;
   }
+
+  a {
+    text-decoration: none;
+  }
 }
 
 .btnText {
@@ -27,17 +31,4 @@
   cursor: pointer;
   color: #B0AEAA;
   font-weight: 600;
-}
-
-.avatar a {
-  height: 2rem;
-  width: 2rem;
-  aspect-ratio: 1/1;
-  display: grid;
-  place-items: center;
-  background-color: #FFA115;
-  border-radius: 50%;
-  color: #fff;
-  cursor: pointer;
-  text-decoration: none;
 }

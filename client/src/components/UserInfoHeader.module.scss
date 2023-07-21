@@ -1,0 +1,42 @@
+.profileInfoHeader {
+  a {
+    text-decoration: none;
+    display: flex;
+    color: #B0AEAA;
+    gap: 0.75rem;
+
+    .userInfo {
+      display: grid;
+      gap: 0.25rem;
+      justify-items: start;
+      grid-template-areas: 
+        "name badge"
+        "username username";
+      
+      h2 {
+        color: #fff;
+        font-size: 1rem;
+        grid-area: name;
+      }
+
+      svg {
+        grid-area: badge;
+      }
+
+      p {
+        grid-area: username;
+      }
+    }
+  }
+
+  &.column a {
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  &.row a  .userInfo {
+    display: flex;
+    gap: 0.75rem;
+  }
+}

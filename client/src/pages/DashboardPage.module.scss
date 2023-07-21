@@ -32,38 +32,6 @@
     text-align: center;
     grid-area: stats;
 
-    a {
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: #B0AEAA;
-
-      .userInfo {
-        display: grid;
-        gap: 0.25rem;
-        margin-top: 0.75rem;
-        grid-template-areas: 
-          "name badge"
-          "username username";
-        
-        h2 {
-          color: #fff;
-          font-size: 1rem;
-          grid-area: name;
-        }
-  
-        svg {
-          grid-area: badge;
-        }
-  
-        p {
-          grid-area: username;
-        }
-      }
-    }
-
-
     .statsGrid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;

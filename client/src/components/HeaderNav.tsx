@@ -1,8 +1,9 @@
 import { IconInbox } from '../icons';
-import { useUserContext } from '../components/UserContext';
+import { useUserContext } from './UserContext';
 import axios from "axios"
 import Cookies from 'js-cookie';
 import { useNavigate, Link } from 'react-router-dom';
+import { Avatar } from './Avatar';
 
 import styles from "./HeaderNav.module.scss"
 
@@ -30,11 +31,10 @@ export const HeaderNav = () => {
     <section className={styles.left}><h1>Codegram</h1></section>
     <section className={styles.right}>
       <IconInbox />
-      <article className={styles.avatar}>
-        <Link to={`/${username}`} relative='path'>
-          {username && username[0].toUpperCase()}
-        </Link>
-      </article>
+      <Link to={`/${username}`} relative='path'>
+        <Avatar username={username || ""} />
+        {/* {username && username[0].toUpperCase()} */}
+      </Link>
       <button className={styles.btnText} onClick={handleLogout}>Logout</button>
     </section>
   </header>)
