@@ -5,6 +5,7 @@ import { IconFollowBtnPlus, IconLikeBtnHeart } from '../icons';
 import { HeaderNav } from '../components/HeaderNav';
 import { UserInfoHeader, UserInfoHeaderVariant } from '../components/UserInfoHeader';
 import { AvatarSize } from '../components/Avatar';
+import { ListGroup } from '../components/ListGroup';
 
 import styles from "./DashboardPage.module.scss"
 
@@ -171,8 +172,26 @@ const DashboardPage = () => {
               }
             </article>
             <article className={styles.relationships}>
-              <RelationshipList title='Friends' relationships={friendsDummyData} />
-              <RelationshipList title='Groups' relationships={groupsDummyData} />
+              <ListGroup title='Friends'>
+                {friendsDummyData.map(({name, handle}, index) => (
+                  <li key={index}>
+                    <UserInfoHeader 
+                      username={name} 
+                      name={handle} 
+                    />
+                  </li>
+                ))}
+              </ListGroup>
+              <ListGroup title='Groups'>
+                {groupsDummyData.map(({name, handle}, index) => (
+                  <li key={index}>
+                    <UserInfoHeader 
+                      username={name} 
+                      name={handle} 
+                    />
+                  </li>
+                ))}
+              </ListGroup>
             </article>
           </main>
         </>
@@ -214,27 +233,6 @@ const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps
 interface RelationshipProps {
   name: string,
   handle: string
-}
-
-interface RelationshipListProps {
-  title: string,
-  relationships: RelationshipProps[]
-}
-
-const RelationshipList = ({ title, relationships }: RelationshipListProps) => {
-  return <article className={styles.relationshipList}>
-    <h2>{title}</h2>
-    <ul className={styles.list}>
-      {relationships.map(({name, handle}, index) => 
-        <li key={index}>
-          <UserInfoHeader 
-            username={name} 
-            name={handle} 
-          />
-        </li>
-      )}
-    </ul>
-  </article>
 }
 
 export default DashboardPage;

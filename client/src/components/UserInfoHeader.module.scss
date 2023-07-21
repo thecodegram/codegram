@@ -9,6 +9,7 @@
       display: grid;
       gap: 0.25rem;
       justify-items: start;
+      align-content: center;  
       grid-template-areas: 
         "name badge"
         "username username";
