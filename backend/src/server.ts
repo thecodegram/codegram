@@ -13,12 +13,16 @@ const authRouter = require('./routes/auth-route')
 
 // Create an Express.js app
 const app = express();
+
+
+
 const port = env.PORT || 8080;
 
 // middleware
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(session(sessionOptions));
+app.set('trust proxy', 1);
 
 // request logging
 app.use('/', (req: Request, res: Response, next: NextFunction) => {

@@ -13,14 +13,8 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  leetcode: {
-    type: leetcodeStatsSchema,
-    required: false
-  },
-  vjudge: {
-    type: vjudgeStatsSchema,
-    required: false
-  }
+  leetcode:  leetcodeStatsSchema,
+  vjudge:  vjudgeStatsSchema
 });
 
 export const User = mongoose.model('User', userSchema);
