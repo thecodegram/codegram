@@ -6,6 +6,7 @@ import { UserInfoHeader, UserInfoHeaderVariant } from '../components/UserInfoHea
 import { AvatarSize } from '../components/Avatar';
 import { ListGroup } from '../components/ListGroup';
 import { FeedItem } from '../components/FeedItem';
+import { UserStatsGrid } from '../components/UserStatsGrid';
 
 import styles from "./DashboardPage.module.scss"
 
@@ -36,7 +37,7 @@ interface RelationshipProps {
   handle: string
 }
 
-const friendsDummyData: RelationshipProps[] = [
+export const friendsDummyData: RelationshipProps[] = [
   {
     name: "Peyz",
     handle: "peyz"
@@ -55,7 +56,7 @@ const friendsDummyData: RelationshipProps[] = [
   },
 ]
 
-const groupsDummyData: RelationshipProps[] = [
+export const groupsDummyData: RelationshipProps[] = [
   {
     name: "372 Group",
     handle: "372group"
@@ -71,37 +72,9 @@ const groupsDummyData: RelationshipProps[] = [
 ]
 
 const DashboardPage = () => {
-  const [statsData, setStatsData] = useState<leetcodeData>({
-    leetcode: {
-      submitStats: {
-        acSubmissionNum: []
-      }
-    }
-  });
   const [feedData, setFeedData] = useState<feedData[]>([])
   const [loading, setLoading] = useState(true);
   const { username } = useUserContext();
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/user/${username}`,
-          {
-            withCredentials: true,
-          }
-        );
-        const jsonData = await response.data;
-  
-        setStatsData(jsonData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, [username]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -155,14 +128,7 @@ const DashboardPage = () => {
                 variant={UserInfoHeaderVariant.column} 
                 avatarSize={AvatarSize.medium}
               />
-              <div className={styles.statsGrid}>
-                {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
-                  <div>
-                    <p>{item.count.toString()}</p>
-                    <h3>{item.difficulty}</h3>
-                  </div>
-                ))}
-              </div>
+              {username && <UserStatsGrid username={username} />}
             </article>
             <article className={styles.feed}>
               {feedData && feedData.map(({title, timestamp}, index) => 
