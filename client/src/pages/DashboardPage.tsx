@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useUserContext } from '../components/UserContext';
-import Cookies from 'js-cookie';
-import { IconInbox, IconFollowBtnPlus, IconVerifiedBadge, IconLikeBtnHeart } from '../icons';
+import { IconFollowBtnPlus, IconVerifiedBadge, IconLikeBtnHeart } from '../icons';
+import { HeaderNav } from './HeaderNav';
+import { Link } from 'react-router-dom';
+
 import styles from "./DashboardPage.module.scss"
-import { useNavigate } from 'react-router-dom';
 
-
-interface leetcodeData {
-  usename?: string;
+export interface leetcodeData {
+  username?: string;
   leetcode: {
     submitStats?: {
       acSubmissionNum: {
@@ -17,7 +17,7 @@ interface leetcodeData {
         submissions: number;
       }[];
     }
-  }
+  },
 }
 
 interface feedData {
@@ -73,7 +73,6 @@ const DashboardPage = () => {
   });
   const [feedData, setFeedData] = useState<feedData[]>([])
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const { username } = useUserContext();
   
   useEffect(() => {
@@ -118,21 +117,7 @@ const DashboardPage = () => {
     fetchData();
   }, [username]);
 
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {}, { withCredentials: true });
   
-      if (response.status === 200) {
-        Cookies.remove('mysession'); // replace 'cookie-name' with the name of the cookie you want to delete
-        // Redirect the user to the login page
-        navigate('/login');
-      } else {
-        console.error('Error logging out: Invalid response status');
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   // const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   setUsername(event.target.value);
@@ -154,24 +139,17 @@ const DashboardPage = () => {
         <p>Loading...</p>
       ) : (
         <>
-          <header className={styles.header}>
-            <section className={styles.left}><h1>Codegram</h1></section>
-            <section className={styles.right}>
-              <IconInbox />
-              <article className={styles.avatar}>
-                {username && username[0].toUpperCase()}
-              </article>
-              <button className={styles.btnText} onClick={handleLogout}>Logout</button>
-            </section>
-          </header>
+          <HeaderNav />
           <main className={styles.main}>
             <article className={styles.stats}>
-              <div className={styles.avatar}>{username && username[0].toUpperCase()}</div>
-              <div className={styles.userInfo}>
-                <h2>{username}</h2>
-                <IconVerifiedBadge />
-                <p>@{username}</p>
-              </div>
+              <Link to={`/${username}`} relative='path'>
+                <div className={styles.avatar}>{username && username[0].toUpperCase()}</div>
+                <div className={styles.userInfo}>
+                  <h2>{username}</h2>
+                  <IconVerifiedBadge />
+                  <p>@{username}</p>
+                </div>
+              </Link>
               <div className={styles.statsGrid}>
                 {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
                   <div>
@@ -198,7 +176,6 @@ const DashboardPage = () => {
               <RelationshipList title='Groups' relationships={groupsDummyData} />
             </article>
           </main>
-        
         </>
       )}
     </div>
@@ -217,8 +194,10 @@ const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps
 
   return <article className={styles.feedItem}>
     <section className={styles.header}>
-      <div className={styles.avatar}>{name[0].toUpperCase()}</div>
-      <h3>{name}</h3>
+      <Link to={`/${username}`} relative='path'>
+        <div className={styles.avatar}>{name[0].toUpperCase()}</div>
+        <h3>{name}</h3>
+      </Link>
       <IconVerifiedBadge />
       <p className={styles.detailText}>@{username}</p>
       <div className={styles.dot}></div>
@@ -250,12 +229,14 @@ const RelationshipList = ({ title, relationships }: RelationshipListProps) => {
     <ul className={styles.list}>
       {relationships.map(({name, handle}, index) => 
         <li key={index}>
-          <div className={styles.avatar}>{name[0]}</div>
-          <div className={styles.info}>
-            <h3>{name}</h3>
-            <IconVerifiedBadge />
-            <p>@{handle}</p>
-          </div>
+          <Link to={`/${handle}`} relative='path'>
+            <div className={styles.avatar}>{name[0]}</div>
+            <div className={styles.info}>
+              <h3>{name}</h3>
+              <IconVerifiedBadge />
+              <p>@{handle}</p>
+            </div>
+          </Link>
         </li>
       )}
     </ul>

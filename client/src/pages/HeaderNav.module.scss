@@ -1,0 +1,43 @@
+.header {
+  background-color: #202020;
+  display: flex;
+  align-items: center;
+  height: 4rem;
+  padding: 1rem;
+  justify-content: space-between;
+  color: #B0AEAA;
+
+  & > section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  h1 {
+    color: #FFA115;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+.btnText {
+  background: none;
+  border: none;
+  width: fit-content;
+  cursor: pointer;
+  color: #B0AEAA;
+  font-weight: 600;
+}
+
+.avatar a {
+  height: 2rem;
+  width: 2rem;
+  aspect-ratio: 1/1;
+  display: grid;
+  place-items: center;
+  background-color: #FFA115;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+}
