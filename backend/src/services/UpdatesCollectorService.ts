@@ -1,6 +1,7 @@
 import { getLatestAcceptedSubmits, getSubmitStats } from "../api/leetcode";
 import { UserNameNotFoundError } from "../errors/username-not-found-error";
-import { UpdateEventData, userUpdateEventEmitter } from "../events/UserUpdateEventEmitter";
+import { userUpdateEventEmitter } from "../events/UserUpdateEventEmitter";
+import { UpdateEventData } from "../repository/EventRepository";
 import { User } from "../model/schemas/userSchema";
 
 export async function getLeetcodeUpdates(username: string) {
