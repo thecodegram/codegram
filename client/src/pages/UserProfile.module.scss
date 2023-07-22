@@ -38,12 +38,85 @@
     margin-right: auto;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+
+    .statsGrid {
+      padding-top: 1rem;
+
+      h2 {
+        font-size: 1rem;
+        color: #B0AEAA;
+        margin-bottom: 1rem;
+      }
+
+      & > div {
+        padding: 1.5rem;
+        background-color: #202020;
+        border-radius: 1rem;
+      }
+    }
+
+    .activityFeed {
+      nav {
+        padding: 1rem 0 1.5rem 0;
+        display: flex;
+        gap: 1.5rem;
+
+        button {
+          cursor: pointer;
+          white-space: nowrap;
+          font-size: 1rem;
+          font-weight: 600;
+          color: #fff;
+          width: min-content;
+          background: none;
+          padding-bottom: 1rem;
+          border: none;
+          border-bottom: 3px solid transparent;
+
+          &.active {
+            border-bottom: 3px solid #FFA115;
+          }
+        }
+      }
+
+      .feed {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
 
     .relationships {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
+    }
+
+  }
+
+  @media screen and (min-width: 1200px) {
+    header {
+      padding-top: 1rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 50% 1fr;
+      grid-template-areas: "stats feed relationships";
+    }
+    
+    .statsGrid {
+      grid-area: stats;
+    }
+
+    .relationships {
+      grid-area: relationships;
+    }
+
+    .activityFeed {
+      grid-area: feed;
     }
   }
 }

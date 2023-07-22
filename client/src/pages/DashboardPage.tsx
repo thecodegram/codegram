@@ -23,7 +23,7 @@ export interface leetcodeData {
   },
 }
 
-interface feedData {
+export interface feedData {
   "title": string,
   "titleSlug": string,
   "timestamp": string,

@@ -6,14 +6,43 @@ import { UserStatsGrid } from "../components/UserStatsGrid"
 import { ListGroup } from "../components/ListGroup"
 import { friendsDummyData, groupsDummyData } from "./DashboardPage"
 import { IconRankingMovedUp } from "../icons"
+import { useState, useEffect } from "react"
+import { feedData } from "./DashboardPage"
+import { FeedItem } from "../components/FeedItem"
+import axios from "axios"
 
 import styles from "./UserProfile.module.scss"
 
+enum ActivityFeedTab {
+  all = "all",
+  leetcode = "leedcode",
+  vjudge = "vjudge"
+}
+
 export const UserProfilePage = () => {
   const { username } = useParams()
-  // useEffect(async () => {
+  const [ activeFeedTab, setActiveFeedTab ] = useState<ActivityFeedTab>(ActivityFeedTab.all)
+  const [feedData, setFeedData] = useState<feedData[]>([])
 
-  // }, )
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${username}/latestSubmits`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
+  
+        setFeedData(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [username]);
 
 
   return(
@@ -32,7 +61,11 @@ export const UserProfilePage = () => {
           </article>
         </header>
         <main className={styles.main}>
-          {username && <UserStatsGrid username={username} />}
+          <article className={styles.statsGrid}>
+            <h2>Stats</h2>
+            {username && <UserStatsGrid username={username} />}
+          </article>
+
           <article className={styles.relationships}>
             <ListGroup title='Friends'>
               {friendsDummyData.map(({name, handle}, index) => (
@@ -54,6 +87,39 @@ export const UserProfilePage = () => {
                 </li>
               ))}
             </ListGroup>
+          </article>
+
+          <article className={styles.activityFeed}>
+            <nav>
+              <button 
+                className={activeFeedTab === ActivityFeedTab.all ? styles.active : ''} 
+                onClick={() => setActiveFeedTab(ActivityFeedTab.all)}>
+                  All Activity
+              </button>
+              <button 
+                className={activeFeedTab === ActivityFeedTab.leetcode ? styles.active : ''} 
+                onClick={() => setActiveFeedTab(ActivityFeedTab.leetcode)}>
+                  LeetCode
+              </button>
+              <button 
+                className={activeFeedTab === ActivityFeedTab.vjudge ? styles.active : ''} 
+                onClick={() => setActiveFeedTab(ActivityFeedTab.vjudge)}>
+                  Vjudge
+              </button>
+            </nav>
+            <section className={styles.feed}>
+              {feedData && feedData.map(({title, timestamp}, index) => 
+                <FeedItem 
+                  key={index}
+                  name={username || ""}
+                  username={username || ""}
+                  body={`${username} just solved ${title} on LeetCode!`} 
+                  numOfLikes={Math.floor(Math.random() * 20) + 1}
+                  createdTime={new Date(+timestamp * 1000)}
+                  showFullInfo={false}
+                />
+              )}
+            </section>
           </article>
         </main>
       </div>

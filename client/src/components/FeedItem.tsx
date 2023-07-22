@@ -8,20 +8,21 @@ interface FeedItemProps {
   username: string,
   body: string,
   numOfLikes: number,
-  createdTime: Date
+  createdTime: Date,
+  showFullInfo?: boolean
 }
 
-export const FeedItem = ({name, username, body, numOfLikes, createdTime}: FeedItemProps) => {
+export const FeedItem = ({ name, username, body, numOfLikes, createdTime, showFullInfo=true }: FeedItemProps) => {
   return <article className={styles.feedItem}>
     <section className={styles.header}>
-      <UserInfoHeader 
+      {showFullInfo && <UserInfoHeader 
         username={username} 
         name={name} 
         variant={UserInfoHeaderVariant.row}
-      />
-      <div className={styles.dot}></div>
+      />}
+      {showFullInfo && <div className={styles.dot}></div>}
       <p className={styles.detailText}>{createdTime.toDateString()}</p>
-      <button><IconFollowBtnPlus />Follow</button>
+      {showFullInfo && <button><IconFollowBtnPlus />Follow</button>}
     </section>
     <section className={styles.body}>
       <p>{body}</p>
