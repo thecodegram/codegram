@@ -12,7 +12,7 @@ INSERT INTO platform (pid, pname)
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    mongo_id VARCHAR(15) NOT NULL,
+    mongo_id VARCHAR(25) NOT NULL,
     username VARCHAR(30)
 );
 
