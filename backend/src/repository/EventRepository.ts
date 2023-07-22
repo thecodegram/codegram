@@ -9,6 +9,8 @@ export interface UpdateEventData {
 }
 
 export class EventRepository {
+
+    
   async saveEvent(updateData: UpdateEventData) {
     console.log("Save event", updateData);
 
@@ -57,5 +59,5 @@ export class EventRepository {
     }
   }
 
-  
+
 }
