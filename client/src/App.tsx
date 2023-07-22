@@ -1,6 +1,6 @@
 // App.tsx
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,6 +12,7 @@ import SignupPage from "./pages/SignupPage";
 import DashboardPage from "./pages/DashboardPage";
 import PrivateRoute from "./components/PrivateRoute";
 import OnBoardingPage from "./pages/OnBoardingPage";
+import { UserProfilePage } from "./pages/UserProfile"
 import { UserContext } from "./components/UserContext";
 
 function App() {
@@ -37,6 +38,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <DashboardPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/:username"
+              element={
+                <PrivateRoute>
+                  <UserProfilePage />
                 </PrivateRoute>
               }
             />
