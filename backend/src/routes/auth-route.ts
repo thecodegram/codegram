@@ -4,6 +4,7 @@ import { User } from "../model/schemas/userSchema";
 import { isValidUsername } from "../utils/utils";
 
 const router = express.Router();
+const nodeMailer = require("nodemailer");
 
 // Add some parameters to the session
 declare module "express-session" {
@@ -70,6 +71,33 @@ router.post("/signup", async (req: Request, res: Response) => {
       req.session.username = newUser.username;
       req.session.save();
 
+      // send email
+      var transporter = nodeMailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "kodygramme@gmail.com",
+          pass: "buaknommahtbfzpu",
+        },
+      });
+      
+      // Update the text property to include an anchor tag with the YouTube link
+      var mailOptions = {
+        from: "kodygramme@gmail.com",
+        to: "zhiani2000@gmail.com", // shramko.georgiy@gmail.com
+        subject: "You have been invited to collaborate on CodeGram",
+        html:
+          "<p>@shaygeko has invited you to collaborate on CodeGram, <a href='https://www.youtube.com/watch?v=j5a0jTc9S10&list=PL3KnTfyhrIlcudeMemKd6rZFGDWyK23vx&index=11&ab_channel=YourUncleMoe'>click to join</a></p>",
+      };
+    
+      transporter.sendMail(mailOptions, function (error: any, info: { response: string }) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
+      
+
       res.status(200).send("Registered");
     }
   } catch (e: any) {
@@ -80,17 +108,17 @@ router.post("/signup", async (req: Request, res: Response) => {
   }
 });
 
-router.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Error logging out:', err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            // Redirect the user to the login page or any other desired destination
-            res.status(200).send('Logged out');
-        }
-    });
-})
+router.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error logging out:", err);
+      res.status(500).send("Internal Server Error");
+    } else {
+      // Redirect the user to the login page or any other desired destination
+      res.status(200).send("Logged out");
+    }
+  });
+});
 
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
