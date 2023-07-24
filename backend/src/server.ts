@@ -33,7 +33,9 @@ app.use('/', (req: Request, res: Response, next: NextFunction) => {
 // routing
 app.use('/api/trigger-requests', [enforceLoggedIn], triggerRequestsRouter);
 app.use('/api/user', [enforceLoggedIn], usersRouter);
+app.use('/api/updates', [enforceLoggedIn], require('./routes/updates-route'));
 app.use('/api/auth', authRouter);
+
 
 (async () => {
   const isConnectedToDB = await setUpDB();

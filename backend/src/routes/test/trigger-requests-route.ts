@@ -83,7 +83,7 @@ router.get('/updatesList/:username', [
   else {
     try {
       const updates = await getUpdates(username);
-
+      
       res.json(updates).send();
     }
     catch(err){

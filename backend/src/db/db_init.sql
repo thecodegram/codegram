@@ -20,10 +20,19 @@ CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
     pid INTEGER, 
     user_id INTEGER,
-    event_description VARCHAR(255),
+    problem_name VARCHAR(255),
+    problem_slug VARCHAR(255),
     event_timestamp TIMESTAMP,
     CONSTRAINT fk_events_platform FOREIGN KEY (pid) REFERENCES platform(pid) ON DELETE CASCADE,
     CONSTRAINT fk_events_users  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATe TABLE IF NOT EXISTS likes (
+    user_id INTEGER,
+    event_id INTEGER,
+    CONSTRAINT fk_likes_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_likes_events FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    CONSTRAINT pk_likes PRIMARY KEY (user_id, event_id)
 );
 
 CREATE TABLE IF NOT EXISTS grind_group (

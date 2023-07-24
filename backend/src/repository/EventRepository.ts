@@ -23,6 +23,7 @@ export class EventRepository {
         username,
         platform,
         problemTitle,
+        problemTitleSlug,
         timestamp,
       } = updateData;
       
@@ -43,10 +44,11 @@ export class EventRepository {
           `Failed to find userId for username ${username} or platformId for platform ${platform}`
         );
       }
-
+      console.log("userId:", userId);
+      console.log("platformId:", platformId);
       const insertRes = await client.query(
-        "INSERT INTO events (pid, user_id, event_description, event_timestamp) VALUES ($1, $2, $3, TO_TIMESTAMP($4/1000)) RETURNING id",
-        [platformId, userId, problemTitle, timestamp]
+        "INSERT INTO events (pid, user_id, problem_name, problem_slug, event_timestamp) VALUES ($1, $2, $3, $4, TO_TIMESTAMP($5/1000)) RETURNING id",
+        [platformId, userId, problemTitle, problemTitleSlug, timestamp]
       );
       console.log("Inserted event with id", insertRes.rows[0].id);
 

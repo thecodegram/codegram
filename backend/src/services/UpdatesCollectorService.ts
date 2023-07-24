@@ -25,7 +25,7 @@ export async function getLeetcodeUpdates(username: string) {
                     updates.forEach((upd: any) => {
                         const updateData: UpdateEventData = {
                             username: username,
-                            platform: "LEETCODE",
+                            platform: "leetcode",
                             problemTitle: upd.title,
                             problemTitleSlug: upd.titleSlug,
                             timestamp: parseInt(upd.timestamp)
