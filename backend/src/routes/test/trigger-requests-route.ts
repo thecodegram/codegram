@@ -7,7 +7,8 @@ import { getSubmissionStats } from '../../api/vjudge';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { ExternalApiError } from '../../errors/external-api-error';
 import { User } from '../../model/schemas/userSchema';
-import { UpdateEventData, userUpdateEventEmitter } from '../../events/UserUpdateEventEmitter';
+import { userUpdateEventEmitter } from '../../events/UserUpdateEventEmitter';
+import { UpdateEventData } from '../../repository/EventRepository';
 import { getLeetcodeUpdates, getUpdates } from '../../services/UpdatesCollectorService';
 
 const router = express.Router()
@@ -82,7 +83,7 @@ router.get('/updatesList/:username', [
   else {
     try {
       const updates = await getUpdates(username);
-
+      
       res.json(updates).send();
     }
     catch(err){

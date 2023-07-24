@@ -1,10 +1,13 @@
 import express, { Request, Response } from "express";
 import { User } from "../model/schemas/userSchema";
-
+import { UserRepository } from "../repository/UserRepository";
 import { isValidUsername } from "../utils/utils";
 
 const router = express.Router();
+
 const nodeMailer = require("nodemailer");
+
+const userRepository = new UserRepository();
 
 // Add some parameters to the session
 declare module "express-session" {
@@ -65,8 +68,18 @@ router.post("/signup", async (req: Request, res: Response) => {
         email: email,
       });
 
-      await newUser.save();
+      const registedUser = await newUser.save();
 
+      console.log(registedUser);
+      console.log("this is the id: "+registedUser._id.toString());
+      //save to postgresql
+      if(registedUser.username && registedUser._id){
+          userRepository.saveUser(registedUser._id.toString(), registedUser.username);
+      } else {
+           console.log("username is undefined")
+      }
+      
+      
       // Init the user session
       req.session.username = newUser.username;
       req.session.save();
@@ -120,17 +133,6 @@ router.post("/logout", (req, res) => {
   });
 });
 
-router.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Error logging out:", err);
-      res.status(500).send("Internal Server Error");
-    } else {
-      // Redirect the user to the login page or any other desired destination
-      res.redirect("/login");
-    }
-  });
-});
 
 router.get("/check", (req: Request, res: Response) => {
   if (req.session && req.session.username) {
