@@ -10,6 +10,7 @@ import { UserNameNotFoundError } from "../../errors/username-not-found-error";
 import { getSubmissionStats } from "../../api/vjudge";
 import { getLatestAcceptedSubmits, getSubmitStats } from "../../api/leetcode";
 import { uploadFile, getFile } from "../../repository/ImageBucket";
+import sanitize from "sanitize-filename";
 import multer from "multer";
 import fs from "fs";
 
@@ -108,7 +109,8 @@ router.put(
           try {
             if (req.file) {
               const filePath = req.file.path;
-              const fileName = `profile_pics/${username}/${req.file.originalname}`;
+              const sanitizedOriginalName = sanitize(req.file.originalname);
+              const fileName = `profile_pics/${username}/${sanitizedOriginalName}`;
               // Upload the file to GCS
               await uploadFile(fileName, filePath);
               // Store the file name in the user document

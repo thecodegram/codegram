@@ -26,6 +26,7 @@
     "nodemailer": "^6.9.4",
     "nodemon": "^2.0.22",
     "pg": "^8.11.1",
+    "sanitize-filename": "^1.6.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
