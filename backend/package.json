@@ -23,6 +23,7 @@
     "mongodb": "^5.6.0",
     "mongoose": "^7.3.1",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.4",
     "nodemon": "^2.0.22",
     "pg": "^8.11.1",
     "ts-node": "^10.9.1",
