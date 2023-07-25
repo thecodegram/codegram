@@ -14,7 +14,8 @@ const userSchema = new Schema({
     required: true,
   },
   leetcode:  leetcodeStatsSchema,
-  vjudge:  vjudgeStatsSchema
+  vjudge:  vjudgeStatsSchema,
+  profilePic: String
 });
 
 export const User = mongoose.model('User', userSchema);
