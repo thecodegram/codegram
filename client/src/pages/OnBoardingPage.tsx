@@ -3,7 +3,7 @@ import styles from "./OnBoardingPage.module.css";
 import { IconLeetCodeLogo } from "../icons/icon-leetcode-logo";
 import { IconVJudgeLogo } from "../icons/icon-vjudge-logo";
 import { IconAddPhoto } from "../icons/import-photo-icon";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const OnBoardingPage = () => {
@@ -32,7 +32,6 @@ const OnBoardingPage = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-
     if (leetCodeUsername === "" && vJudgeUsername === "") {
       setErrorMsg("Please ensure at least one of the usernames is provided");
       return;
@@ -40,11 +39,10 @@ const OnBoardingPage = () => {
 
     const formData = new FormData();
     formData.append("leetcodeUsername", leetCodeUsername);
-    formData.append("vJudgeUsername", vJudgeUsername);
+    formData.append("vjudgeUsername", vJudgeUsername);
     if (imageFile) {
       formData.append("image", imageFile);
     }
-
 
     setErrorMsg("");
 
@@ -55,9 +53,8 @@ const OnBoardingPage = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            
           },
-            withCredentials: true,
+          withCredentials: true,
         }
       );
 
@@ -67,7 +64,18 @@ const OnBoardingPage = () => {
         setErrorMsg("Something went wrong, please try again.");
       }
     } catch (error) {
-      setErrorMsg("Failed to submit. Please try again.");
+      const axiosError = error as AxiosError;
+      if (
+        axiosError.response &&
+        axiosError.response.data &&
+        typeof axiosError.response.data === "string"
+      ) {
+        // If the API returned a detailed error message, use it
+        setErrorMsg(axiosError.response.data);
+      } else {
+        // Otherwise, use a generic error message
+        setErrorMsg("Failed to submit. Please try again.");
+      }
     }
   };
 
