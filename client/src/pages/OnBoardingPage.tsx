@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 import styles from "./OnBoardingPage.module.css";
 import { IconLeetCodeLogo } from "../icons/icon-leetcode-logo";
 import { IconVJudgeLogo } from "../icons/icon-vjudge-logo";
 import { IconAddPhoto } from "../icons/import-photo-icon";
 import axios, { AxiosError } from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import { UserContext } from "../components/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const OnBoardingPage = () => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
@@ -14,8 +15,7 @@ const OnBoardingPage = () => {
   const [vJudgeUsername, setVJudgeUsername] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
-  const { username } = location.state || { username: "" };
+  const { username } = useContext(UserContext);
 
   const handleClick = () => {
     hiddenFileInput.current?.click();
