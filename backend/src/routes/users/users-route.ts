@@ -10,12 +10,14 @@ import { UserNameNotFoundError } from "../../errors/username-not-found-error";
 import { getSubmissionStats } from "../../api/vjudge";
 import { getLatestAcceptedSubmits, getSubmitStats } from "../../api/leetcode";
 import { uploadFile, getFile } from "../../repository/ImageBucket";
+import { NotificationRepository } from "../../repository/NotificationRepository";
 import sanitize from "sanitize-filename";
 import multer from "multer";
 import fs from "fs";
 
 const upload = multer({ dest: "uploads/" });
 const router = express.Router();
+const notificationRepository = new NotificationRepository()
 
 router.get(
   "/:username/latestSubmits",
@@ -231,5 +233,38 @@ router.get(
     }
   }
 );
+
+router.get('/:userId/notifications', [
+  // Sanitize the userId variable
+  validateUsername('userId'),
+  handleValidationErrors
+],async (req: Request, res: Response) => {
+  const { userId } = req.params
+
+  try {
+    const notifications = await notificationRepository.getNotifications(userId)
+    res.status(200).json(notifications)
+  } catch(err) {
+    res.status(500).send(err)
+  }
+})
+
+router.post('/:userId/notifications', [
+  // Sanitize the userId variable
+  validateUsername('userId'),
+  handleValidationErrors
+],async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const { message } = req.body
+
+  try {
+    const notifications = await notificationRepository.createNotification(parseInt(userId, 16), message)
+    res.status(200).json(notifications)
+  } catch(err) {
+    res.status(500).send(err)
+  }
+})
+
+
 
 module.exports = router;
