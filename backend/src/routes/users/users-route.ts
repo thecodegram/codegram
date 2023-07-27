@@ -255,10 +255,10 @@ router.post('/:userId/notifications', [
   handleValidationErrors
 ],async (req: Request, res: Response) => {
   const { userId } = req.params
-  const { message } = req.body
+  const { message, type } = req.body
 
   try {
-    const notifications = await notificationRepository.createNotification(parseInt(userId, 16), message)
+    const notifications = await notificationRepository.createNotification(+userId, message, type)
     res.status(200).json(notifications)
   } catch(err) {
     res.status(500).send(err)

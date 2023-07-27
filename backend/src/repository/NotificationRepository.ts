@@ -1,15 +1,17 @@
 import { pool } from "../db/db";
 
+export enum NotificationTypes {
+  friend = "friend",
+  group = "group"
+}
+
 export class NotificationRepository {
   async getNotifications(userId: string) {
     const client = await pool.connect();
 
     try {
       await client.query('BEGIN');
-      const notifications = await client.query(
-        "SELECT * FROM notification WHERE recipient_id = $1;",
-        [userId]
-      );
+      const notifications = await client.query(`SELECT * FROM notification WHERE recipient_id = $1`, [userId]);
 
       await client.query('COMMIT');
       
@@ -23,11 +25,15 @@ export class NotificationRepository {
     }
   }
 
-  async createNotification(userId: number, message: string) {
+  async createNotification(userId: number, message: string, type: NotificationTypes) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      const instertNotification = await client.query("INSERT INTO notification (message, recipient_id) VALUES ($1, $2) RETURNING notification_id", [message, userId]);
+      const instertNotification = await client.query(`
+        INSERT INTO notification (message, recipient_id, type) 
+        VALUES ($1, $2, $3) 
+        RETURNING notification_id
+      `, [message, userId, type]);
 
       console.log("Inserted notification with id", instertNotification.rows[0].notification_id);
       await client.query('COMMIT');

@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS notification (
     notification_id SERIAL PRIMARY KEY,
     message VARCHAR(255),
     recipient_id INTEGER,
+    type VARCHAR(25),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_notification_user FOREIGN KEY (recipient_id) REFERENCES users(id) on DELETE CASCADE
-)
+);
