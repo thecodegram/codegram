@@ -32,3 +32,50 @@
   color: #B0AEAA;
   font-weight: 600;
 }
+
+.dropdown {
+  color: #fff;
+  min-width: 20rem;
+
+  h2 {
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+  }
+
+  .dropdownList {
+    max-height: 30vh;
+    overflow-y: scroll;
+    padding-right: 0.5rem;
+  
+    /* width */
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    /* Track */
+    &::-webkit-scrollbar-track {
+      background: #2C2C2C;
+    }
+  
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+      background: #5B5955;
+    }
+  
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+      background: #84827e;
+    }
+    
+    .dropdownItem {
+      border-bottom: 1px solid #444340;
+      padding: 1.5rem 0;
+
+      .timestamp {
+        margin-top: 0.5rem;
+        font-size: 0.88rem;
+        color: #9C9995;
+      }
+    }
+  }
+}

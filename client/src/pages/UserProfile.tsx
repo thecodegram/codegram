@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom"
-import { HeaderNav } from "../components/HeaderNav"
 import { UserInfoHeader } from "../components/UserInfoHeader"
 import { AvatarSize } from "../components/Avatar"
 import { UserStatsGrid } from "../components/UserStatsGrid"
@@ -9,6 +8,7 @@ import { IconRankingMovedUp } from "../icons"
 import { useState, useEffect } from "react"
 import { feedData } from "./DashboardPage"
 import { FeedItem } from "../components/FeedItem"
+import { HeaderNav } from "../components/HeaderNav"
 import axios from "axios"
 
 import styles from "./UserProfile.module.scss"

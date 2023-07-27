@@ -1,0 +1,17 @@
+.dropdown {
+  position: relative;
+}
+
+.trigger {
+  cursor: pointer;
+}
+
+.panel {
+  position: absolute;
+  top: 2rem;
+  right: 0;
+  padding: 1rem;
+  background-color: #2C2C2C;
+  border-radius: 1rem;
+  box-shadow: 0px 2px 8px 0px rgba(22, 22, 21, 0.35);
+}

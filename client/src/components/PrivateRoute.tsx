@@ -11,20 +11,21 @@ interface PrivateRouteProps {
 
 const PrivateRoute: FC<PrivateRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const { setUsername } = useUserContext();
+  const { setUsername, setUserId } = useUserContext();
   const navigate = useNavigate();
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/api/auth/check`, { withCredentials: true })
       .then(response => {
         setIsAuthenticated(response.status === 200);
-        setUsername(response.data);
+        setUsername(response.data.username);
+        setUserId(response.data.userId);
       })
       .catch(() => {
         setIsAuthenticated(false);
         setUsername(null);
       });
-  }, [setUsername]);
+  }, [setUsername, setUserId]);
 
   if (isAuthenticated === null) return null;
 

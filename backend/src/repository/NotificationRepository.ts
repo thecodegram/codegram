@@ -11,7 +11,12 @@ export class NotificationRepository {
 
     try {
       await client.query('BEGIN');
-      const notifications = await client.query(`SELECT * FROM notification WHERE recipient_id = $1`, [userId]);
+      const notifications = await client.query(`
+        SELECT * 
+        FROM notification 
+        WHERE recipient_id = $1
+        ORDER BY created_at DESC
+      `, [userId]);
 
       await client.query('COMMIT');
       

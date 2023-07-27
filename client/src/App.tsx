@@ -17,11 +17,12 @@ import { UserContext } from "./components/UserContext";
 
 function App() {
   const [username, setUsername] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   return (
     <Router>
       <div className="App">
-        <UserContext.Provider value={{ username, setUsername }}>
+        <UserContext.Provider value={{ username, userId, setUsername, setUserId }}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />

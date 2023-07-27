@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useUserContext } from "../components/UserContext";
-import { HeaderNav } from "../components/HeaderNav";
 import {
   UserInfoHeader,
   UserInfoHeaderVariant,
@@ -10,6 +9,7 @@ import { AvatarSize } from "../components/Avatar";
 import { ListGroup } from "../components/ListGroup";
 import { FeedItem } from "../components/FeedItem";
 import { UserStatsGrid } from "../components/UserStatsGrid";
+import { HeaderNav } from "../components/HeaderNav";
 
 import styles from "./DashboardPage.module.scss";
 
