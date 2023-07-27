@@ -33,8 +33,12 @@ const LoginPage = () => {
       );
 
       if ((await response.status) === 200) {
-        // localStorage.setItem("isLoggedIn", "true");
-        navigate("/dashboard");
+        // this is gonna flag for onboarding or dashboard
+        if (response.data.status === "onboarding") {
+          navigate("/onboarding");
+        } else if (response.data.status === "dashboard") {
+          navigate("/dashboard");
+        }
       } else {
         setError("Invalid username or password. Please try again.");
       }
