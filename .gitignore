@@ -18,3 +18,6 @@ dist/
 # Logs
 logs/
 *.log
+
+# Google Cloud Key file
+gcloudkey.json
