@@ -3,6 +3,7 @@ import { UserNameNotFoundError } from "../errors/username-not-found-error";
 import { userUpdateEventEmitter } from "../events/UserUpdateEventEmitter";
 import { UpdateEventData } from "../repository/EventRepository";
 import { User } from "../model/schemas/userSchema";
+import { getSubmissionStats } from "../api/vjudge";
 
 export async function getLeetcodeUpdates(username: string) {
     const u = await User.findOne({ username: username });
@@ -45,9 +46,64 @@ export async function getLeetcodeUpdates(username: string) {
     }
 }
 
+
+function generateVjudgeUpdateEvent(username: string, platform: string, problemName: string): UpdateEventData {
+    const updateData: UpdateEventData = {
+        username: username,
+        platform: "vjudge",
+        problemTitle: platform+'-'+problemName,
+        problemTitleSlug: platform+'-'+problemName,
+        timestamp: Math.floor(Date.now()/1000)
+    }
+
+    return updateData;
+}
+
 export async function getVjudgeUpdates(username: string) {
-    // TODO: implement
-    return [];
+    const u = await User.findOne({ username: username }, {leetcode: 0});
+
+    if(!u) {
+        throw new UserNameNotFoundError(username);
+    } else {
+        const updates = await (async () => {
+            if(u.vjudge?.username) {
+                const latestData = await getSubmissionStats(u.vjudge.username);
+
+                const storedAcData = u.vjudge.acRecords!!;
+                const storedFailedData = u.vjudge.failRecords!!;
+
+                const keys: string[] = ['AtCoder', 'CSES', 'CodeChef', 'CodeForces', 'DMOJ', 'EOlymp','Gym', 'Kattis', 'SPOJ', 'TopCoder', 'UVA'];
+                
+                const updates = [];
+                // go through all platformNames and check if there are updates for any of them
+                for (var i = 0; i < keys.length; ++i) {
+                      const key:string = keys[i];
+                      const oldValues: string[] = storedAcData[key as keyof typeof storedAcData].sort();
+                      const newValues: string[] = latestData.acRecords[key].sort();
+
+                      // something changed!
+                      if(oldValues.length < newValues.length) {
+
+                        // 2-pointer approach to finding the different elements in 2 lists
+                        for(var i = 0, j = 0; i < oldValues.length; ++i, ++j) {
+                            while(j < newValues.length && oldValues[i] !== newValues[j]) {
+                                const update = generateVjudgeUpdateEvent(username, key, newValues[j]);
+                                updates.push(update);
+                                userUpdateEventEmitter.emit(update);
+                                ++j;
+                            }
+                        }
+                      }
+                }
+
+                return updates;
+            } else {
+                return [];
+            }
+        })();
+
+        return updates;
+    }
 }
 
 export async function getUpdates(username: string) {
