@@ -20,6 +20,7 @@ interface FriendRequestItem {
 export const FriendRequestsPage = () => {
   const { userId } = useUserContext()
   const [ friendRequestsData, setFriendRequestsData] = useState<FriendRequestItem[]>([])
+  const [ forceRerender, setForceRerender ] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +40,7 @@ export const FriendRequestsPage = () => {
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, forceRerender]);
 
   const onClickRemoveFriendRequest = async (friendRequestId: number) => {
     try {
@@ -49,6 +50,7 @@ export const FriendRequestsPage = () => {
           withCredentials: true,
         }
       );
+      setForceRerender(!forceRerender);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -65,6 +67,7 @@ export const FriendRequestsPage = () => {
           withCredentials: true,
         }
       );
+      setForceRerender(!forceRerender);
     } catch (error) {
       console.error('Error fetching data:', error);
     }

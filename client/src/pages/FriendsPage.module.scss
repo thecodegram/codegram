@@ -32,7 +32,7 @@
     }
   }
 
-  .friendRequestListItem + .friendRequestListItem {
+  .friendRequestListItem + .friendRequestListItem, .friendListItem + .friendListItem {
     border-top: 1px solid #2C2C2C;
   }
 }
