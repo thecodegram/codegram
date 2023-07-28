@@ -3,7 +3,7 @@ import { UserInfoHeader } from "../components/UserInfoHeader"
 import { AvatarSize } from "../components/Avatar"
 import { UserStatsGrid } from "../components/UserStatsGrid"
 import { ListGroup } from "../components/ListGroup"
-import { friendsDummyData, groupsDummyData } from "./DashboardPage"
+import { groupsDummyData } from "./DashboardPage"
 import { IconRankingMovedUp, IconAddFriendBtnPlus } from "../icons"
 import { useState, useEffect } from "react"
 import { feedData } from "./DashboardPage"
@@ -12,6 +12,8 @@ import { HeaderNav } from "../components/HeaderNav"
 import { Button } from "../components/Button"
 import { useUserContext } from "../components/UserContext"
 import { UserInfoData } from "./DashboardPage"
+import { FriendsList } from "../components/FriendsList"
+import { EmptyState } from "../components/EmptyState"
 import axios from "axios"
 
 import styles from "./UserProfile.module.scss"
@@ -26,7 +28,7 @@ export const UserProfilePage = () => {
   const { username, userId } = useUserContext()
   const { username: profileUsername } = useParams()
   const [ activeFeedTab, setActiveFeedTab ] = useState<ActivityFeedTab>(ActivityFeedTab.all)
-  const [ userProfileData, setUserProfileData ] = useState<UserInfoData>()
+  const [ profileUserData, setProfileUserData ] = useState<UserInfoData>()
   const [feedData, setFeedData] = useState<feedData[]>([])
   const showAddFriendBtn = username !== profileUsername
 
@@ -61,7 +63,7 @@ export const UserProfilePage = () => {
         );
         const jsonData = await response.data;
   
-        setUserProfileData(jsonData);
+        setProfileUserData(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -73,7 +75,7 @@ export const UserProfilePage = () => {
   const onClickAddFriend = async () => {
     try {
       await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/user/${userId}/send-friend-request/${userProfileData?.postgres.id}`, {},
+        `${process.env.REACT_APP_API_URL}/api/user/${userId}/send-friend-request/${profileUserData?.postgres.id}`, {},
         {
           withCredentials: true,
         }
@@ -106,16 +108,7 @@ export const UserProfilePage = () => {
           </article>
 
           <article className={styles.relationships}>
-            <ListGroup title='Friends'>
-              {friendsDummyData.map(({name, handle}, index) => (
-                <li key={index}>
-                  <UserInfoHeader 
-                    username={name} 
-                    name={handle} 
-                  />
-                </li>
-              ))}
-            </ListGroup>
+            <FriendsList userId={profileUserData?.postgres.id || null} />
             <ListGroup title='Groups'>
               {groupsDummyData.map(({name, handle}, index) => (
                 <li key={index}>
@@ -147,17 +140,21 @@ export const UserProfilePage = () => {
               </button>
             </nav>
             <section className={styles.feed}>
-              {feedData && feedData.map(({title, timestamp}, index) => 
-                <FeedItem 
-                  key={index}
-                  name={profileUsername || ""}
-                  username={profileUsername || ""}
-                  body={`${profileUsername} just solved ${title} on LeetCode!`} 
-                  numOfLikes={Math.floor(Math.random() * 20) + 1}
-                  createdTime={new Date(+timestamp * 1000)}
-                  showFullInfo={false}
-                />
-              )}
+              {feedData.length === 0 
+                ? <EmptyState>No activity yet</EmptyState>
+                : feedData.map(({title, timestamp}, index) => 
+                  <FeedItem 
+                    key={index}
+                    name={profileUsername || ""}
+                    username={profileUsername || ""}
+                    body={`${profileUsername} just solved ${title} on LeetCode!`} 
+                    numOfLikes={Math.floor(Math.random() * 20) + 1}
+                    createdTime={new Date(+timestamp * 1000)}
+                    showFullInfo={false}
+                  />
+                )
+              }
+              
             </section>
           </article>
         </main>

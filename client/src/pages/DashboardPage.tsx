@@ -10,7 +10,7 @@ import { ListGroup } from "../components/ListGroup";
 import { FeedItem } from "../components/FeedItem";
 import { UserStatsGrid } from "../components/UserStatsGrid";
 import { HeaderNav } from "../components/HeaderNav";
-import { Link } from "react-router-dom";
+import { FriendsList } from "../components/FriendsList";
 
 import styles from "./DashboardPage.module.scss";
 
@@ -46,25 +46,6 @@ interface RelationshipProps {
   handle: string;
 }
 
-export const friendsDummyData: RelationshipProps[] = [
-  {
-    name: "Peyz",
-    handle: "peyz",
-  },
-  {
-    name: "Danny",
-    handle: "dannyl1u",
-  },
-  {
-    name: "George",
-    handle: "shaygeko",
-  },
-  {
-    name: "Bobby",
-    handle: "bobbychan",
-  },
-];
-
 export const groupsDummyData: RelationshipProps[] = [
   {
     name: "372 Group",
@@ -84,7 +65,7 @@ const DashboardPage = () => {
   const [feedData, setFeedData] = useState<feedData[]>([]);
   const [loading, setLoading] = useState(true);
   const [profilePic, setProfilePic] = useState<string | null>(null);
-  const { username } = useUserContext();
+  const { username, userId } = useUserContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,16 +157,7 @@ const DashboardPage = () => {
                 ))}
             </article>
             <article className={styles.relationships}>
-              <ListGroup title="Friends">
-                <Link to={`/friends`} relative="path" className={styles.viewAll}>
-                  View all
-                </Link>
-                {friendsDummyData.map(({ name, handle }, index) => (
-                  <li key={index}>
-                    <UserInfoHeader username={name} name={handle} />
-                  </li>
-                ))}
-              </ListGroup>
+              {userId && <FriendsList userId={userId} />}
               <ListGroup title="Groups">
                 {groupsDummyData.map(({ name, handle }, index) => (
                   <li key={index}>

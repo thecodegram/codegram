@@ -7,7 +7,7 @@ import { Link } from "react-router-dom"
 
 import styles from "./FriendsPage.module.scss"
 
-interface FriendItem {
+export interface FriendItem {
   user_1_id: number,
   user_2_id: number,
   user_1_username: string,
