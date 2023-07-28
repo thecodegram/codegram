@@ -14,6 +14,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import OnBoardingPage from "./pages/OnBoardingPage";
 import { UserProfilePage } from "./pages/UserProfile"
 import { FriendsPage } from "./pages/FriendsPage";
+import { FriendRequestsPage } from "./pages/FriendRequestsPage";
 import { UserContext } from "./components/UserContext";
 
 function App() {
@@ -44,13 +45,18 @@ function App() {
               }
             />
             <Route
-              path="/friends"
+              path="/friends/*"
               element={
                 <PrivateRoute>
                   <FriendsPage />
                 </PrivateRoute>
               }
-            />
+            >
+              <Route
+                path="requests"
+                element={<FriendRequestsPage />}
+              />
+            </Route>
             <Route
               path="/:username"
               element={

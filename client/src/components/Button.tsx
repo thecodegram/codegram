@@ -9,11 +9,11 @@ export enum ButtonVariant {
 interface ButtonProps {
   variant?: ButtonVariant,
   children?: any,
-  props?: any
+  onClick?: () => any;
 }
 
-export const Button = ({ variant = ButtonVariant.primary, children, ...props }: ButtonProps) => {
-  return <button className={`${styles.btn} ${styles[variant]}`} {...props}>
+export const Button = ({ variant = ButtonVariant.primary, children, onClick }: ButtonProps) => {
+  return <button className={`${styles.btn} ${styles[variant]}`} onClick={onClick}>
     {children}
   </button>
 }

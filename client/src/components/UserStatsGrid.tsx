@@ -38,8 +38,8 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
   }, [username]);
 
   return <div className={styles.statsGrid}>
-  {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
-    <div>
+  {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item, index) => (
+    <div key={index}>
       <p>{item.count.toString()}</p>
       <h3>{item.difficulty}</h3>
     </div>

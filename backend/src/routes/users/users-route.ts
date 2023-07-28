@@ -270,7 +270,7 @@ router.post('/:userId/notifications', [
 router.get('/:userId/friend-requests', [
   validateUsername('userId'),
   handleValidationErrors
-],async (req: Request, res: Response) => {
+], async (req: Request, res: Response) => {
   const { userId } = req.params
 
   try {
@@ -281,14 +281,44 @@ router.get('/:userId/friend-requests', [
   }
 })
 
-router.post('/:userId/friend-requests/:requesteeId', [
+router.post('/:userId/send-friend-request/:requesteeId', [
   validateUsername('userId'),
   handleValidationErrors
-],async (req: Request, res: Response) => {
+], async (req: Request, res: Response) => {
   const { userId: requesterId, requesteeId } = req.params
 
   try {
     const newFriendRequest = await friendRepository.createFriendRequest(+requesterId, +requesteeId)
+    res.status(200).json(newFriendRequest)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+})
+
+router.post('/:userId/friend-requests/:friendRequestId/accept', [
+  validateUsername('userId'),
+  handleValidationErrors
+],async (req: Request, res: Response) => {
+  const { userId: requesteeId, friendRequestId } = req.params
+  const { requesterId } = req.body
+
+  try {
+    const newFriend = await friendRepository.createFriend(+requesterId, +requesteeId)
+    await friendRepository.deactivateFriendRequest(+friendRequestId)
+    res.status(200).json(newFriend)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+})
+
+router.post('/:userId/friend-requests/:friendRequestId/remove', [
+  validateUsername('userId'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { friendRequestId } = req.params
+
+  try {
+    const newFriendRequest = await friendRepository.deactivateFriendRequest(+friendRequestId)
     res.status(200).json(newFriendRequest)
   } catch (err) {
     res.status(500).send(err)

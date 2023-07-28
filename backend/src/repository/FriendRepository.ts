@@ -1,7 +1,7 @@
 import { pool } from "../db/db";
 
 export class FriendRepository {
-  async createFriendRequest(requester_id: number, requestee_id: number) {
+  async createFriendRequest(requesterId: number, requesteeId: number) {
     const client = await pool.connect();
 
     try {
@@ -11,7 +11,7 @@ export class FriendRepository {
         INSERT INTO friend_request (requester_id, requestee_id)
         VALUES ($1, $2)
         RETURNING friend_request_id
-      `, [requester_id, requestee_id])
+      `, [requesterId, requesteeId])
   
       console.log("Inserted friend request with id", newFriendRequest.rows[0].notification_id);
       await client.query('COMMIT');
@@ -41,7 +41,8 @@ export class FriendRepository {
         INNER JOIN
           users AS requestee ON friend_request.requestee_id = requestee.id
         WHERE
-          friend_request.requestee_id = $1;
+          friend_request.requestee_id = $1 AND
+          friend_request.is_active = true;
       `, [userId]);
 
       await client.query('COMMIT');
@@ -53,6 +54,50 @@ export class FriendRepository {
       throw e;
     } finally {
       client.release();
+    }
+  }
+
+  async deactivateFriendRequest(friend_request_id: number) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      const updatedFriendRequest = await client.query(`
+        UPDATE friend_request
+        SET is_active = false
+        WHERE friend_request_id = $1;
+      `, [friend_request_id]);
+
+      await client.query('COMMIT');
+      
+      return updatedFriendRequest.rows;
+    } catch(e) {
+      await client.query('ROLLBACK');
+      console.error("Failed to set friend request as inactive for this user:", e);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  async createFriend(user1Id: number, user2Id: number) {
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+
+      const newFriend = await client.query(`
+        INSERT INTO friend (user_1_id, user_2_id) VALUES ($1, $2) RETURNING user_1_id, user_2_id;
+      `, [user1Id, user2Id])
+  
+      console.log(`Inserted friend with user1Id=${newFriend.rows[0].user_1_id}, user2Id=${newFriend.rows[0].user_2_id}`);
+      await client.query('COMMIT');
+  
+      return newFriend.rows;
+    } catch (e) {
+      await client.query('ROLLBACK');
+    } finally {
+      client.release()
     }
   }
 }
