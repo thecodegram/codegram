@@ -11,6 +11,7 @@ import { getSubmissionStats } from "../../api/vjudge";
 import { getLatestAcceptedSubmits, getSubmitStats } from "../../api/leetcode";
 import { uploadFile, getFile } from "../../repository/ImageBucket";
 import { NotificationRepository } from "../../repository/NotificationRepository";
+import { FriendRepository } from "../../repository/FriendRepository";
 import sanitize from "sanitize-filename";
 import multer from "multer";
 import fs from "fs";
@@ -18,6 +19,7 @@ import fs from "fs";
 const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 const notificationRepository = new NotificationRepository()
+const friendRepository = new FriendRepository()
 
 router.get(
   "/:username/latestSubmits",
@@ -238,13 +240,13 @@ router.get('/:userId/notifications', [
   // Sanitize the userId variable
   validateUsername('userId'),
   handleValidationErrors
-],async (req: Request, res: Response) => {
+], async (req: Request, res: Response) => {
   const { userId } = req.params
 
   try {
     const notifications = await notificationRepository.getNotifications(userId)
     res.status(200).json(notifications)
-  } catch(err) {
+  } catch (err) {
     res.status(500).send(err)
   }
 })
@@ -253,18 +255,45 @@ router.post('/:userId/notifications', [
   // Sanitize the userId variable
   validateUsername('userId'),
   handleValidationErrors
-],async (req: Request, res: Response) => {
+], async (req: Request, res: Response) => {
   const { userId } = req.params
   const { message, type } = req.body
 
   try {
-    const notifications = await notificationRepository.createNotification(+userId, message, type)
-    res.status(200).json(notifications)
-  } catch(err) {
+    const newNotification = await notificationRepository.createNotification(+userId, message, type)
+    res.status(200).json(newNotification)
+  } catch (err) {
     res.status(500).send(err)
   }
 })
 
+router.get('/:userId/friend-requests', [
+  validateUsername('userId'),
+  handleValidationErrors
+],async (req: Request, res: Response) => {
+  const { userId } = req.params
+
+  try {
+    const friendRequests = await friendRepository.getFriendRequests(+userId)
+    res.status(200).json(friendRequests)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+})
+
+router.post('/:userId/friend-requests/:requesteeId', [
+  validateUsername('userId'),
+  handleValidationErrors
+],async (req: Request, res: Response) => {
+  const { userId: requesterId, requesteeId } = req.params
+
+  try {
+    const newFriendRequest = await friendRepository.createFriendRequest(+requesterId, +requesteeId)
+    res.status(200).json(newFriendRequest)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+})
 
 
 module.exports = router;

@@ -34,16 +34,16 @@ export class NotificationRepository {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      const instertNotification = await client.query(`
+      const newNotification = await client.query(`
         INSERT INTO notification (message, recipient_id, type) 
         VALUES ($1, $2, $3) 
         RETURNING notification_id
       `, [message, userId, type]);
 
-      console.log("Inserted notification with id", instertNotification.rows[0].notification_id);
+      console.log("Inserted notification with id", newNotification.rows[0].notification_id);
       await client.query('COMMIT');
 
-      return instertNotification.rows[0].id;
+      return newNotification.rows[0].id;
     } catch(e) {
       await client.query('ROLLBACK');
       console.error("Failed to insert user into PostgreSQL database:", e);
