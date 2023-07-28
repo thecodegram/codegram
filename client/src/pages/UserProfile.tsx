@@ -4,11 +4,14 @@ import { AvatarSize } from "../components/Avatar"
 import { UserStatsGrid } from "../components/UserStatsGrid"
 import { ListGroup } from "../components/ListGroup"
 import { friendsDummyData, groupsDummyData } from "./DashboardPage"
-import { IconRankingMovedUp } from "../icons"
+import { IconRankingMovedUp, IconAddFriendBtnPlus } from "../icons"
 import { useState, useEffect } from "react"
 import { feedData } from "./DashboardPage"
 import { FeedItem } from "../components/FeedItem"
 import { HeaderNav } from "../components/HeaderNav"
+import { Button } from "../components/Button"
+import { useUserContext } from "../components/UserContext"
+import { UserInfoData } from "./DashboardPage"
 import axios from "axios"
 
 import styles from "./UserProfile.module.scss"
@@ -20,15 +23,18 @@ enum ActivityFeedTab {
 }
 
 export const UserProfilePage = () => {
-  const { username } = useParams()
+  const { username, userId } = useUserContext()
+  const { username: profileUsername } = useParams()
   const [ activeFeedTab, setActiveFeedTab ] = useState<ActivityFeedTab>(ActivityFeedTab.all)
+  const [ userProfileData, setUserProfileData ] = useState<UserInfoData>()
   const [feedData, setFeedData] = useState<feedData[]>([])
+  const showAddFriendBtn = username !== profileUsername
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/user/${username}/latestSubmits`,
+          `${process.env.REACT_APP_API_URL}/api/user/${profileUsername}/latestSubmits`,
           {
             withCredentials: true,
           }
@@ -42,7 +48,40 @@ export const UserProfilePage = () => {
     };
 
     fetchData();
-  }, [username]);
+  }, [profileUsername]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${profileUsername}`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
+  
+        setUserProfileData(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [profileUsername]);
+
+  const onClickAddFriend = async () => {
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/user/${userId}/send-friend-request/${userProfileData?.postgres.id}`, {},
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+    }
+  }
 
   return(
     <>
@@ -50,19 +89,20 @@ export const UserProfilePage = () => {
       <div className={styles.userProfilePage}>
         <header>
           <UserInfoHeader 
-            username={username || ""} 
-            name={username || ""}
+            username={profileUsername || ""} 
+            name={profileUsername || ""}
             avatarSize={AvatarSize.large}
             />
           <article className={styles.rankTag}>
             #12
             <span><IconRankingMovedUp />2</span>
           </article>
+          {showAddFriendBtn && <Button onClick={onClickAddFriend}><IconAddFriendBtnPlus /> Add friend</Button>}
         </header>
         <main className={styles.main}>
           <article className={styles.statsGrid}>
             <h2>Stats</h2>
-            {username && <UserStatsGrid username={username} />}
+            {profileUsername && <UserStatsGrid username={profileUsername} />}
           </article>
 
           <article className={styles.relationships}>
@@ -110,9 +150,9 @@ export const UserProfilePage = () => {
               {feedData && feedData.map(({title, timestamp}, index) => 
                 <FeedItem 
                   key={index}
-                  name={username || ""}
-                  username={username || ""}
-                  body={`${username} just solved ${title} on LeetCode!`} 
+                  name={profileUsername || ""}
+                  username={profileUsername || ""}
+                  body={`${profileUsername} just solved ${title} on LeetCode!`} 
                   numOfLikes={Math.floor(Math.random() * 20) + 1}
                   createdTime={new Date(+timestamp * 1000)}
                   showFullInfo={false}

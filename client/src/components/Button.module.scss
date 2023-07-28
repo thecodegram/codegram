@@ -9,6 +9,11 @@
   font-weight: 600;
   cursor: pointer;
   width: fit-content;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 
   &.secondary {
     background-color: #2C2C2C;

@@ -12,12 +12,15 @@ import { getLatestAcceptedSubmits, getSubmitStats } from "../../api/leetcode";
 import { uploadFile, getFile } from "../../repository/ImageBucket";
 import { NotificationRepository } from "../../repository/NotificationRepository";
 import { FriendRepository } from "../../repository/FriendRepository";
+import { UserRepository } from "../../repository/UserRepository";
 import sanitize from "sanitize-filename";
 import multer from "multer";
 import fs from "fs";
 
 const upload = multer({ dest: "uploads/" });
 const router = express.Router();
+
+const userRepository = new UserRepository()
 const notificationRepository = new NotificationRepository()
 const friendRepository = new FriendRepository()
 
@@ -184,7 +187,9 @@ router.get(
   async (req: Request, res: Response) => {
     const { username } = req.params;
 
-    const userData = await User.findOne(
+    const userPostgresData = await userRepository.getUser(username)
+
+    const userMongoData = await User.findOne(
       { username: username },
       {
         password: false,
@@ -194,10 +199,10 @@ router.get(
       }
     );
 
-    if (!userData) {
+    if (!userMongoData || !userPostgresData) {
       res.status(404).send("User not found");
     } else {
-      res.status(200).json(userData);
+      res.status(200).json({ mongo: userMongoData, postgres: { id: userPostgresData.id } });
     }
   }
 );

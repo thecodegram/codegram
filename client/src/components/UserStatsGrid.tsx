@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
-import { leetcodeData } from "../pages/DashboardPage"
+import { UserInfoData } from "../pages/DashboardPage"
 
 import styles from "./UserStatsGrid.module.scss"
 
@@ -9,13 +9,7 @@ interface UserStatsGridProps {
 }
 
 export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
-  const [statsData, setStatsData] = useState<leetcodeData>({
-    leetcode: {
-      submitStats: {
-        acSubmissionNum: []
-      }
-    }
-  });
+  const [statsData, setStatsData] = useState<UserInfoData>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +32,7 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
   }, [username]);
 
   return <div className={styles.statsGrid}>
-  {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item, index) => (
+  {statsData && statsData?.mongo.leetcode.submitStats?.acSubmissionNum.map((item, index) => (
     <div key={index}>
       <p>{item.count.toString()}</p>
       <h3>{item.difficulty}</h3>

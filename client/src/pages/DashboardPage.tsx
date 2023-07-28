@@ -14,17 +14,22 @@ import { Link } from "react-router-dom";
 
 import styles from "./DashboardPage.module.scss";
 
-export interface leetcodeData {
-  username?: string;
-  leetcode: {
-    submitStats?: {
-      acSubmissionNum: {
-        difficulty: string;
-        count: number;
-        submissions: number;
-      }[];
+export interface UserInfoData {
+  mongo: {
+    username?: string;
+    leetcode: {
+      submitStats?: {
+        acSubmissionNum: {
+          difficulty: string;
+          count: number;
+          submissions: number;
+        }[];
+      };
     };
-  };
+  },
+  postgres: {
+    id: number
+  }
 }
 
 export interface feedData {
