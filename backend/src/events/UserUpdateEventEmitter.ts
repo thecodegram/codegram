@@ -1,5 +1,6 @@
 import EventEmitter from "events";
-import { UpdateEventData, EventRepository } from "../repository/EventRepository";
+import { EventRepository } from "../repository/EventRepository";
+import { UpdateEventData } from "../model/UpdateEventData";
 
 export class UserUpdateEventEmitter {
   private eventEmitter: EventEmitter;

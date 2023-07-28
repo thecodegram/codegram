@@ -1,11 +1,13 @@
 import { getLatestAcceptedSubmits, getSubmitStats } from "../api/leetcode";
 import { UserNameNotFoundError } from "../errors/username-not-found-error";
 import { userUpdateEventEmitter } from "../events/UserUpdateEventEmitter";
-import { UpdateEventData } from "../repository/EventRepository";
 import { User } from "../model/schemas/userSchema";
 import { getSubmissionStats } from "../api/vjudge";
+import { UpdateEventData } from "../model/UpdateEventData";
+import { refreshLeetcodeDataEventEmitter } from "../events/RefreshLeetcodeDataEventEmitter";
+import { storeVjudgeSubmissionEventEmitter } from "../events/StoreVjudgeSubmissionEventEmitter";
 
-export async function getLeetcodeUpdates(username: string) {
+export async function getAndStoreLeetcodeUpdates(username: string) {
     const u = await User.findOne({ username: username });
 
     if (!u) {
@@ -33,6 +35,8 @@ export async function getLeetcodeUpdates(username: string) {
                         }
                         userUpdateEventEmitter.emit(updateData);
                     });
+                    refreshLeetcodeDataEventEmitter.emit(newData);
+
                     return updates;
                 }
                 else {
@@ -59,7 +63,7 @@ function generateVjudgeUpdateEvent(username: string, platform: string, problemNa
     return updateData;
 }
 
-export async function getVjudgeUpdates(username: string) {
+export async function getAndStoreVjudgeUpdates(username: string) {
     const u = await User.findOne({ username: username }, {leetcode: 0});
 
     if(!u) {
@@ -78,7 +82,7 @@ export async function getVjudgeUpdates(username: string) {
                 // go through all platformNames and check if there are updates for any of them
                 for (var i = 0; i < keys.length; ++i) {
                       const key:string = keys[i];
-                      const oldValues: string[] = storedAcData[key as keyof typeof storedAcData].sort();
+                      const oldValues: string[] = storedAcData[key as keyof typeof storedAcData];
                       const newValues: string[] = latestData.acRecords[key].sort();
 
                       // something changed!
@@ -89,13 +93,21 @@ export async function getVjudgeUpdates(username: string) {
                             while(j < newValues.length && oldValues[i] !== newValues[j]) {
                                 const update = generateVjudgeUpdateEvent(username, key, newValues[j]);
                                 updates.push(update);
+
+                                // store update to be displayable in feed
                                 userUpdateEventEmitter.emit(update);
+                                // update submits data to know about this problem
+                                storeVjudgeSubmissionEventEmitter.emit({
+                                    platform: key,
+                                    username: username,
+                                    problem: newValues[j]
+                                });
+
                                 ++j;
                             }
                         }
                       }
                 }
-
                 return updates;
             } else {
                 return [];
@@ -107,8 +119,8 @@ export async function getVjudgeUpdates(username: string) {
 }
 
 export async function getUpdates(username: string) {
-    const leetcodeUpdatesPromise = getLeetcodeUpdates(username);
-    const vjudgeUpdatesPromise = getVjudgeUpdates(username);
+    const leetcodeUpdatesPromise = getAndStoreLeetcodeUpdates(username);
+    const vjudgeUpdatesPromise = getAndStoreVjudgeUpdates(username);
 
     const leetcodeUpdates = await leetcodeUpdatesPromise;
     const vjudgeUpdates= await vjudgeUpdatesPromise;
