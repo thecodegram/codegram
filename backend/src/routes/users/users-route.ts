@@ -10,7 +10,7 @@ import { UserNameNotFoundError } from "../../errors/username-not-found-error";
 import { getSubmissionStats } from "../../api/vjudge";
 import { getLatestAcceptedSubmits, getSubmitStats } from "../../api/leetcode";
 import { uploadFile, getFile } from "../../repository/ImageBucket";
-import { NotificationRepository } from "../../repository/NotificationRepository";
+import { NotificationRepository, NotificationTypes } from "../../repository/NotificationRepository";
 import { FriendRepository } from "../../repository/FriendRepository";
 import { UserRepository } from "../../repository/UserRepository";
 import sanitize from "sanitize-filename";
@@ -291,9 +291,16 @@ router.post('/:userId/send-friend-request/:requesteeId', [
   handleValidationErrors
 ], async (req: Request, res: Response) => {
   const { userId: requesterId, requesteeId } = req.params
+  const requesterUsername = req.session.username
 
   try {
     const newFriendRequest = await friendRepository.createFriendRequest(+requesterId, +requesteeId)
+    await notificationRepository.createNotification(
+      +requesteeId, 
+      `@${requesterUsername} sent you a friend request!`,
+      NotificationTypes.friend
+    )
+
     res.status(200).json(newFriendRequest)
   } catch (err) {
     res.status(500).send(err)
