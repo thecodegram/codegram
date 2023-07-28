@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Avatar } from './Avatar';
 import { Dropdown } from './Dropdown';
 import { useEffect, useState } from 'react';
+import { EmptyState } from './EmptyState';
 
 import styles from "./HeaderNav.module.scss"
 
@@ -53,16 +54,18 @@ export const HeaderNav = () => {
       <Dropdown trigger={<IconInbox />}>
         <article className={styles.dropdown}>
           <h2>Notifications</h2>
-          {notifications.length > 0 &&<section className={styles.dropdownList}>
-            {notifications.map(({ message, created_at, type }, index) => 
-              <div key={index} className={styles.dropdownItem}>
-                <Link to={type === "friend" ? `/friends?tab=requests` : "/dashboard"} relative='path'>
-                  <p className={styles.message}>{message}</p>
-                  <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
-                </Link>
-              </div>
-            )}
-          </section>}
+          {notifications.length === 0 
+            ? <EmptyState>All caught up!</EmptyState>
+            : <section className={styles.dropdownList}>
+                {notifications.map(({ message, created_at, type }, index) => 
+                  <div key={index} className={styles.dropdownItem}>
+                    <Link to={type === "friend" ? `/friends?tab=requests` : "/dashboard"} relative='path'>
+                      <p className={styles.message}>{message}</p>
+                      <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
+                    </Link>
+                  </div>
+                )}
+              </section>}
         </article>
       </Dropdown>
       <Link to={`/${username}`} relative='path'>

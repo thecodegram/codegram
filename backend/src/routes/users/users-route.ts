@@ -325,5 +325,18 @@ router.post('/:userId/friend-requests/:friendRequestId/remove', [
   }
 })
 
+router.get('/:userId/friends', [
+  validateUsername('userId'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { userId } = req.params
+
+  try {
+    const newFriendRequest = await friendRepository.getFriends(+userId)
+    res.status(200).json(newFriendRequest)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+})
 
 module.exports = router;

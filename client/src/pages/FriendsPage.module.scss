@@ -48,6 +48,7 @@
       font-size: 1rem;
       color: #fff;
       margin-bottom: 0.5rem;
+      font-weight: 400;
     }
 
     p {
@@ -59,5 +60,23 @@
   .actions {
     display: flex;
     gap: 0.5rem;
+  }
+}
+
+.friendListItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  justify-content: space-between;
+  color: #fff;
+
+  a {
+    text-decoration: none;
+  }
+
+  h3 {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 400;
   }
 }

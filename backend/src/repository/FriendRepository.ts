@@ -100,4 +100,29 @@ export class FriendRepository {
       client.release()
     }
   }
+
+  async getFriends(userId: number) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      const friends = await client.query(`
+        SELECT f.*, u1.username AS user_1_username, u2.username AS user_2_username
+        FROM friend AS f
+        INNER JOIN users AS u1 ON f.user_1_id = u1.id
+        INNER JOIN users AS u2 ON f.user_2_id = u2.id
+        WHERE f.user_1_id = $1 OR f.user_2_id = $1;
+      `, [userId]);
+
+      await client.query('COMMIT');
+      
+      return friends.rows;
+    } catch(e) {
+      await client.query('ROLLBACK');
+      console.error("Failed to get friend requests for this user:", e);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
 }

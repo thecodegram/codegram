@@ -15,6 +15,7 @@ import OnBoardingPage from "./pages/OnBoardingPage";
 import { UserProfilePage } from "./pages/UserProfile"
 import { FriendsPage } from "./pages/FriendsPage";
 import { FriendRequestsPage } from "./pages/FriendRequestsPage";
+import { AllFriendsPage } from "./pages/AllFriendsPage";
 import { UserContext } from "./components/UserContext";
 
 function App() {
@@ -52,6 +53,10 @@ function App() {
                 </PrivateRoute>
               }
             >
+              <Route
+                path=""
+                element={<AllFriendsPage />}
+              />
               <Route
                 path="requests"
                 element={<FriendRequestsPage />}

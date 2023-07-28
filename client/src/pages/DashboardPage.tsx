@@ -10,6 +10,7 @@ import { ListGroup } from "../components/ListGroup";
 import { FeedItem } from "../components/FeedItem";
 import { UserStatsGrid } from "../components/UserStatsGrid";
 import { HeaderNav } from "../components/HeaderNav";
+import { Link } from "react-router-dom";
 
 import styles from "./DashboardPage.module.scss";
 
@@ -171,6 +172,9 @@ const DashboardPage = () => {
             </article>
             <article className={styles.relationships}>
               <ListGroup title="Friends">
+                <Link to={`/friends`} relative="path" className={styles.viewAll}>
+                  View all
+                </Link>
                 {friendsDummyData.map(({ name, handle }, index) => (
                   <li key={index}>
                     <UserInfoHeader username={name} name={handle} />
