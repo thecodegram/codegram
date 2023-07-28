@@ -1,0 +1,63 @@
+.friendsPage {
+  background-color: #1B1B1A;
+  min-height: calc(100vh - 4rem);
+  padding: 2rem 1rem;
+
+  h1 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 3rem;
+  }
+
+  nav {
+    padding: 1rem 0 1.5rem 0;
+    display: flex;
+    gap: 1.5rem;
+
+    button {
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      width: min-content;
+      background: none;
+      padding-bottom: 1rem;
+      border: none;
+      border-bottom: 3px solid transparent;
+
+      &.active {
+        border-bottom: 3px solid #FFA115;
+      }
+    }
+  }
+
+  .friendRequestListItem + .friendRequestListItem {
+    border-top: 1px solid #2C2C2C;
+  }
+}
+
+.friendRequestListItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  justify-content: space-between;
+
+  .userInfo {
+    h3 {
+      font-size: 1rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.88rem;
+      color: #9C9995;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}

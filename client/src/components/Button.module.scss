@@ -1,0 +1,23 @@
+.btn {
+  border: none;
+  background-color: #FFA115;
+  height: 2.5rem;
+  border-radius: 10rem;
+  padding: 0 1rem;
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+
+  &.secondary {
+    background-color: #2C2C2C;
+    color: #D7D6D5;
+  }
+
+  &.tetriary {
+    background-color: #202020;
+    border: 1px solid #2C2C2C;
+    color: #D7D6D5;
+  }
+}

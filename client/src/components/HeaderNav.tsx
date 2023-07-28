@@ -42,21 +42,6 @@ export const HeaderNav = () => {
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
-    // const interval = setInterval(async () => {
-    //   try {
-    //     const response = await axios.get(
-    //       `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
-    //       {
-    //         responseType: "blob",
-    //         withCredentials: true,
-    //       }
-    //     );
-    //     // creates a local URL for the Blob
-    //     const profilePicURL = URL.createObjectURL(response.data); 
-    //     setProfilePic(profilePicURL);
-    //   } catch (error) {
-    //     console.error("Error fetching profile picture:", error);
-    //   }
     }, 1000);
   
     return () => clearInterval(interval);
@@ -69,10 +54,12 @@ export const HeaderNav = () => {
         <article className={styles.dropdown}>
           <h2>Notifications</h2>
           {notifications.length > 0 &&<section className={styles.dropdownList}>
-            {notifications.map(({message, created_at}, index) => 
+            {notifications.map(({ message, created_at, type }, index) => 
               <div key={index} className={styles.dropdownItem}>
-                <p className={styles.message}>{message}</p>
-                <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
+                <Link to={type === "friend" ? `/friends?tab=requests` : "/dashboard"} relative='path'>
+                  <p className={styles.message}>{message}</p>
+                  <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
+                </Link>
               </div>
             )}
           </section>}

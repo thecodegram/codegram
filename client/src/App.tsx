@@ -13,6 +13,7 @@ import DashboardPage from "./pages/DashboardPage";
 import PrivateRoute from "./components/PrivateRoute";
 import OnBoardingPage from "./pages/OnBoardingPage";
 import { UserProfilePage } from "./pages/UserProfile"
+import { FriendsPage } from "./pages/FriendsPage";
 import { UserContext } from "./components/UserContext";
 
 function App() {
@@ -39,6 +40,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <DashboardPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/friends"
+              element={
+                <PrivateRoute>
+                  <FriendsPage />
                 </PrivateRoute>
               }
             />

@@ -44,7 +44,6 @@ export const UserProfilePage = () => {
     fetchData();
   }, [username]);
 
-
   return(
     <>
       <HeaderNav />

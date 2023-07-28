@@ -66,10 +66,17 @@
     &::-webkit-scrollbar-thumb:hover {
       background: #84827e;
     }
+
+    .dropdownItem + .dropdownItem {
+      border-top: 1px solid #444340;
+    }
     
     .dropdownItem {
-      border-bottom: 1px solid #444340;
       padding: 1.5rem 0;
+
+      a p {
+        color: #fff;
+      }
 
       .timestamp {
         margin-top: 0.5rem;
