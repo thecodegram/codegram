@@ -13,7 +13,7 @@ export async function getSubmissionStats(username: string) {
     } catch(err) {
         if(err instanceof AxiosError){
             const response = err.response!!;
-            if(response.status === 404) throw new UserNameNotFoundError(username);
+            if(response.status === 404) throw new UserNameNotFoundError(username, "vjudge");
             else throw new ExternalApiError("vjudge", response.status);
         }
         else throw err;
