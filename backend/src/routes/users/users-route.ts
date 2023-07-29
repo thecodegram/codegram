@@ -222,8 +222,6 @@ router.get(
       }
     );
 
-    console.log(userData);
-
     if (!userData) {
       res.status(404).send("User not found");
     } else {
@@ -252,7 +250,7 @@ router.get('/:userId/notifications', [
     const notifications = await notificationRepository.getNotifications(userId)
     res.status(200).json(notifications)
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send("Failed to get user's notifications")
   }
 })
 
@@ -268,7 +266,7 @@ router.post('/:userId/notifications', [
     const newNotification = await notificationRepository.createNotification(+userId, message, type)
     res.status(200).json(newNotification)
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send("Failed to create a new notification")
   }
 })
 
@@ -282,7 +280,7 @@ router.get('/:userId/friend-requests', [
     const friendRequests = await friendRepository.getFriendRequests(+userId)
     res.status(200).json(friendRequests)
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send("Failed to get user's friend requests")
   }
 })
 
@@ -303,7 +301,7 @@ router.post('/:userId/send-friend-request/:requesteeId', [
 
     res.status(200).json(newFriendRequest)
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send("Failed to send friend request")
   }
 })
 
@@ -319,7 +317,7 @@ router.post('/:userId/friend-requests/:friendRequestId/accept', [
     await friendRepository.deactivateFriendRequest(+friendRequestId)
     res.status(200).json(newFriend)
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send("Failed to accept friend request")
   }
 })
 
@@ -333,7 +331,7 @@ router.post('/:userId/friend-requests/:friendRequestId/remove', [
     const newFriendRequest = await friendRepository.deactivateFriendRequest(+friendRequestId)
     res.status(200).json(newFriendRequest)
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send("Failed to remove friend request")
   }
 })
 
@@ -347,7 +345,7 @@ router.get('/:userId/friends', [
     const newFriendRequest = await friendRepository.getFriends(+userId)
     res.status(200).json(newFriendRequest)
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send("Failed to get user's friends")
   }
 })
 
