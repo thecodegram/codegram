@@ -20,8 +20,7 @@ const decryptPassword = (pwd: String) => {
   return pwd;
 };
 router.post("/login", async (req: Request, res: Response) => {
-  const username: String = req.body.username;
-  const password: String = req.body.password;
+  const { username, password } = req.body;
 
   if (isValidUsername(username)) {
     const password1 = decryptPassword(password);
@@ -35,11 +34,14 @@ router.post("/login", async (req: Request, res: Response) => {
       if (user === null) {
         res.status(400).send();
       } else {
-        console.log(user);
         req.session.username = user.username;
         req.session.save();
 
-        res.status(200).send("Logged in successfully");
+        if (!user.leetcode?.username && !user.vjudge?.username) {
+          res.status(200).json({ status: "onboarding" });
+        } else {
+          res.status(200).json({ status: "dashboard" });
+        }
       }
     } catch (e: any) {
       res.status(400).end();
@@ -71,15 +73,17 @@ router.post("/signup", async (req: Request, res: Response) => {
       const registedUser = await newUser.save();
 
       console.log(registedUser);
-      console.log("this is the id: "+registedUser._id.toString());
+      console.log("this is the id: " + registedUser._id.toString());
       //save to postgresql
-      if(registedUser.username && registedUser._id){
-          userRepository.saveUser(registedUser._id.toString(), registedUser.username);
+      if (registedUser.username && registedUser._id) {
+        userRepository.saveUser(
+          registedUser._id.toString(),
+          registedUser.username
+        );
       } else {
-          console.log("username is undefined")
+        console.log("username is undefined")
       }
-      
-      
+
       // Init the user session
       req.session.username = newUser.username;
       req.session.save();
@@ -92,24 +96,25 @@ router.post("/signup", async (req: Request, res: Response) => {
           pass: "buaknommahtbfzpu",
         },
       });
-      
+
       // Update the text property to include an anchor tag with the YouTube link
       var mailOptions = {
         from: "kodygramme@gmail.com",
-        to: "zhiani2000@gmail.com", // shramko.georgiy@gmail.com
+        to: "zhiani2000@gmail.com", // shramko.georgiy@gmail.com BRUHHHH
         subject: "You have been invited to collaborate on CodeGram",
-        html:
-          "<p>@shaygeko has invited you to collaborate on CodeGram, <a href='https://www.youtube.com/watch?v=j5a0jTc9S10&list=PL3KnTfyhrIlcudeMemKd6rZFGDWyK23vx&index=11&ab_channel=YourUncleMoe'>click to join</a></p>",
+        html: "<p>@shaygeko has invited you to collaborate on CodeGram, <a href='https://www.youtube.com/watch?v=j5a0jTc9S10&list=PL3KnTfyhrIlcudeMemKd6rZFGDWyK23vx&index=11&ab_channel=YourUncleMoe'>click to join</a></p>",
       };
-    
-      transporter.sendMail(mailOptions, function (error: any, info: { response: string }) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("Email sent: " + info.response);
+
+      transporter.sendMail(
+        mailOptions,
+        function (error: any, info: { response: string }) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
         }
-      });
-      
+      );
 
       res.status(200).send("Registered");
     }

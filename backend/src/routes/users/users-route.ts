@@ -98,9 +98,10 @@ router.put(
       res.status(403).send("Forbidden");
     } else {
       const data = req.body;
-      console.log("this is body" + data.vjudgeUsername);
+      console.log("this is vjudge username " + data.vjudgeUsername);
+      console.log("this is leetcode username " + data.leetcodeUsername);
       if (!data) {
-        res.send(400);
+        res.sendStatus(400);
       } else {
         // find the entry in the db for this user
         const user = await User.findOne(
@@ -133,6 +134,15 @@ router.put(
             // ensure this is a valid name
             // update the vjudge username and latest data
             const updateVjudge = (async () => {
+              const existingUser = await User.findOne({
+                "vjudge.username": data.vjudgeUsername,
+              });
+              if (existingUser) {
+                throw new Error(
+                  "VJudge username is already in use by another user"
+                );
+              }
+
               if (data.vjudgeUsername) {
                 const vjudgeStats = await getSubmissionStats(
                   data.vjudgeUsername
@@ -146,29 +156,42 @@ router.put(
             // ensure this is a valid name
             // update the vjudge username and latest data
             const updateLeetcode = (async () => {
-              console.log(data.leetcodeUsername);
+              const existingUser = await User.findOne({
+                "leetcode.username": data.leetcodeUsername,
+              });
+              if (existingUser) {
+                throw new Error(
+                  "Leetcode username is already in use by another user"
+                );
+              }
+
+              // console.log(data.leetcodeUsername);
               if (data.leetcodeUsername) {
                 const leetcodeStats = await getSubmitStats(
                   data.leetcodeUsername
                 );
-                console.log(leetcodeStats);
+                console.log("this is LC data: " + leetcodeStats);
                 user.leetcode = leetcodeStats;
               }
             })();
 
             // update in parallel
-            await updateVjudge;
-            await updateLeetcode;
-
+            // await updateVjudge;
+            // await updateLeetcode;
+            await Promise.all([updateVjudge, updateLeetcode]);
             await user.save();
 
             res.sendStatus(200);
           } catch (err) {
             if (err instanceof UserNameNotFoundError) {
               res.status(404).send(err.message);
-            } else {
+            } else if (err instanceof Error) {
               console.error(err);
-              res.status(500).send("Something went wrong");
+              res.status(500).send(`${err.message}`);
+            } else {
+              // err is something unexpected (not an Error instance)
+              console.error(err);
+              res.status(500).send("An unexpected error occurred");
             }
           }
         }
