@@ -13,8 +13,13 @@ INSERT INTO platform (pid, pname)
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     mongo_id VARCHAR(25) NOT NULL,
-    username VARCHAR(30)
+    username VARCHAR(30),
+    current_rank INTEGER,
+    previous_rank INTEGER,
+    score INTEGER
 );
+
+CREATE INDEX IF NOT EXISTS idx_users_score ON users (score DESC);
 
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
