@@ -11,6 +11,8 @@ import { FeedItem } from "../components/FeedItem";
 import { UserStatsGrid } from "../components/UserStatsGrid";
 import { HeaderNav } from "../components/HeaderNav";
 import { FriendsList } from "../components/FriendsList";
+import { LoadingEllipsis } from "../components/LoadingEllipsis";
+import { EmptyState } from "../components/EmptyState";
 
 import styles from "./DashboardPage.module.scss";
 
@@ -120,32 +122,26 @@ const DashboardPage = () => {
   // };
 
   return (
-    <div>
-      {/* <form onSubmit={handleFormSubmit}>
-      <button onClick={handleLogout}>Logout</button>
-        <input type="text" value={username} onChange={handleUsernameChange} placeholder="Enter LeetCode username" />
-        <button type="submit">Check stats</button>
-      </form> */}
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <HeaderNav />
-          <main className={styles.main}>
-            <article className={styles.stats}>
-              <UserInfoHeader
-                username={username || ""}
-                name={username || ""}
-                variant={UserInfoHeaderVariant.column}
-                avatarSize={AvatarSize.medium}
-                profilePic={profilePic}
-              />
+    <>
+      <HeaderNav />
+      <main className={styles.main}>
+        <article className={styles.stats}>
+          <UserInfoHeader
+            username={username || ""}
+            name={username || ""}
+            variant={UserInfoHeaderVariant.column}
+            avatarSize={AvatarSize.medium}
+            profilePic={profilePic}
+          />
 
-              {username && <UserStatsGrid username={username} />}
-            </article>
-            <article className={styles.feed}>
-              {feedData &&
-                feedData.map(({ title, timestamp }, index) => (
+          {username && <UserStatsGrid username={username} />}
+        </article>
+        <article className={styles.feed}>
+          {loading 
+            ? <LoadingEllipsis />
+            : feedData.length === 0
+              ? <EmptyState>No activity yet</EmptyState>
+              : feedData.map(({ title, timestamp }, index) => (
                   <FeedItem
                     key={index}
                     name={username || ""}
@@ -154,23 +150,22 @@ const DashboardPage = () => {
                     numOfLikes={Math.floor(Math.random() * 20) + 1}
                     createdTime={new Date(+timestamp * 1000)}
                   />
-                ))}
-            </article>
-            <article className={styles.relationships}>
-              {userId && <FriendsList userId={userId} />}
-              <ListGroup title="Groups">
-                {groupsDummyData.map(({ name, handle }, index) => (
-                  <li key={index}>
-                    <UserInfoHeader username={name} name={handle} />
-                  </li>
-                ))}
-              </ListGroup>
-            </article>
-          </main>
-        </>
-      )}
-    </div>
-  );
+                ))
+          }
+        </article>
+        <article className={styles.relationships}>
+          {userId && <FriendsList userId={userId} />}
+          <ListGroup title="Groups">
+            {groupsDummyData.map(({ name, handle }, index) => (
+              <li key={index}>
+                <UserInfoHeader username={name} name={handle} />
+              </li>
+            ))}
+          </ListGroup>
+        </article>
+      </main>
+    </>
+  )
 };
 
 export default DashboardPage;

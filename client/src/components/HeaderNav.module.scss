@@ -6,6 +6,10 @@
   padding: 1rem;
   justify-content: space-between;
   color: #B0AEAA;
+  position: sticky;
+  z-index: 98;
+  top: 0;
+  box-shadow: 0px 2px 8px 0px rgba(22, 22, 21, 0.35);
 
   & > section {
     display: flex;

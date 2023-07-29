@@ -6,6 +6,7 @@
   header {
     display: flex;
     gap: 1rem;
+    padding-bottom: 1rem;
     flex-wrap: wrap;
     align-items: center;
     
@@ -41,8 +42,6 @@
     gap: 1rem;
 
     .statsGrid {
-      padding-top: 1rem;
-
       h2 {
         font-size: 1rem;
         color: #B0AEAA;
@@ -117,6 +116,12 @@
 
     .activityFeed {
       grid-area: feed;
+    }
+
+    .statsGrid, .relationships {
+      position: sticky;
+      top: 5rem;
+      height: fit-content;
     }
   }
 }
