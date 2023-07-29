@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import { useNavigate, Link } from 'react-router-dom';
 import { Avatar } from './Avatar';
 import { Dropdown } from './Dropdown';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { EmptyState } from './EmptyState';
 
 import styles from "./HeaderNav.module.scss"
