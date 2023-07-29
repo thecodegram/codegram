@@ -31,27 +31,23 @@ export const HeaderNav = () => {
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/user/${userId}/notifications`, 
-          { withCredentials: true, }
-        )
+  const onClickShowNotifications = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/user/${userId}/notifications`, 
+        { withCredentials: true, }
+      )
 
-        setNotifications(response.data)
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
-      }
-    }, 1000);
-  
-    return () => clearInterval(interval);
-  }, [username, userId]);
+      setNotifications(response.data)
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  }
 
   return (<header className={styles.header}>
     <section className={styles.left}><h1><Link to="/dashboard" relative='path'>Codegram</Link></h1></section>
     <section className={styles.right}>
-      <Dropdown trigger={<IconInbox />}>
+      <Dropdown trigger={<IconInbox />} triggerAction={onClickShowNotifications}>
         <article className={styles.dropdown}>
           <h2>Notifications</h2>
           {notifications.length === 0 
