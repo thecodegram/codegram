@@ -8,7 +8,7 @@ import { refreshLeetcodeDataEventEmitter } from "../events/RefreshLeetcodeDataEv
 import { storeVjudgeSubmissionEventEmitter } from "../events/StoreVjudgeSubmissionEventEmitter";
 
 export async function getAndStoreLeetcodeUpdates(username: string) {
-    const u = await User.findOne({ username: username });
+  const u = await User.findOne({ username: username });
 
   if (!u) {
     throw new UserNameNotFoundError(username, "leetcode");
@@ -31,27 +31,27 @@ export async function getAndStoreLeetcodeUpdates(username: string) {
             solvedDifference
           );
 
-                    // once we have a list of problems that were solved since last check, emit an event for each of them
-                    updates.forEach((upd: any) => {
-                        const updateData: UpdateEventData = {
-                            username: username,
-                            platform: "leetcode",
-                            problemTitle: upd.title,
-                            problemTitleSlug: upd.titleSlug,
-                            timestamp: parseInt(upd.timestamp)
-                        }
-                        userUpdateEventEmitter.emit(updateData);
-                    });
-                    refreshLeetcodeDataEventEmitter.emit(newData);
+          // once we have a list of problems that were solved since last check, emit an event for each of them
+          updates.forEach((upd: any) => {
+            const updateData: UpdateEventData = {
+              username: username,
+              platform: "leetcode",
+              problemTitle: upd.title,
+              problemTitleSlug: upd.titleSlug,
+              timestamp: parseInt(upd.timestamp)
+            }
+            userUpdateEventEmitter.emit(updateData);
+          });
+          refreshLeetcodeDataEventEmitter.emit(newData);
 
-                    return updates;
-                }
-                else {
-                    console.log(`No LeetCode updates for user ${username}`);
-                    return [];
-                }
-            } else return [];
-        })();
+          return updates;
+        }
+        else {
+          console.log(`No LeetCode updates for user ${username}`);
+          return [];
+        }
+      } else return [];
+    })();
 
     return updates;
   }
@@ -59,75 +59,79 @@ export async function getAndStoreLeetcodeUpdates(username: string) {
 
 
 function generateVjudgeUpdateEvent(username: string, platform: string, problemName: string): UpdateEventData {
-    const updateData: UpdateEventData = {
-        username: username,
-        platform: "vjudge",
-        problemTitle: platform+'-'+problemName,
-        problemTitleSlug: platform+'-'+problemName,
-        timestamp: Math.floor(Date.now()/1000)
-    }
+  const updateData: UpdateEventData = {
+    username: username,
+    platform: "vjudge",
+    problemTitle: platform + '-' + problemName,
+    problemTitleSlug: platform + '-' + problemName,
+    timestamp: Math.floor(Date.now() / 1000)
+  }
 
-    return updateData;
+  return updateData;
 }
 
 export async function getAndStoreVjudgeUpdates(username: string) {
-    const u = await User.findOne({ username: username }, {leetcode: 0});
+  const u = await User.findOne({ username: username }, { leetcode: 0 });
 
-    if(!u) {
-        throw new UserNameNotFoundError(username, "vjudge");
-    } else {
-        const updates = await (async () => {
-            if(u.vjudge?.username) {
-                const latestData = await getSubmissionStats(u.vjudge.username);
+  if (!u) {
+    throw new UserNameNotFoundError(username, "vjudge");
+  } else {
+    const updates = await (async () => {
+      if (u.vjudge?.username) {
+        const latestData = await getSubmissionStats(u.vjudge.username);
 
-                const storedAcData = u.vjudge.acRecords!!;
-                const storedFailedData = u.vjudge.failRecords!!;
+        const storedAcData = u.vjudge.acRecords!!;
+        const storedFailedData = u.vjudge.failRecords!!;
 
-                const keys: string[] = ['AtCoder', 'CSES', 'CodeChef', 'CodeForces', 'DMOJ', 'EOlymp','Gym', 'Kattis', 'SPOJ', 'TopCoder', 'UVA'];
-                
-                const updates = [];
-                // go through all platformNames and check if there are updates for any of them
-                for (var i = 0; i < keys.length; ++i) {
-                      const key:string = keys[i];
-                      const oldValues: string[] = storedAcData[key as keyof typeof storedAcData];
-                      const newValues: string[] = latestData.acRecords[key].sort();
+        const keys: string[] = ['AtCoder', 'CSES', 'CodeChef', 'CodeForces', 'DMOJ', 'EOlymp', 'Gym', 'Kattis', 'SPOJ', 'TopCoder', 'UVA'];
 
-                      // something changed!
-                      if(oldValues.length < newValues.length) {
+        const updates = [];
+        // go through all platformNames and check if there are updates for any of them
+        for (var i = 0; i < keys.length; ++i) {
+          const key: string = keys[i];
+          const oldValues: string[] = storedAcData[key as keyof typeof storedAcData];
+          const newValues: string[] = latestData.acRecords[key].sort();
 
-                        // 2-pointer approach to finding the different elements in 2 lists
-                        for(var i = 0, j = 0; i < oldValues.length; ++i, ++j) {
-                            while(j < newValues.length && oldValues[i] !== newValues[j]) {
-                                const update = generateVjudgeUpdateEvent(username, key, newValues[j]);
-                                updates.push(update);
+          // something changed!
+          if (oldValues.length < newValues.length) {
+            console.log(
+              `User ${u.username} has solved something new on leetcode. (username: ${u.vjudge.username})`
+            );
+            // 2-pointer approach to finding the different elements in 2 lists
+            for (var i = 0, j = 0; i < oldValues.length; ++i, ++j) {
+              while (j < newValues.length && oldValues[i] !== newValues[j]) {
+                const update = generateVjudgeUpdateEvent(username, key, newValues[j]);
+                updates.push(update);
 
-                                // store update to be displayable in feed
-                                userUpdateEventEmitter.emit(update);
-                                // update submits data to know about this problem
-                                storeVjudgeSubmissionEventEmitter.emit({
-                                    platform: key,
-                                    username: username,
-                                    problem: newValues[j]
-                                });
+                // store update to be displayable in feed
+                userUpdateEventEmitter.emit(update);
+                // update submits data to know about this problem
+                storeVjudgeSubmissionEventEmitter.emit({
+                  platform: key,
+                  username: username,
+                  problem: newValues[j]
+                });
 
-                                ++j;
-                            }
-                        }
-                      }
-                }
-                return updates;
-            } else {
-                return [];
+                ++j;
+              }
             }
-        })();
-
+          } else {
+            console.log(`No Vjudge updates for user ${username}`);
+          }
+        }
         return updates;
-    }
+      } else {
+        return [];
+      }
+    })();
+
+    return updates;
+  }
 }
 
 export async function getUpdates(username: string) {
-    const leetcodeUpdatesPromise = getAndStoreLeetcodeUpdates(username);
-    const vjudgeUpdatesPromise = getAndStoreVjudgeUpdates(username);
+  const leetcodeUpdatesPromise = getAndStoreLeetcodeUpdates(username);
+  const vjudgeUpdatesPromise = getAndStoreVjudgeUpdates(username);
 
   const leetcodeUpdates = await leetcodeUpdatesPromise;
   const vjudgeUpdates = await vjudgeUpdatesPromise;

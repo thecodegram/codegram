@@ -42,4 +42,30 @@ export class UserRepository {
       client.release();
     }
   }
+
+  async getAllUsernames() : Promise<any[]>  {
+    const query = `SELECT username from users;`;
+
+    try {
+      const result = await pool.query(query);
+
+      return result.rows;
+    } catch(e) {
+      console.error('Failed to query postgres db for usernames');
+    }
+
+    return [];
+  }
+
+  async getAll() {
+    const query = `SELECT username from users;`;
+
+    try {
+      const result = await pool.query(query);
+
+      return result.rows;
+    } catch(e) {
+      console.error('Failed to query postgres db for usernames');
+    }
+  }
 }

@@ -1,20 +1,50 @@
 import { CronJob } from "cron";
-import { User } from "../model/schemas/userSchema";
-import { getUpdates } from "../services/UpdatesCollectorService";
+import { getAndStoreLeetcodeUpdates, getAndStoreVjudgeUpdates, getUpdates } from "../services/UpdatesCollectorService";
+import { UserRepository } from "../repository/UserRepository";
 
 
-const job = new CronJob('*/2 * * * *', async () => {
-    const userData = await User.find({}, {
-      _id:1,
-      username:1,
-    })
+export class Scheduler {
+  private userRepository: UserRepository
+  constructor() {
+    this.userRepository = new UserRepository();
+  }
+  private readonly leetcodeUpdatesCollectorJob = new CronJob('*/30 * * * *', async () => {
+
+    const userData = await this.userRepository.getAllUsernames();
 
     await Promise.all(userData.map(u => {
       // should probably change this to use id
-      getUpdates(u.username!!)
+      getAndStoreLeetcodeUpdates(u.username!!)
     }))
 
   });
 
-export const startJob = () => job.start();
-export const stopJob = () => job.stop();
+  private readonly vjudgeUpdatesCollectorJob = new CronJob('5 * * * *', async () => {
+
+    const userData = await this.userRepository.getAllUsernames();
+
+    await Promise.all(userData.map(u => {
+      // should probably change this to use id
+      getAndStoreVjudgeUpdates(u.username!!)
+    }))
+
+  });
+
+  public start() {
+    this.leetcodeUpdatesCollectorJob.start();
+    this.vjudgeUpdatesCollectorJob.start();
+    console.log("Started leetcode updates collection!");
+    console.log("Started vjudge updates collection!");
+  }
+  public stop() {
+    console.log("Scheduler is stopping");
+    if (this.leetcodeUpdatesCollectorJob.running) {
+      this.leetcodeUpdatesCollectorJob.stop();
+      console.log("Stopped leetcode updates collection");
+    }
+    if (this.vjudgeUpdatesCollectorJob.running) {
+      this.vjudgeUpdatesCollectorJob.stop();
+      console.log("Stopped vjudge updates collection");
+    }
+  }
+}
