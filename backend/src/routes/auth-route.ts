@@ -132,10 +132,12 @@ router.get("/check", async (req: Request, res: Response) => {
   if (req.session && req.session.username) {
     const userInfo = await userRepository.getUser(req.session.username);
 
-    res
-      .status(200)
-      .send({ username: req.session.username, userId: userInfo.id })
-      .end();
+    // Check if userInfo is defined
+    if (!userInfo) {
+      res.status(404).send({ error: 'User not found' }).end();
+    } else {
+      res.status(200).send({ username: req.session.username, userId: userInfo.id }).end();
+    }
   } else {
     res.status(401).end();
   }
