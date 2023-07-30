@@ -13,8 +13,13 @@ INSERT INTO platform (pid, pname)
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     mongo_id VARCHAR(25) NOT NULL,
-    username VARCHAR(30)
+    username VARCHAR(30),
+    current_rank INTEGER,
+    previous_rank INTEGER,
+    score INTEGER
 );
+
+CREATE INDEX IF NOT EXISTS idx_users_score ON users (score DESC);
 
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
@@ -57,3 +62,30 @@ CREATE TABLE IF NOT EXISTS follower (
     CONSTRAINT pk_follower PRIMARY KEY (follower_id, followee_id)
 );
 
+CREATE TABLE IF NOT EXISTS notification (
+    notification_id SERIAL PRIMARY KEY,
+    message VARCHAR(255),
+    recipient_id INTEGER,
+    type VARCHAR(25),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_notification_user FOREIGN KEY (recipient_id) REFERENCES users(id) on DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS friend_request (
+    friend_request_id SERIAL PRIMARY KEY,
+    requester_id INTEGER,
+    requestee_id INTEGER,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_requester_user FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_requestee_user FOREIGN KEY (requestee_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS friend (
+    user_1_id INTEGER,
+    user_2_id INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  
+    CONSTRAINT fk_user_1  FOREIGN KEY (user_1_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_2 FOREIGN KEY (user_2_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT pk_friend PRIMARY KEY (user_1_id, user_2_id)
+);

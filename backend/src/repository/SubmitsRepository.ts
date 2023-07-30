@@ -9,7 +9,7 @@ export class SubmitsRepository {
         const user = await User.findOne({username:stats.username}, {vjudge:0});
         
         if(!user) {
-            throw new UserNameNotFoundError(stats.username);
+            throw new UserNameNotFoundError(stats.username, "leetcode");
         }
 
         user.leetcode = stats;
@@ -20,7 +20,7 @@ export class SubmitsRepository {
         const user = await User.findOne({username:username}, {leetcode:0});
         
         if(!user || !user.vjudge?.acRecords) {
-            throw new UserNameNotFoundError(username);
+            throw new UserNameNotFoundError(username, "vjudge");
         }
         
         // Some reflection black magic to add the problem to the list corresponding to platform

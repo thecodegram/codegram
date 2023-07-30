@@ -21,4 +21,25 @@ export class UserRepository {
       client.release();
     }
   }
+
+  async getUser(username: string) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const userInfo = await client.query(`SELECT * FROM users WHERE username = $1`, [username]);
+
+      await client.query('COMMIT');
+      
+      return userInfo.rows[0];
+
+    } catch(e) {
+      await client.query('ROLLBACK');
+      console.error("Failed to get user info from PostgreSQL database:", e);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
 }

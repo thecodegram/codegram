@@ -4,12 +4,14 @@ import styles from "./LoginPage.module.css";
 import { IconGoogleLogo } from "../icons/icon-google-logo";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [passwordType, setPasswordType] = useState("password");
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const navigate = useNavigate();
 
@@ -23,6 +25,7 @@ const LoginPage = () => {
     const payload = {
       username: email,
       password: password,
+      recaptchaToken: recaptchaToken,
     };
 
     try {
@@ -33,8 +36,12 @@ const LoginPage = () => {
       );
 
       if ((await response.status) === 200) {
-        // localStorage.setItem("isLoggedIn", "true");
-        navigate("/dashboard");
+        // this is gonna flag for onboarding or dashboard
+        if (response.data.status === "onboarding") {
+          navigate("/onboarding");
+        } else if (response.data.status === "dashboard") {
+          navigate("/dashboard");
+        }
       } else {
         setError("Invalid username or password. Please try again.");
       }
@@ -50,6 +57,11 @@ const LoginPage = () => {
 
   const togglePassword = () => {
     setPasswordType(passwordType === "password" ? "text" : "password");
+  };
+
+  const handleRecaptcha = (token: any) => {
+    setRecaptchaToken(token); // store the recaptcha token
+    console.log(token);
   };
 
   return (
@@ -88,13 +100,20 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          
           <i className={styles.eyeIcon} onClick={togglePassword}>
             {passwordType === "password" ? <FaEye /> : <FaEyeSlash />}
           </i>
+          
           <a href="/">
             <p>Forgot your password?</p>
           </a>
         </div>
+        <ReCAPTCHA
+          className={styles.recaptcha}
+          sitekey="6Lev7GcnAAAAAI5flktV2-RN7p1ZSf7otKpReIP2" 
+          onChange={handleRecaptcha}
+        />
         <div>
           <button type="submit" className={styles.btn}>
             Log In

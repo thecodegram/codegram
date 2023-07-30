@@ -1,5 +1,5 @@
 import { UserInfoHeader, UserInfoHeaderVariant } from "./UserInfoHeader"
-import { IconFollowBtnPlus, IconLikeBtnHeart } from "../icons"
+import { IconLikeBtnHeart } from "../icons"
 
 import styles from "./FeedItem.module.scss"
 
@@ -22,7 +22,6 @@ export const FeedItem = ({ name, username, body, numOfLikes, createdTime, showFu
       />}
       {showFullInfo && <div className={styles.dot}></div>}
       <p className={styles.detailText}>{createdTime.toDateString()}</p>
-      {showFullInfo && <button><IconFollowBtnPlus />Follow</button>}
     </section>
     <section className={styles.body}>
       <p>{body}</p>

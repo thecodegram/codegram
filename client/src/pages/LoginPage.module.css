@@ -149,3 +149,7 @@ button {
   cursor: pointer;
   color: #fff; 
 }
+
+.recaptcha {
+  margin-bottom: 1rem;
+}
