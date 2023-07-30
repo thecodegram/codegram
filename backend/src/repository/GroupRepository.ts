@@ -83,7 +83,7 @@ export class GroupRepository {
       console.log("Inserted group with id", newGroup.rows[0].group_id);
       await client.query('COMMIT');
   
-      return newGroup.rows[0].id;
+      return newGroup.rows[0];
     } catch (e) {
       await client.query('ROLLBACK');
     } finally {
@@ -101,9 +101,10 @@ export class GroupRepository {
         SELECT gg.group_id, gg.name, gg.created_at
         FROM group_member gm
         JOIN grind_group gg ON gm.group_id = gg.group_id
-        WHERE gm.user_id = $1;
+        WHERE gm.user_id = $1
+        ORDER BY created_at DESC
       `, [userId])
-  
+
       await client.query('COMMIT');
   
       return groups.rows;
@@ -155,6 +156,32 @@ export class GroupRepository {
       return groups.rows;
     } catch (e) {
       await client.query('ROLLBACK');
+    } finally {
+      client.release()
+    }
+  }
+
+  async isGroupMember(groupId: number, userId: number) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const isGroupMember = await client.query<{is_member: boolean}>(`
+        SELECT EXISTS (
+          SELECT 1
+          FROM group_member
+          WHERE group_id = $1
+          AND user_id = $2
+        ) AS is_member;
+      `, [groupId, userId])
+  
+      await client.query('COMMIT');
+  
+      return isGroupMember.rows[0].is_member;
+    } catch (e) {
+      await client.query('ROLLBACK');
+      return false
     } finally {
       client.release()
     }
