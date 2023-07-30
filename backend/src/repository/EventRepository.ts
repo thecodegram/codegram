@@ -52,5 +52,25 @@ export class EventRepository {
     }
   }
 
+  async getEventsForOneUser(id: number, offset: number, limit: number) {
+    const query = `
+      SELECT e.id, p.pname, u.username, e.problem_name, e.problem_slug, e.event_timestamp
+       FROM events e JOIN users u ON e.user_id = u.id JOIN platform p ON e.pid = p.pid
+       WHERE u.id = $1
+       ORDER BY e.event_timestamp DESC
+       OFFSET $2 ROWS
+       FETCH NEXT $3 ROWS ONLY;`
 
+    try {
+      const results = await pool.query(query, [id, offset, limit]);
+
+      return results.rows;
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  async getEventsVisibleToUser(id: number, offset: number, limit: number) {
+    
+  }
 }
