@@ -3,6 +3,7 @@ import { User } from "../model/schemas/userSchema";
 import { UserRepository } from "../repository/UserRepository";
 import { isValidUsername } from "../utils/utils";
 import { sendWelcomeEmail } from "../services/EmailService";
+import { verifyRecaptcha } from "../services/RecaptchaService";
 
 const router = express.Router();
 
@@ -19,8 +20,17 @@ const decryptPassword = (pwd: String) => {
   return pwd;
 };
 router.post("/login", async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { username, password, recaptchaToken } = req.body;
 
+  // Verify the recaptcha token
+  const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+
+  if (!isRecaptchaValid) {
+    // If the recaptcha token is invalid, return an error
+    res.status(400).send({ error: 'Invalid reCAPTCHA token.' });
+    return;
+  }
+  
   if (isValidUsername(username)) {
     const password1 = decryptPassword(password);
     try {
