@@ -3,6 +3,7 @@ import { User } from "../model/schemas/userSchema";
 import { UserRepository } from "../repository/UserRepository";
 import { isValidUsername } from "../utils/utils";
 import { sendWelcomeEmail } from "../services/EmailService";
+import { verifyRecaptcha } from "../services/RecaptchaService";
 
 const router = express.Router();
 
@@ -19,7 +20,14 @@ const decryptPassword = (pwd: String) => {
   return pwd;
 };
 router.post("/login", async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { username, password, recaptchaToken } = req.body;
+
+  const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+
+  if (!isRecaptchaValid) {
+    res.status(400).send({ error: "Invalid reCAPTCHA token." });
+    return;
+  }
 
   if (isValidUsername(username)) {
     const password1 = decryptPassword(password);
@@ -51,8 +59,17 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 router.post("/signup", async (req: Request, res: Response) => {
-  const { username, password, email } = req.body;
+  const { username, password, email, recaptchaToken } = req.body;
+
   console.log(username, email);
+
+  const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+
+  if (!isRecaptchaValid) {
+    res.status(400).send({ error: "Invalid reCAPTCHA token." });
+    return;
+  }
+
   try {
     const user = await User.findOne({
       $or: [{ username: username }, { email: email }],
@@ -80,7 +97,7 @@ router.post("/signup", async (req: Request, res: Response) => {
           registedUser.username
         );
       } else {
-        console.log("username is undefined")
+        console.log("username is undefined");
       }
 
       // Init the user session
@@ -111,12 +128,14 @@ router.post("/logout", (req, res) => {
   });
 });
 
-
 router.get("/check", async (req: Request, res: Response) => {
   if (req.session && req.session.username) {
-    const userInfo = await userRepository.getUser(req.session.username)
+    const userInfo = await userRepository.getUser(req.session.username);
 
-    res.status(200).send({ username: req.session.username, userId: userInfo.id }).end();
+    res
+      .status(200)
+      .send({ username: req.session.username, userId: userInfo.id })
+      .end();
   } else {
     res.status(401).end();
   }
