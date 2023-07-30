@@ -81,7 +81,7 @@ router.post("/signup", async (req: Request, res: Response) => {
           registedUser.username
         );
       } else {
-        console.log("username is undefined");
+        console.log("username is undefined")
       }
 
       // Init the user session
@@ -138,9 +138,12 @@ router.post("/logout", (req, res) => {
   });
 });
 
-router.get("/check", (req: Request, res: Response) => {
+
+router.get("/check", async (req: Request, res: Response) => {
   if (req.session && req.session.username) {
-    res.status(200).send(req.session.username).end();
+    const userInfo = await userRepository.getUser(req.session.username)
+
+    res.status(200).send({ username: req.session.username, userId: userInfo.id }).end();
   } else {
     res.status(401).end();
   }

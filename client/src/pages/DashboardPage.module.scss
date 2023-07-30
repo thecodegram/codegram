@@ -5,8 +5,8 @@
   display: grid;
   grid-template-areas: 
       "stats"
-      "feed"
-      "relationships";
+      "relationships"
+      "feed";
   gap: 1rem;
 
   .stats {
@@ -34,6 +34,8 @@
 
   .relationships {
     grid-area: relationships;
+    position: relative;
+    height: fit-content;
   }
 
   @media screen and (min-width: 1200px) {
@@ -41,5 +43,10 @@
     grid-template-areas: "stats feed relationships";
     gap: 1rem;
     padding: 2rem;
+
+    .stats, .relationships {
+      position: sticky;
+      top: 5rem;
+    }
   }
 }

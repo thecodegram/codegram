@@ -11,7 +11,7 @@ interface PrivateRouteProps {
 
 const PrivateRoute: FC<PrivateRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const { setUsername } = useUserContext();
+  const { setUsername, setUserId } = useUserContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,13 +21,14 @@ const PrivateRoute: FC<PrivateRouteProps> = ({ children }) => {
       })
       .then((response) => {
         setIsAuthenticated(response.status === 200);
-        setUsername(response.data);
+        setUsername(response.data.username);
+        setUserId(response.data.userId);
       })
       .catch(() => {
         setIsAuthenticated(false);
         setUsername(null);
       });
-  }, [setUsername]);
+  }, [setUsername, setUserId]);
 
   if (isAuthenticated === null) return null;
   return isAuthenticated
