@@ -1,16 +1,7 @@
 import { pool } from "../db/db";
-
-export interface UpdateEventData {
-  username: string;
-  platform: string;
-  problemTitle: string;
-  problemTitleSlug: string; // for "Three sum" titleSlug is "three-sum", needed to craft problem url
-  timestamp: number;
-}
+import { UpdateEventData } from "../model/UpdateEventData";
 
 export class EventRepository {
-
-    
   async saveEvent(updateData: UpdateEventData) {
     console.log("Save event", updateData);
 
