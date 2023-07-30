@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
+import { UserInfoData } from "../pages/DashboardPage"
+import { EmptyState } from "./EmptyState"
 import axios from "axios"
-import { leetcodeData } from "../pages/DashboardPage"
 
 import styles from "./UserStatsGrid.module.scss"
 
@@ -9,13 +10,7 @@ interface UserStatsGridProps {
 }
 
 export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
-  const [statsData, setStatsData] = useState<leetcodeData>({
-    leetcode: {
-      submitStats: {
-        acSubmissionNum: []
-      }
-    }
-  });
+  const [statsData, setStatsData] = useState<UserInfoData>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,12 +32,14 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
     fetchData();
   }, [username]);
 
-  return <div className={styles.statsGrid}>
-  {statsData && statsData?.leetcode.submitStats?.acSubmissionNum.map((item) => (
-    <div>
-      <p>{item.count.toString()}</p>
-      <h3>{item.difficulty}</h3>
+  return !statsData 
+    ? <EmptyState>No stats yet</EmptyState> 
+    : <div className={styles.statsGrid}>
+      {statsData && statsData?.mongo.leetcode.submitStats?.acSubmissionNum.map((item, index) => (
+        <div key={index}>
+          <p>{item.count.toString()}</p>
+          <h3>{item.difficulty}</h3>
+        </div>
+      ))}
     </div>
-  ))}
-</div>
 }

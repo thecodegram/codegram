@@ -1,5 +1,5 @@
 export { IconInbox } from './icon-inbox'
-export { IconFollowBtnPlus } from './icon-follow-btn-plus'
+export { IconAddFriendBtnPlus } from './icon-add-friend-btn-plus'
 export { IconGoogleLogo } from './icon-google-logo'
 export { IconVerifiedBadge } from './icon-verified-badge'
 export { IconLikeBtnHeart } from './icon-like-btn-heart'
