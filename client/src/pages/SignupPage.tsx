@@ -4,6 +4,7 @@ import axios from "axios";
 import { IconGoogleLogo } from "../icons/icon-google-logo";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import ReCAPTCHA from 'react-google-recaptcha';
 
 // for refrence:
 // 16 px is 1 rem whcih is the original size of the font for most stuff, base on that most of the sizes are calculated
@@ -15,6 +16,7 @@ const SignupPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [passwordType, setPasswordType] = useState("password");
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const navigate = useNavigate();
 
@@ -30,6 +32,7 @@ const SignupPage = () => {
       username: username,
       email: email,
       password: password,
+      recaptchaToken: recaptchaToken,
     };
 
     try {
@@ -64,6 +67,11 @@ const SignupPage = () => {
 
   const togglePassword = () => {
     setPasswordType(passwordType === "password" ? "text" : "password");
+  };
+
+  const handleRecaptcha = (token: any) => {
+    setRecaptchaToken(token); // store the recaptcha token
+    console.log(token);
   };
 
   return (
@@ -114,6 +122,11 @@ const SignupPage = () => {
             {passwordType === "password" ? <FaEye /> : <FaEyeSlash />}
           </i>
         </div>
+        <ReCAPTCHA
+          className={styles.recaptcha}
+          sitekey="6Lev7GcnAAAAAI5flktV2-RN7p1ZSf7otKpReIP2" 
+          onChange={handleRecaptcha}
+        />
         <div>
           <button type="submit" className={styles.btn}>
             Sign Up
