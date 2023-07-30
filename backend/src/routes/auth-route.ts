@@ -87,7 +87,7 @@ router.post("/signup", async (req: Request, res: Response) => {
       req.session.username = newUser.username;
       req.session.save();
 
-      await sendWelcomeEmail("");
+      await sendWelcomeEmail(email);
 
 
       res.status(200).send("Registered");
