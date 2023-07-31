@@ -16,7 +16,6 @@ export class StoreVjudgeSubmissionEventEmitter {
     this.eventEmitter.on(
       this.EVENT_NAME,
       async (vjudgeProblemData: VjudgeProblemData) => {
-        console.log("Store vjudge problem event fired", vjudgeProblemData);
         await this.submitsRepository.saveVjudgeSubmission(vjudgeProblemData);
       }
     );

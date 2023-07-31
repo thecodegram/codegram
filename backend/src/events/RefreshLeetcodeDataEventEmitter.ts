@@ -15,7 +15,6 @@ export class RefreshLeetcodeDataEventEmitter {
     this.eventEmitter.on(
       this.EVENT_NAME,
       async (leetcodeData: LeetcodeData) => {
-        console.log("Refresh leetcode data event fired", leetcodeData);
         await this.submitsRepository.saveLeetcodeSubmissionStats(leetcodeData);
       }
     );

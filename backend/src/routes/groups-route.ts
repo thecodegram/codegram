@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
-import { GroupRepository } from "../../repository/GroupRepository";
-import { UserRepository } from "../../repository/UserRepository";
-import { NotificationRepository, NotificationTypes } from "../../repository/NotificationRepository";
-import { handleValidationErrors } from "../../utils/middleware";
+import { GroupRepository } from "../repository/GroupRepository";
+import { UserRepository } from "../repository/UserRepository";
+import { NotificationRepository, NotificationTypes } from "../repository/NotificationRepository";
+import { handleValidationErrors } from "../utils/middleware";
 
 const router = express.Router();
 const groupRepository = new GroupRepository()

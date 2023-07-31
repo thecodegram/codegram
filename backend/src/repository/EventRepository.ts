@@ -1,7 +1,25 @@
 import { pool } from "../db/db";
+import { EventModel } from "../model/EventModel";
 import { UpdateEventData } from "../model/UpdateEventData";
 
 export class EventRepository {
+  private asEventModels = (rows: any[]) => {
+    return rows.map(r => {
+      const eventModel: EventModel = {
+        eventId: r.event_id,
+        submitterId: r.submitter_id,
+        platform: r.platform,
+        username: r.username,
+        problemTitle: r.problem_name,
+        problemTitleSlug: r.problem_slug,
+        timestamp: new Date(r.event_timestamp).getTime(),
+        likes: r.likes
+      };
+
+      return eventModel;
+    });
+  }
+
   async saveEvent(updateData: UpdateEventData) {
     console.log("Save event", updateData);
 
@@ -30,12 +48,11 @@ export class EventRepository {
           `Failed to find userId for username ${username} or platformId for platform ${platform}`
         );
       }
-      console.log("userId:", userId);
-      console.log("platformId:", platformId);
       const insertRes = await client.query(
-        "INSERT INTO events (pid, user_id, problem_name, problem_slug, event_timestamp) VALUES ($1, $2, $3, $4, TO_TIMESTAMP($5/1000)) RETURNING id",
-        [platformId, userId, problemTitle, problemTitleSlug, timestamp]
+        "INSERT INTO events (pid, user_id, problem_name, problem_slug, event_timestamp) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+        [platformId, userId, problemTitle, problemTitleSlug, new Date(timestamp).toISOString()]
       );
+      console.log(`timestamp: ${new Date(timestamp).toISOString()}`)
       console.log("Inserted event with id", insertRes.rows[0].id);
 
       await client.query("COMMIT");
@@ -47,6 +64,139 @@ export class EventRepository {
     }
   }
 
+  async getEventsForOneUser(id: number, offset: number, limit: number, platform?: number) {
+    const queryParams = [id, offset, limit];
+    var query = `
+      WITH likes_count(event_id, likes) AS (
+        SELECT e.id, count(l.user_id)
+        FROM events e LEFT JOIN likes l ON e.id = l.event_id
+        WHERE e.user_id = $1
+        GROUP BY e.id
+      )
+      SELECT
+       e.id AS event_id, u.id AS submitter_id, p.pname AS platform, u.username, e.problem_name,
+       e.problem_slug, e.event_timestamp, lc.likes
+       FROM events e 
+        JOIN users u ON e.user_id = u.id
+        JOIN platform p ON e.pid = p.pid
+        JOIN likes_count lc ON e.id = lc.event_id
+       WHERE u.id = $1 `;
+
+    // if platform is specified query from it
+    // otherwise query from all
+    if (platform != undefined) {
+      query += `AND p.pid = $4 `;
+      queryParams.push(platform);
+    }
+    query += `
+        ORDER BY e.event_timestamp DESC
+        OFFSET $2 ROWS
+        FETCH NEXT $3 ROWS ONLY;
+      `
+
+    try {
+      const results = await pool.query(query, queryParams);
+
+      return this.asEventModels(results.rows);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async getEventsForGroup(
+    user_id: number, group_id: number, offset: number, limit: number, platform?: number) {
+    const queryParams = [user_id, group_id, offset, limit];
+    var query = `
+      WITH likes_count(event_id, likes) AS (
+        SELECT e.id, count(l.user_id)
+        FROM events e LEFT JOIN likes l ON e.id = l.event_id
+        WHERE e.user_id = $1
+        GROUP BY e.id
+      ),
+      group_member_ids(id) AS (
+        SELECT ug2.user_id
+        FROM users u
+          JOIN group_member ug1 ON u.id = ug1.user_id
+          JOIN group_member ug2 ON ug1.group_id = ug2.group_id
+        WHERE u.id = $1 AND ug1.group_id = $2
+      )
+      SELECT 
+        e.id AS event_id, u.id AS submitter_id, p.pname AS platform, u.username,
+        e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
+       FROM events e 
+        JOIN users u ON e.user_id = u.id
+        JOIN platform p ON e.pid = p.pid
+        JOIN likes_count lc ON e.id = lc.event_id
+       WHERE u.id IN (SELECT * FROM group_member_ids)`;
+
+    if (platform != undefined) {
+      query += `AND p.pid = $5 `;
+      queryParams.push(platform);
+    }
+    query += `
+        ORDER BY e.event_timestamp DESC
+        OFFSET $3 ROWS
+        FETCH NEXT $4 ROWS ONLY;
+      `
+
+    try {
+      const results = await pool.query(query, queryParams);
+
+      return this.asEventModels(results.rows);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async getEventsVisibleToUser(id: number, offset: number, limit: number) {
+    const query = `
+      WITH likes_count(event_id, likes) AS (
+        SELECT e.id, count(l.user_id)
+        FROM events e LEFT JOIN likes l ON e.id = l.event_id
+        WHERE e.user_id = $1
+        GROUP BY e.id
+      ),
+      group_member_ids(id) AS (
+        SELECT DISTINCT other.user_id
+        FROM group_member current
+          JOIN group_member other ON current.group_id = other.group_id
+        WHERE current.user_id = $1
+      ),
+      friend_ids(id) AS (
+        (
+          SELECT user_2_id
+          FROM friend f
+          WHERE f.user_1_id = $1
+        )
+        UNION
+        (
+          SELECT user_1_id
+          FROM friend f
+          WHERE f.user_2_id = $1
+        )
+      )
+      SELECT
+        e.id AS event_id, u.id AS submitter_id, p.pname platform, u.username, e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
+      FROM events e 
+        JOIN users u ON e.user_id = u.id
+        JOIN platform p ON e.pid = p.pid
+        JOIN likes_count lc ON e.id = lc.event_id
+      WHERE 
+        u.id = 1 
+        OR u.id IN (SELECT * FROM group_member_ids)
+        OR u.id IN (SELECT * FROM friend_ids)
+      ORDER BY e.event_timestamp DESC
+      OFFSET $2 ROWS
+      FETCH NEXT $3 ROWS ONLY;`;
+
+    try {
+      const results = await pool.query(query, [id, offset, limit]);
+
+      return this.asEventModels(results.rows);
+    } catch (e) {
+      throw (e);
+    }
+  }
   async toggleLike(user_id: number, event_id: number) {
     const client = await pool.connect();
 

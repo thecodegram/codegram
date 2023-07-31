@@ -3,20 +3,20 @@ import express, { Request, Response } from "express";
 import {
   validateUsername,
   handleValidationErrors,
-} from "../../utils/middleware";
-import { getUserIDs, addUserID } from "../../model/users";
-import { User } from "../../model/schemas/userSchema";
-import { UserNameNotFoundError } from "../../errors/username-not-found-error";
-import { getSubmissionStats } from "../../api/vjudge";
-import { getLatestAcceptedSubmits, getSubmitStats } from "../../api/leetcode";
-import { uploadFile, getFile } from "../../repository/ImageBucket";
+} from "../utils/middleware";
+import { getUserIDs, addUserID } from "../model/users";
+import { User } from "../model/schemas/userSchema";
+import { UserNameNotFoundError } from "../errors/username-not-found-error";
+import { getSubmissionStats } from "../api/vjudge";
+import { getLatestAcceptedSubmits, getSubmitStats } from "../api/leetcode";
+import { uploadFile, getFile } from "../repository/ImageBucket";
 import {
   NotificationRepository,
   NotificationTypes,
-} from "../../repository/NotificationRepository";
-import { FriendRepository } from "../../repository/FriendRepository";
-import { UserRepository } from "../../repository/UserRepository";
-import { GroupRepository } from "../../repository/GroupRepository";
+} from "../repository/NotificationRepository";
+import { FriendRepository } from "../repository/FriendRepository";
+import { UserRepository } from "../repository/UserRepository";
+import { GroupRepository } from "../repository/GroupRepository";
 
 import sanitize from "sanitize-filename";
 import multer from "multer";

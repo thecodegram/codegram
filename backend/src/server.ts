@@ -6,11 +6,13 @@ import { setUpDB } from './db/db';
 import { corsOptions } from './config/corsConfig';
 import { sessionOptions } from './config/sessionConfig';
 import { env } from './config/env';
+import { Scheduler } from './scheduler/scheduler';
 
 const triggerRequestsRouter = require('./routes/test/trigger-requests-route')
-const usersRouter = require('./routes/users/users-route')
+const usersRouter = require('./routes/users-route')
 const authRouter = require('./routes/auth-route')
-const groupRouter = require('./routes/groups/groups-route')
+const eventsRouter = require('./routes/events-route')
+const groupRouter = require('./routes/groups-route')
 
 // Create an Express.js app
 const app = express();
@@ -36,8 +38,12 @@ app.use('/api/trigger-requests', [enforceLoggedIn], triggerRequestsRouter);
 app.use('/api/user', [enforceLoggedIn], usersRouter);
 app.use('/api/group', [enforceLoggedIn], groupRouter);
 app.use('/api/updates', [enforceLoggedIn], require('./routes/updates-route'));
+app.use('/api/events', [enforceLoggedIn], eventsRouter);
 app.use('/api/auth', authRouter);
 
+
+
+const scheduler = new Scheduler();
 
 (async () => {
   const isConnectedToDB = await setUpDB();
@@ -47,5 +53,20 @@ app.use('/api/auth', authRouter);
       console.log(`Server running on port ${port}`);
       console.log(`Navigate to http://localhost:${port}/`);
     });
+
+    console.log("Starting updates collector scheduler");
+    scheduler.start();
   }
 })();
+
+function shutdown() {
+  console.log('Server is shutting down...');
+  scheduler.stop();
+
+  console.log("Server was shutdown");
+  process.exit(0); // Exit the process gracefully
+}
+
+process.on('SIGINT', shutdown); // Capturing SIGINT (Ctrl+C)
+process.on('SIGTERM', shutdown); // Capturing SIGTERM (kill command)
+process.on('SIGUSR2', shutdown); // Capturing SIGUSR2 - restart from nodemon

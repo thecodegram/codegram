@@ -36,7 +36,6 @@ router.post("/login", async (req: Request, res: Response) => {
         username: username,
         password: password1,
       });
-      console.log(user);
 
       if (user === null) {
         res.status(400).send();

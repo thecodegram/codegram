@@ -3,7 +3,6 @@ import { isValidUsername } from "../utils/utils";
 
 // Function to make GraphQL requests for a specific user ID
 export async function getSubmitStats(userId: string) {
-  console.log(userId);
   if (!isValidUsername(userId)) {
     console.log("invalid username");
     return;
@@ -29,10 +28,6 @@ export async function getSubmitStats(userId: string) {
       }
         `,
     });
-
-    // Handle the response
-    console.log(`User ID: ${userId}`);
-    console.log(JSON.stringify(response.data.data.matchedUser));
 
     if (response.data.data.matchedUser === null) {
       throw new Error(`Leetcode username ${userId} was not found`);
