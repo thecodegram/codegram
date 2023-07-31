@@ -1,16 +1,7 @@
 import { pool } from "../db/db";
-
-export interface UpdateEventData {
-  username: string;
-  platform: string;
-  problemTitle: string;
-  problemTitleSlug: string; // for "Three sum" titleSlug is "three-sum", needed to craft problem url
-  timestamp: number;
-}
+import { UpdateEventData } from "../model/UpdateEventData";
 
 export class EventRepository {
-
-    
   async saveEvent(updateData: UpdateEventData) {
     console.log("Save event", updateData);
 
@@ -18,15 +9,10 @@ export class EventRepository {
 
     try {
       await client.query("BEGIN");
-      
-      const {
-        username,
-        platform,
-        problemTitle,
-        problemTitleSlug,
-        timestamp,
-      } = updateData;
-      
+
+      const { username, platform, problemTitle, problemTitleSlug, timestamp } =
+        updateData;
+
       const userRes = await client.query(
         "SELECT id FROM users WHERE username = $1",
         [username]
@@ -52,7 +38,7 @@ export class EventRepository {
       );
       console.log("Inserted event with id", insertRes.rows[0].id);
 
-      await client.query("COMMIT"); 
+      await client.query("COMMIT");
     } catch (e) {
       await client.query("ROLLBACK");
       console.error("Failed to insert event into database:", e);
@@ -61,5 +47,33 @@ export class EventRepository {
     }
   }
 
+  async toggleLike(user_id: number, event_id: number) {
+    const client = await pool.connect();
 
+    try {
+      const deleteLikeQuery =
+        "DELETE FROM likes WHERE user_id = $1 AND event_id = $2 RETURNING *";
+      const deletedLike = await client.query(deleteLikeQuery, [
+        user_id,
+        event_id,
+      ]);
+
+      if (deletedLike.rowCount > 0) {
+        return { success: true, message: "Event was unliked successfully." };
+      } else {
+        const insertLikeQuery =
+          "INSERT INTO likes(user_id, event_id) VALUES ($1, $2) RETURNING *";
+        await client.query(insertLikeQuery, [user_id, event_id]);
+        return { success: true, message: "Event was liked successfully." };
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      return {
+        success: false,
+        message: "An error occurred while changing like status.",
+      };
+    } finally {
+      client.release();
+    }
+  }
 }

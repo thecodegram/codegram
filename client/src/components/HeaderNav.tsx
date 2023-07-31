@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { EmptyState } from './EmptyState';
 import { Button, ButtonVariant } from './Button';
 import { Modal } from './Modal';
+import { useImageCache } from "./ImageCacheContext";
 
 import styles from "./HeaderNav.module.scss"
 
@@ -17,20 +18,25 @@ export const HeaderNav = () => {
   const navigate = useNavigate();
   const [ notifications, setNotifications ] = useState([])
   const [ showCreateGroupModal, setShowCreateGroupModal ] = useState<boolean>(false)
+  const { clearCache } = useImageCache();
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {}, { withCredentials: true });
-  
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+
       if (response.status === 200) {
-        Cookies.remove('mysession'); // replace 'cookie-name' with the name of the cookie you want to delete
-        // Redirect the user to the login page
-        navigate('/login');
+        Cookies.remove("mysession");
+        clearCache(); 
+        navigate("/login");
       } else {
-        console.error('Error logging out: Invalid response status');
+        console.error("Error logging out: Invalid response status");
       }
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error("Error logging out:", error);
     }
   };
 
@@ -46,15 +52,15 @@ export const HeaderNav = () => {
   const onClickShowNotifications = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/user/${userId}/notifications`, 
-        { withCredentials: true, }
-      )
+        `${process.env.REACT_APP_API_URL}/api/user/${userId}/notifications`,
+        { withCredentials: true }
+      );
 
-      setNotifications(response.data)
+      setNotifications(response.data);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
-  }
+  };
 
   return <>
     <header className={styles.header}>

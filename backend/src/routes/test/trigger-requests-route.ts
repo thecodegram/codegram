@@ -8,8 +8,8 @@ import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { ExternalApiError } from '../../errors/external-api-error';
 import { User } from '../../model/schemas/userSchema';
 import { userUpdateEventEmitter } from '../../events/UserUpdateEventEmitter';
-import { UpdateEventData } from '../../repository/EventRepository';
-import { getLeetcodeUpdates, getUpdates } from '../../services/UpdatesCollectorService';
+import { UpdateEventData } from '../../model/UpdateEventData';
+import { getAndStoreLeetcodeUpdates, getUpdates } from '../../services/UpdatesCollectorService';
 
 const router = express.Router()
 

@@ -1,4 +1,4 @@
-import {Schema} from 'mongoose'
+import {Schema, model} from 'mongoose'
 
 export const vjudgeStatsSchema = new Schema({
     username: {
@@ -36,3 +36,5 @@ export const vjudgeStatsSchema = new Schema({
         },
     },
 })
+
+export const VjudgeStats = model('VjudgeStats', vjudgeStatsSchema);
