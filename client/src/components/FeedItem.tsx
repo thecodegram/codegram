@@ -2,7 +2,6 @@ import { UserInfoHeader, UserInfoHeaderVariant } from "./UserInfoHeader"
 import { IconLikeBtnHeart } from "../icons"
 
 import styles from "./FeedItem.module.scss"
-import { platform } from "os"
 
 interface FeedItemProps {
   name: string,
@@ -16,7 +15,7 @@ interface FeedItemProps {
 }
 
 const prettifyPlatform = (platform: string) => {
-  if(platform == 'leetcode') return 'LeetCode';
+  if(platform === 'leetcode') return 'LeetCode';
   else return 'VJudge';
 }
 
