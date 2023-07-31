@@ -182,7 +182,7 @@ export class EventRepository {
         JOIN platform p ON e.pid = p.pid
         JOIN likes_count lc ON e.id = lc.event_id
       WHERE 
-        u.id = 1 
+        u.id = $1 
         OR u.id IN (SELECT * FROM group_member_ids)
         OR u.id IN (SELECT * FROM friend_ids)
       ORDER BY e.event_timestamp DESC
