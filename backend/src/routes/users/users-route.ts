@@ -261,7 +261,7 @@ router.get(
 
         readStream.pipe(res);
       } else {
-        res.status(200).send("No profile picture set");
+        res.status(204).end();
       }
     }
   }

@@ -17,13 +17,13 @@ export const Avatar = ({
   size = AvatarSize.regular,
   profilePic,
 }: AvatarProps) => {
-  const style = profilePic
+  const style = profilePic && profilePic.length > 0
     ? { backgroundImage: `url(${profilePic})`, backgroundSize: "cover" }
     : {};
 
   return (
     <div className={`${styles.avatar} ${styles[size]}`} style={style}>
-      {!profilePic && username && username[0].toUpperCase()}
+      {(profilePic === null || profilePic === undefined || profilePic.length === 0) && username && username[0].toUpperCase()}
     </div>
   );
 };

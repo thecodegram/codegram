@@ -91,14 +91,13 @@ const DashboardPage = () => {
     fetchData();
   }, [username]);
 
-  //this is new for profile pic
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const fetchProfilePic = async () => {
       if (username) {
         // this checks if username exists in cache and if  it exists, set profilePic to cached data and if not fetch data from API and then updates the cache
-        if (cache[username]) {
-          setProfilePic(cache[username]);
-        } else {
+        const currentCache = cache[username];
+        if (currentCache === undefined || currentCache === null) {
           try {
             console.log("Fetching profile picture I AM CALLED");
             const response = await axios.get(
@@ -108,19 +107,27 @@ const DashboardPage = () => {
                 withCredentials: true,
               }
             );
-            const profilePicURL = URL.createObjectURL(response.data);
-
-            setCache(username, profilePicURL);
-            setProfilePic(profilePicURL);
+            if (response.status !== 204) {
+              const profilePicURL = URL.createObjectURL(response.data);
+              console.log("profilePicURL", profilePicURL);
+              setCache(username, profilePicURL);
+              setProfilePic(profilePicURL);
+            } else {
+              setCache(username, "");
+              setProfilePic("");
+            }
           } catch (error) {
             console.error("Error fetching profile picture:", error);
           }
+        } else {
+          setProfilePic(currentCache);
         }
       }
     };
 
     fetchProfilePic();
-  }, [username, cache, setCache]);
+  }, [username, setCache]);
+  /* eslint-disable react-hooks/exhaustive-deps */
 
   // const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   setUsername(event.target.value);
