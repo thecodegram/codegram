@@ -87,14 +87,32 @@ export async function getAndStoreVjudgeUpdates(username: string) {
         const storedAcData = u.vjudge.acRecords!!;
         const storedFailedData = u.vjudge.failRecords!!;
 
-        const keys: string[] = ['AtCoder', 'CSES', 'CodeChef', 'CodeForces', 'DMOJ', 'EOlymp', 'Gym', 'Kattis', 'SPOJ', 'TopCoder', 'UVA'];
+        const keys: string[] = [
+          'AtCoder',
+          'CSES',
+          'CodeChef',
+          'CodeForces',
+          'DMOJ',
+          'EOlymp',
+          'Gym',
+          'Kattis',
+          'SPOJ',
+          'TopCoder',
+          'UVA',
+          'HDU',
+          'HackerRank',
+          'LightOJ',
+          'SGU',
+          'URAL',
+          'UVALive'
+        ];
 
         const updates = [];
         // go through all platformNames and check if there are updates for any of them
         for (var i = 0; i < keys.length; ++i) {
           const key: string = keys[i];
-          const oldValues: string[] = storedAcData[key as keyof typeof storedAcData];
-          const newValues: string[] = latestData.acRecords[key].sort();
+          const oldValues: string[] = storedAcData[key as keyof typeof storedAcData] ?? [];
+          const newValues: string[] = (latestData.acRecords[key]? (latestData.acRecords[key].sort()):[]);
 
           // something changed!
           if (oldValues.length < newValues.length) {

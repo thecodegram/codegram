@@ -25,7 +25,11 @@ export class SubmitsRepository {
         
         // Some reflection black magic to add the problem to the list corresponding to platform
         // for example, add problem to vjudge.acRecords.Kattis
-        (user.vjudge.acRecords[platform as keyof typeof user.vjudge.acRecords]).push(problem);
+        const key = platform as keyof typeof user.vjudge.acRecords;
+        if(!user.vjudge.acRecords[key]) {
+            user.vjudge.acRecords[key] = [];
+        }
+        user.vjudge.acRecords[key].push(problem);
 
         await user.save();
     }
