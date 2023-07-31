@@ -44,9 +44,13 @@ export const FeedItem = ({
       <p className={styles.detailText}>{createdTime.toDateString()}</p>
     </section>
     <section className={styles.body}>
-      <p>{`${username} solved `}
-      <a href={getLink(problemTitleSlug, platform)} target="_blank">{`${problemTitle}`} </a>
-      {`on ${prettifyPlatform(platform)}!`}</p>
+      <p>
+      {`${username} solved `}
+        <a href={getLink(problemTitleSlug, platform)} target="_blank" rel="noreferrer">
+          {`${problemTitle}`}
+        </a>
+        {` on ${prettifyPlatform(platform)}!`}
+      </p>
     </section>
     <section className={styles.footer}>
       <button><IconLikeBtnHeart />{numOfLikes}</button>
