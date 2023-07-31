@@ -2,9 +2,6 @@ import { useState } from "react";
 import { IconClose } from "../icons/icon-close";
 import { FormEvent } from "react";
 import { Button, ButtonTypes } from "./Button";
-import { useNavigate } from "react-router-dom";
-
-import axios from "axios";
 
 import styles from "./Modal.module.scss";
 
@@ -18,7 +15,6 @@ export interface ModalProps {
 }
 
 export const Modal = ({ title, inputLabel, inputPlaceholder, submitBtnLabel, onClickClose, onClickSubmit }: ModalProps) => {
-  const navigate = useNavigate()
   const [ value, setValue ] = useState<string>("")
   const [ formError, setFormError ] = useState<string>("")
 
@@ -32,19 +28,11 @@ export const Modal = ({ title, inputLabel, inputPlaceholder, submitBtnLabel, onC
     }
 
     try {
-      const newGroup = await axios.post(`${process.env.REACT_APP_API_URL}/api/group`,
-        { name: value },
-        { withCredentials: true, }
-      )
-
-      navigate(`/g/${newGroup.data.group_id}`)
-
+      onClickSubmit(value)
     } catch (error) {
       setFormError("Error creating a new group")
       console.error("Error creating a new group:", error);
     }
-
-    onClickSubmit(value)
   }
 
   return (

@@ -5,6 +5,7 @@ import { GroupInfoHeader } from "../components/GroupInfoHeader"
 import { useState, useEffect } from "react"
 import { IconAddBtnPlus } from "../icons"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
+import { Modal } from "../components/Modal"
 
 import axios from "axios"
 
@@ -28,6 +29,7 @@ export const GroupProfilePage = () => {
   const location = useLocation()
   const [ activeTab, setActiveTab ] = useState<GroupProfilePageTab>(() =>
   location.pathname.includes("/members") ? GroupProfilePageTab.members : GroupProfilePageTab.activity)
+  const [ showInviteMemberModal, setShowInviteMemberModal ] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,7 +51,18 @@ export const GroupProfilePage = () => {
     fetchData();
   }, [groupId]);
 
-  const onClickInviteMember = () => console.log("test")
+  const onClickInviteMember = async (value: string) => {
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/group/${groupId}/send-group-invite/${value}`, {},
+        { withCredentials: true }
+      )
+
+      navigate(`/g/${groupId}/members`)
+      setShowInviteMemberModal(false)
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  }
 
   return <>
     <HeaderNav />
@@ -59,7 +72,7 @@ export const GroupProfilePage = () => {
             groupName={groupInfoData.name}
             createdAt={groupInfoData.created_at}
             />
-          <Button onClick={onClickInviteMember}><IconAddBtnPlus /> Invite Member</Button>
+          <Button onClick={() => setShowInviteMemberModal(true)}><IconAddBtnPlus /> Invite Member</Button>
         </header>
         <nav className={styles.tabNav}>
           <button 
@@ -82,5 +95,13 @@ export const GroupProfilePage = () => {
         <Outlet />
       </div>
     }
+    {showInviteMemberModal && <Modal
+      title="Invite member"
+      inputLabel="Username"
+      inputPlaceholder="Enter a username"
+      submitBtnLabel="Invite member"
+      onClickClose={() => setShowInviteMemberModal(false)}
+      onClickSubmit={onClickInviteMember}
+    />}
   </>
 }

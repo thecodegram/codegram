@@ -34,8 +34,13 @@ export const HeaderNav = () => {
     }
   };
 
-  const onClickCreateGroup = (value: string) => {
-    console.log(value)
+  const onClickCreateGroup = async (value: string) => {
+    const newGroup = await axios.post(`${process.env.REACT_APP_API_URL}/api/group`,
+      { name: value },
+      { withCredentials: true, }
+    )
+
+    navigate(`/g/${newGroup.data.group_id}`)
   }
 
   const onClickShowNotifications = async () => {

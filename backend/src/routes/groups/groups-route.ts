@@ -1,11 +1,13 @@
 import express, { Request, Response } from "express";
 import { GroupRepository } from "../../repository/GroupRepository";
 import { UserRepository } from "../../repository/UserRepository";
+import { NotificationRepository, NotificationTypes } from "../../repository/NotificationRepository";
 import { handleValidationErrors } from "../../utils/middleware";
 
 const router = express.Router();
 const groupRepository = new GroupRepository()
 const userRepository = new UserRepository()
+const notificationRepository = new NotificationRepository()
 
 router.post("", [
   handleValidationErrors
@@ -42,18 +44,31 @@ router.get("/:groupId", [
   }
 })
 
-router.post("/:groupId/send-group-invite/:inviteeId", [
+router.post("/:groupId/send-group-invite/:inviteeUsername", [
   handleValidationErrors
 ], async (req: Request, res: Response) => {
   if (req.session && req.session.username) {
-    const { groupId, inviteeId } = req.params
+    const { groupId, inviteeUsername } = req.params
   
     try {
       const userInfo = await userRepository.getUser(req.session.username);
       const isGroupMember = await groupRepository.isGroupMember(+groupId, +userInfo.id)
 
+      // Check if session user is a group member
       if (isGroupMember) {
+        const inviteeUserInfo = await userRepository.getUser(inviteeUsername)
+        const inviteeId = inviteeUserInfo.id
+
+        const groupInfo = await groupRepository.getGroupInfo(+groupId)
+        const groupName = groupInfo.name
+
         const newGroupInvite = await groupRepository.createGroupInvite(+groupId, +inviteeId)
+        await notificationRepository.createNotification(
+          inviteeId, 
+          `You've been invited to join ${groupName}`,
+          NotificationTypes.group
+        )
+
         res.status(200).json(newGroupInvite)
       } else {
         res.status(401).send("Failed to send group invite because inviter is not a group member")
