@@ -17,6 +17,7 @@ import { FriendsPage } from "./pages/FriendsPage";
 import { FriendRequestsPage } from "./pages/FriendRequestsPage";
 import { AllFriendsPage } from "./pages/AllFriendsPage";
 import { UserContext } from "./components/UserContext";
+import { GroupProfilePage } from "./pages/GroupProfile";
 
 function App() {
   const [username, setUsername] = useState<string | null>(null);
@@ -63,10 +64,18 @@ function App() {
               />
             </Route>
             <Route
-              path="/:username"
+              path="/u/:username"
               element={
                 <PrivateRoute>
                   <UserProfilePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/g/:groupId"
+              element={
+                <PrivateRoute>
+                  <GroupProfilePage />
                 </PrivateRoute>
               }
             />

@@ -6,13 +6,13 @@ import {
   UserInfoHeaderVariant,
 } from "../components/UserInfoHeader";
 import { AvatarSize } from "../components/Avatar";
-import { ListGroup } from "../components/ListGroup";
 import { FeedItem } from "../components/FeedItem";
 import { UserStatsGrid } from "../components/UserStatsGrid";
 import { HeaderNav } from "../components/HeaderNav";
 import { FriendsList } from "../components/FriendsList";
 import { LoadingEllipsis } from "../components/LoadingEllipsis";
 import { EmptyState } from "../components/EmptyState";
+import { GroupsList } from "../components/GroupsList";
 
 import styles from "./DashboardPage.module.scss";
 
@@ -42,26 +42,6 @@ export interface feedData {
   lang: string;
   __typename: string;
 }
-
-interface RelationshipProps {
-  name: string;
-  handle: string;
-}
-
-export const groupsDummyData: RelationshipProps[] = [
-  {
-    name: "372 Group",
-    handle: "372group",
-  },
-  {
-    name: "Bobby's Class",
-    handle: "bobbychan372",
-  },
-  {
-    name: "SFU Competitive Programming club",
-    handle: "sfucpc",
-  },
-];
 
 const DashboardPage = () => {
   const [feedData, setFeedData] = useState<feedData[]>([]);
@@ -155,13 +135,7 @@ const DashboardPage = () => {
         </article>
         <article className={styles.relationships}>
           {userId && <FriendsList userId={userId} />}
-          <ListGroup title="Groups">
-            {groupsDummyData.map(({ name, handle }, index) => (
-              <li key={index}>
-                <UserInfoHeader username={name} name={handle} />
-              </li>
-            ))}
-          </ListGroup>
+          {userId && <GroupsList userId={userId} />}
         </article>
       </main>
     </>

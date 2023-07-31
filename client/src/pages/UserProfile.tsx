@@ -2,9 +2,7 @@ import { useParams } from "react-router-dom"
 import { UserInfoHeader } from "../components/UserInfoHeader"
 import { AvatarSize } from "../components/Avatar"
 import { UserStatsGrid } from "../components/UserStatsGrid"
-import { ListGroup } from "../components/ListGroup"
-import { groupsDummyData } from "./DashboardPage"
-import { IconRankingMovedUp, IconAddFriendBtnPlus } from "../icons"
+import { IconRankingMovedUp, IconAddBtnPlus } from "../icons"
 import { useState, useEffect } from "react"
 import { feedData } from "./DashboardPage"
 import { FeedItem } from "../components/FeedItem"
@@ -14,6 +12,8 @@ import { useUserContext } from "../components/UserContext"
 import { UserInfoData } from "./DashboardPage"
 import { FriendsList } from "../components/FriendsList"
 import { EmptyState } from "../components/EmptyState"
+import { GroupsList } from "../components/GroupsList"
+
 import axios from "axios"
 
 import styles from "./UserProfile.module.scss"
@@ -99,7 +99,7 @@ export const UserProfilePage = () => {
             #12
             <span><IconRankingMovedUp />2</span>
           </article>
-          {showAddFriendBtn && <Button onClick={onClickAddFriend}><IconAddFriendBtnPlus /> Add friend</Button>}
+          {showAddFriendBtn && <Button onClick={onClickAddFriend}><IconAddBtnPlus /> Add friend</Button>}
         </header>
         <main className={styles.main}>
           <article className={styles.statsGrid}>
@@ -109,16 +109,7 @@ export const UserProfilePage = () => {
 
           <article className={styles.relationships}>
             <FriendsList userId={profileUserData?.postgres.id || null} />
-            <ListGroup title='Groups'>
-              {groupsDummyData.map(({name, handle}, index) => (
-                <li key={index}>
-                  <UserInfoHeader 
-                    username={name} 
-                    name={handle} 
-                  />
-                </li>
-              ))}
-            </ListGroup>
+            <GroupsList userId={profileUserData?.postgres.id || null} />
           </article>
 
           <article className={styles.activityFeed}>

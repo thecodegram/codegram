@@ -1,6 +1,27 @@
 import { pool } from "../db/db";
 
 export class GroupRepository {
+  async getGroupInfo(groupId: number) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const group = await client.query(`
+        SELECT * FROM grind_group
+        WHERE group_id = $1
+      `, [groupId])
+  
+      await client.query('COMMIT');
+  
+      return group.rows[0];
+    } catch (e) {
+      await client.query('ROLLBACK');
+    } finally {
+      client.release()
+    }
+  }
+
   async createGroupInvite(groupId: number, inviteeId: number) {
     const client = await pool.connect();
 

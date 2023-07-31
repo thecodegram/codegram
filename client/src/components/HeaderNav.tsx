@@ -64,7 +64,7 @@ export const HeaderNav = () => {
               </section>}
         </article>
       </Dropdown>
-      <Link to={`/${username}`} relative='path'>
+      <Link to={`/u/${username}`} relative='path'>
         <Avatar username={username || ""} />
       </Link>
       <button className={styles.btnText} onClick={handleLogout}>Logout</button>

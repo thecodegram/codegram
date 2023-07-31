@@ -27,6 +27,21 @@ router.post("", [
   }
 })
 
+router.get("/:groupId", [
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { groupId } = req.params;
+
+  try {
+    const group = await groupRepository.getGroupInfo(+groupId)
+
+    res.status(200).json(group)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send("Failed to get group info")
+  }
+})
+
 router.post("/:groupId/send-group-invite/:inviteeId", [
   handleValidationErrors
 ], async (req: Request, res: Response) => {

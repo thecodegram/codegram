@@ -1,0 +1,43 @@
+.groupProfilePage {
+  background-color: #1B1B1A;
+  min-height: calc(100vh - 4rem);
+  padding: 2rem 1rem;
+
+  header {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  @media screen and (min-width: 1200px) {
+    header {
+      padding-top: 1rem;
+      padding-bottom: 2.5rem;
+    }
+  }
+}
+
+.tabNav {
+  padding: 1rem 0 1.5rem 0;
+  display: flex;
+  gap: 1.5rem;
+
+  button {
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    width: min-content;
+    background: none;
+    padding-bottom: 1rem;
+    border: none;
+    border-bottom: 3px solid transparent;
+
+    &.active {
+      border-bottom: 3px solid #FFA115;
+    }
+  }
+}
