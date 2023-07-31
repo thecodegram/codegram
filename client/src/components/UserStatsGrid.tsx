@@ -33,9 +33,9 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
   }, [username]);
 
   return !statsData 
-    ? <EmptyState>No stats yet</EmptyState> 
+    ? <EmptyState>No LeetCode stats yet</EmptyState> 
     : <div className={styles.statsGrid}>
-      {statsData && statsData?.mongo.leetcode.submitStats?.acSubmissionNum.map((item, index) => (
+      {statsData && statsData?.mongo.leetcode?.submitStats?.acSubmissionNum.map((item, index) => (
         <div key={index}>
           <p>{item.count.toString()}</p>
           <h3>{item.difficulty}</h3>
