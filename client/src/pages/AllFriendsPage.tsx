@@ -13,6 +13,7 @@ export interface FriendItem {
   user_1_username: string,
   user_2_username: string,
   created_at: string
+  profilePic?: string | null;
 }
 
 export const AllFriendsPage = () => {

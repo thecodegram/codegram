@@ -1,24 +1,32 @@
-import { IconInbox } from '../icons';
-import { useUserContext } from './UserContext';
-import axios from "axios"
-import Cookies from 'js-cookie';
-import { useNavigate, Link } from 'react-router-dom';
-import { Avatar } from './Avatar';
-import { Dropdown } from './Dropdown';
-import { useState } from 'react';
-import { EmptyState } from './EmptyState';
-import { Button, ButtonVariant } from './Button';
-import { Modal } from './Modal';
+import { IconInbox } from "../icons";
+import { useUserContext } from "./UserContext";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useNavigate, Link } from "react-router-dom";
+import { Avatar } from "./Avatar";
+import { Dropdown } from "./Dropdown";
+import { useEffect, useState } from "react";
+import { EmptyState } from "./EmptyState";
+import { Button, ButtonVariant } from "./Button";
+import { Modal } from "./Modal";
 import { useImageCache } from "./ImageCacheContext";
 
-import styles from "./HeaderNav.module.scss"
+import styles from "./HeaderNav.module.scss";
 
 export const HeaderNav = () => {
   const { username, userId } = useUserContext();
   const navigate = useNavigate();
-  const [ notifications, setNotifications ] = useState([])
-  const [ showCreateGroupModal, setShowCreateGroupModal ] = useState<boolean>(false)
-  const { clearCache } = useImageCache();
+  const [notifications, setNotifications] = useState([]);
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [showCreateGroupModal, setShowCreateGroupModal] =
+    useState<boolean>(false);
+  const { clearCache, cache } = useImageCache();
+
+  useEffect(() => {
+    if (username && cache[username] !== undefined) {
+      setProfilePic(cache[username]);
+    }
+  }, [username, cache]);
 
   const handleLogout = async () => {
     try {
@@ -30,7 +38,7 @@ export const HeaderNav = () => {
 
       if (response.status === 200) {
         Cookies.remove("mysession");
-        clearCache(); 
+        clearCache();
         navigate("/login");
       } else {
         console.error("Error logging out: Invalid response status");
@@ -41,13 +49,14 @@ export const HeaderNav = () => {
   };
 
   const onClickCreateGroup = async (value: string) => {
-    const newGroup = await axios.post(`${process.env.REACT_APP_API_URL}/api/group`,
+    const newGroup = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/group`,
       { name: value },
-      { withCredentials: true, }
-    )
+      { withCredentials: true }
+    );
 
-    navigate(`/g/${newGroup.data.group_id}`)
-  }
+    navigate(`/g/${newGroup.data.group_id}`);
+  };
 
   const onClickShowNotifications = async () => {
     try {
@@ -62,41 +71,75 @@ export const HeaderNav = () => {
     }
   };
 
-  return <>
-    <header className={styles.header}>
-      <section className={styles.left}><h1><Link to="/dashboard" relative='path'>Codegram</Link></h1></section>
-      <section className={styles.right}>
-        <Dropdown trigger={<IconInbox />} triggerAction={onClickShowNotifications}>
-          <article className={styles.dropdown}>
-            <h2>Notifications</h2>
-            {notifications.length === 0 
-              ? <EmptyState>All caught up!</EmptyState>
-              : <section className={styles.dropdownList}>
-                  {notifications.map(({ message, created_at, type }, index) => 
+  return (
+    <>
+      <header className={styles.header}>
+        <section className={styles.left}>
+          <h1>
+            <Link to="/dashboard" relative="path">
+              Codegram
+            </Link>
+          </h1>
+        </section>
+        <section className={styles.right}>
+          <Dropdown
+            trigger={<IconInbox />}
+            triggerAction={onClickShowNotifications}
+          >
+            <article className={styles.dropdown}>
+              <h2>Notifications</h2>
+              {notifications.length === 0 ? (
+                <EmptyState>All caught up!</EmptyState>
+              ) : (
+                <section className={styles.dropdownList}>
+                  {notifications.map(({ message, created_at, type }, index) => (
                     <div key={index} className={styles.dropdownItem}>
-                      <Link to={type === "friend" ? `/friends/requests` : "/groups/invites"} relative='path'>
+                      <Link
+                        to={
+                          type === "friend"
+                            ? `/friends/requests`
+                            : "/groups/invites"
+                        }
+                        relative="path"
+                      >
                         <p className={styles.message}>{message}</p>
-                        <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
+                        <p className={styles.timestamp}>
+                          {new Date(created_at).toDateString()}
+                        </p>
                       </Link>
                     </div>
-                  )}
-                </section>}
-          </article>
-        </Dropdown>
-        <Button variant={ButtonVariant.secondary} onClick={() => setShowCreateGroupModal(true)}>Create a group</Button>
-        <Link to={`/u/${username}`} relative='path'>
-          <Avatar username={username || ""} />
-        </Link>
-        <button className={styles.btnText} onClick={handleLogout}>Logout</button>
-      </section>
-    </header>
-    {showCreateGroupModal && <Modal
-      title="Create a group"
-      inputLabel="Group name"
-      inputPlaceholder="Enter a group name"
-      submitBtnLabel="Create group"
-      onClickClose={() => setShowCreateGroupModal(false)}
-      onClickSubmit={onClickCreateGroup}
-    />}
-  </>
-}
+                  ))}
+                </section>
+              )}
+            </article>
+          </Dropdown>
+          <Button
+            variant={ButtonVariant.secondary}
+            onClick={() => setShowCreateGroupModal(true)}
+          >
+            Create a group
+          </Button>
+          <Link to={`/u/${username}`} relative="path">
+            <Avatar
+              username={username || ""}
+              profilePic={profilePic}
+            />
+          </Link>
+          <button className={styles.btnText} onClick={handleLogout}>
+            Logout
+          </button>
+        </section>
+      </header>
+      {showCreateGroupModal && (
+        <Modal
+          title="Create a group"
+          inputLabel="Group name"
+          inputPlaceholder="Enter a group name"
+          submitBtnLabel="Create group"
+          onClickClose={() => setShowCreateGroupModal(false)}
+          onClickSubmit={onClickCreateGroup}
+        />
+      )}
+    </>
+  );
+};
