@@ -407,6 +407,21 @@ router.get(
   }
 );
 
+router.get(
+  "/:userId/is-friend/:user2Id",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId, user2Id } = req.params;
+
+    try {
+      const isFriend = await friendRepository.isFriend(+userId, +user2Id);
+      res.status(200).json({ is_friend: isFriend })
+    } catch (err) {
+      res.status(500).send("Failed to get user's friends");
+    }
+  }
+);
+
 router.get('/:userId/groups', [
   validateUsername('userId'),
   handleValidationErrors

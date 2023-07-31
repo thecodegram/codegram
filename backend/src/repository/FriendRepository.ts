@@ -126,4 +126,30 @@ export class FriendRepository {
       client.release();
     }
   }
+
+  async isFriend(user1Id: number, user2Id: number) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      const result = await client.query(`
+        SELECT EXISTS (
+          SELECT 1
+          FROM friend
+          WHERE (user_1_id = $1 AND user_2_id = $2)
+          OR (user_2_id = $1 AND user_1_id = $2)
+        ) AS is_friend;
+      `, [user1Id, user2Id]);
+
+      await client.query('COMMIT');
+      
+      return result.rows[0].is_friend;
+    } catch(e) {
+      await client.query('ROLLBACK');
+      console.error("Failed to see if already friends:", e);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
 }
