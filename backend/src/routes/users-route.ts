@@ -10,9 +10,14 @@ import { UserNameNotFoundError } from "../errors/username-not-found-error";
 import { getSubmissionStats } from "../api/vjudge";
 import { getLatestAcceptedSubmits, getSubmitStats } from "../api/leetcode";
 import { uploadFile, getFile } from "../repository/ImageBucket";
-import { NotificationRepository, NotificationTypes } from "../repository/NotificationRepository";
+import {
+  NotificationRepository,
+  NotificationTypes,
+} from "../repository/NotificationRepository";
 import { FriendRepository } from "../repository/FriendRepository";
 import { UserRepository } from "../repository/UserRepository";
+import { GroupRepository } from "../repository/GroupRepository";
+
 import sanitize from "sanitize-filename";
 import multer from "multer";
 import fs from "fs";
@@ -23,6 +28,7 @@ const router = express.Router();
 const userRepository = new UserRepository()
 const notificationRepository = new NotificationRepository()
 const friendRepository = new FriendRepository()
+const groupRepository = new GroupRepository()
 
 router.get(
   "/:username/latestSubmits",
@@ -210,7 +216,7 @@ router.get(
   async (req: Request, res: Response) => {
     const { username } = req.params;
 
-    const userPostgresData = await userRepository.getUser(username)
+    const userPostgresData = await userRepository.getUser(username);
 
     const userMongoData = await User.findOne(
       { username: username },
@@ -225,7 +231,9 @@ router.get(
     if (!userMongoData || !userPostgresData) {
       res.status(404).send("User not found");
     } else {
-      res.status(200).json({ mongo: userMongoData, postgres: { id: userPostgresData.id } });
+      res
+        .status(200)
+        .json({ mongo: userMongoData, postgres: { id: userPostgresData.id } });
     }
   }
 );
@@ -256,119 +264,176 @@ router.get(
 
         readStream.pipe(res);
       } else {
-        res.status(404).send("Profile picture not found");
+        res.status(204).end();
       }
     }
   }
 );
 
-router.get('/:userId/notifications', [
-  // Sanitize the userId variable
+router.get(
+  "/:userId/notifications",
+  [
+    // Sanitize the userId variable
+    validateUsername("userId"),
+    handleValidationErrors,
+  ],
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+
+    try {
+      const notifications = await notificationRepository.getNotifications(
+        userId
+      );
+      res.status(200).json(notifications);
+    } catch (err) {
+      res.status(500).send("Failed to get user's notifications");
+    }
+  }
+);
+
+router.post(
+  "/:userId/notifications",
+  [
+    // Sanitize the userId variable
+    validateUsername("userId"),
+    handleValidationErrors,
+  ],
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const { message, type } = req.body;
+
+    try {
+      const newNotification = await notificationRepository.createNotification(
+        +userId,
+        message,
+        type
+      );
+      res.status(200).json(newNotification);
+    } catch (err) {
+      res.status(500).send("Failed to create a new notification");
+    }
+  }
+);
+
+router.get(
+  "/:userId/friend-requests",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+
+    try {
+      const friendRequests = await friendRepository.getFriendRequests(+userId);
+      res.status(200).json(friendRequests);
+    } catch (err) {
+      res.status(500).send("Failed to get user's friend requests");
+    }
+  }
+);
+
+router.post(
+  "/:userId/send-friend-request/:requesteeId",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId: requesterId, requesteeId } = req.params;
+    const requesterUsername = req.session.username;
+
+    try {
+      const newFriendRequest = await friendRepository.createFriendRequest(
+        +requesterId,
+        +requesteeId
+      );
+      await notificationRepository.createNotification(
+        +requesteeId,
+        `@${requesterUsername} sent you a friend request!`,
+        NotificationTypes.friend
+      );
+
+      res.status(200).json(newFriendRequest);
+    } catch (err) {
+      res.status(500).send("Failed to send friend request");
+    }
+  }
+);
+
+router.post(
+  "/:userId/friend-requests/:friendRequestId/accept",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId: requesteeId, friendRequestId } = req.params;
+    const { requesterId } = req.body;
+
+    try {
+      const newFriend = await friendRepository.createFriend(
+        +requesterId,
+        +requesteeId
+      );
+      await friendRepository.deactivateFriendRequest(+friendRequestId);
+      res.status(200).json(newFriend);
+    } catch (err) {
+      res.status(500).send("Failed to accept friend request");
+    }
+  }
+);
+
+router.post(
+  "/:userId/friend-requests/:friendRequestId/remove",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { friendRequestId } = req.params;
+
+    try {
+      const updatedFriendRequest = await friendRepository.deactivateFriendRequest(
+        +friendRequestId
+      );
+      res.status(200).json(updatedFriendRequest);
+    } catch (err) {
+      res.status(500).send("Failed to remove friend request");
+    }
+  }
+);
+
+router.get(
+  "/:userId/friends",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+
+    try {
+      const friends = await friendRepository.getFriends(+userId);
+      res.status(200).json(friends);
+    } catch (err) {
+      res.status(500).send("Failed to get user's friends");
+    }
+  }
+);
+
+router.get('/:userId/groups', [
   validateUsername('userId'),
   handleValidationErrors
 ], async (req: Request, res: Response) => {
   const { userId } = req.params
 
   try {
-    const notifications = await notificationRepository.getNotifications(userId)
-    res.status(200).json(notifications)
+    const groups = await groupRepository.getGroups(+userId)
+
+    res.status(200).json(groups)
   } catch (err) {
-    res.status(500).send("Failed to get user's notifications")
+    res.status(500).send("Failed to get user's groups")
   }
 })
 
-router.post('/:userId/notifications', [
-  // Sanitize the userId variable
-  validateUsername('userId'),
-  handleValidationErrors
-], async (req: Request, res: Response) => {
-  const { userId } = req.params
-  const { message, type } = req.body
-
-  try {
-    const newNotification = await notificationRepository.createNotification(+userId, message, type)
-    res.status(200).json(newNotification)
-  } catch (err) {
-    res.status(500).send("Failed to create a new notification")
-  }
-})
-
-router.get('/:userId/friend-requests', [
+router.get('/:userId/group-invites', [
   validateUsername('userId'),
   handleValidationErrors
 ], async (req: Request, res: Response) => {
   const { userId } = req.params
 
   try {
-    const friendRequests = await friendRepository.getFriendRequests(+userId)
-    res.status(200).json(friendRequests)
+    const groupInvites = await groupRepository.getGroupInvites(+userId)
+
+    res.status(200).json(groupInvites)
   } catch (err) {
-    res.status(500).send("Failed to get user's friend requests")
-  }
-})
-
-router.post('/:userId/send-friend-request/:requesteeId', [
-  validateUsername('userId'),
-  handleValidationErrors
-], async (req: Request, res: Response) => {
-  const { userId: requesterId, requesteeId } = req.params
-  const requesterUsername = req.session.username
-
-  try {
-    const newFriendRequest = await friendRepository.createFriendRequest(+requesterId, +requesteeId)
-    await notificationRepository.createNotification(
-      +requesteeId, 
-      `@${requesterUsername} sent you a friend request!`,
-      NotificationTypes.friend
-    )
-
-    res.status(200).json(newFriendRequest)
-  } catch (err) {
-    res.status(500).send("Failed to send friend request")
-  }
-})
-
-router.post('/:userId/friend-requests/:friendRequestId/accept', [
-  validateUsername('userId'),
-  handleValidationErrors
-],async (req: Request, res: Response) => {
-  const { userId: requesteeId, friendRequestId } = req.params
-  const { requesterId } = req.body
-
-  try {
-    const newFriend = await friendRepository.createFriend(+requesterId, +requesteeId)
-    await friendRepository.deactivateFriendRequest(+friendRequestId)
-    res.status(200).json(newFriend)
-  } catch (err) {
-    res.status(500).send("Failed to accept friend request")
-  }
-})
-
-router.post('/:userId/friend-requests/:friendRequestId/remove', [
-  validateUsername('userId'),
-  handleValidationErrors
-], async (req: Request, res: Response) => {
-  const { friendRequestId } = req.params
-
-  try {
-    const newFriendRequest = await friendRepository.deactivateFriendRequest(+friendRequestId)
-    res.status(200).json(newFriendRequest)
-  } catch (err) {
-    res.status(500).send("Failed to remove friend request")
-  }
-})
-
-router.get('/:userId/friends', [
-  validateUsername('userId'),
-  handleValidationErrors
-], async (req: Request, res: Response) => {
-  const { userId } = req.params
-
-  try {
-    const newFriendRequest = await friendRepository.getFriends(+userId)
-    res.status(200).json(newFriendRequest)
-  } catch (err) {
-    res.status(500).send("Failed to get user's friends")
+    res.status(500).send("Failed to get user's group invites")
   }
 })
 

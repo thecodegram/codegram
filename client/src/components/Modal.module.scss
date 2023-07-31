@@ -1,0 +1,98 @@
+.modalOverlay {
+  display: grid;
+  place-content: center;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(22, 22, 22, 0.95);
+  animation: fade-in 0.1s ease forwards;
+  z-index: 100;
+}
+
+.modal {
+  background-color: #202020;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 90vw;
+  max-width: 36rem;
+  max-height: 95vh;
+  opacity: 0;
+  animation: fade-down 0.25s ease forwards;
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    h1 {
+      font-size: 1.25rem;
+      color: #fff;
+    }
+
+    & > div {
+      cursor: pointer;
+    }
+  }
+
+  main {
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: 0.88rem;
+        color: #9A9A9A;
+        width: 100%;
+
+        .error {
+          color: #FFA115;
+        }
+      }
+
+      input {
+        height: 2.5rem;
+        padding: 0 1rem;
+        color: #fff;
+        background-color: #2C2C2C;
+        border-radius: 0.75rem;
+        border: none;
+        font-size: 0.88rem;
+        width: 100%;
+        font-family: 'Inter', sans-serif;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@keyframes fade-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0rem);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

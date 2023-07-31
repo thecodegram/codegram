@@ -12,6 +12,7 @@ enum FriendsPageTab {
   all = "All Friends",
   requests = "Friend Requests",
 }
+
 export const FriendsPage = () => {
   const navigate = useNavigate()
   const location = useLocation()

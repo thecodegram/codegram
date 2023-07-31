@@ -42,7 +42,8 @@ export class FriendRepository {
           users AS requestee ON friend_request.requestee_id = requestee.id
         WHERE
           friend_request.requestee_id = $1 AND
-          friend_request.is_active = true;
+          friend_request.is_active = true
+        ORDER BY created_at DESC;
       `, [userId]);
 
       await client.query('COMMIT');

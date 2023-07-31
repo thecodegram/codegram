@@ -12,6 +12,7 @@ const triggerRequestsRouter = require('./routes/test/trigger-requests-route')
 const usersRouter = require('./routes/users-route')
 const authRouter = require('./routes/auth-route')
 const eventsRouter = require('./routes/events-route')
+const groupRouter = require('./routes/groups-route')
 
 // Create an Express.js app
 const app = express();
@@ -35,6 +36,7 @@ app.use('/', (req: Request, res: Response, next: NextFunction) => {
 // routing
 app.use('/api/trigger-requests', [enforceLoggedIn], triggerRequestsRouter);
 app.use('/api/user', [enforceLoggedIn], usersRouter);
+app.use('/api/group', [enforceLoggedIn], groupRouter);
 app.use('/api/updates', [enforceLoggedIn], require('./routes/updates-route'));
 app.use('/api/events', [enforceLoggedIn], eventsRouter);
 app.use('/api/auth', authRouter);

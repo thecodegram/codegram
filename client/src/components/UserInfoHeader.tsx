@@ -27,7 +27,7 @@ export const UserInfoHeader = ({
 }: UserInfoHeaderProps) => {
   return (
     <article className={`${styles.profileInfoHeader} ${styles[variant]}`}>
-      <Link to={`/${username}`} relative="path">
+      <Link to={`/u/${username}`} relative="path">
         <Avatar username={username} size={avatarSize} profilePic={profilePic} />
         <div className={styles.userInfo}>
           <h2>{name}</h2>

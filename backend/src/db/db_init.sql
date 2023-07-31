@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS platform (
 
 INSERT INTO platform (pid, pname) 
     VALUES 
-     (1,'leetcode'),
-     (2,'vjudge')
+        (1,'leetcode'),
+        (2,'vjudge')
     ON CONFLICT (pid)
     DO UPDATE SET pid = EXCLUDED.pid, pname = EXCLUDED.pname;
 
@@ -36,34 +36,12 @@ CREATE TABLE IF NOT EXISTS events (
 
 CREATE INDEX IF NOT EXISTS idx_events_event_timestamp ON events (event_timestamp DESC);
 
-CREATe TABLE IF NOT EXISTS likes (
+CREATE TABLE IF NOT EXISTS likes (
     user_id INTEGER,
     event_id INTEGER,
     CONSTRAINT fk_likes_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_likes_events FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     CONSTRAINT pk_likes PRIMARY KEY (user_id, event_id)
-);
-
-CREATE TABLE IF NOT EXISTS grind_group (
-    gid SERIAL PRIMARY KEY,
-    group_name VARCHAR(50)
-);
-
-CREATE TABLE IF NOT EXISTS user_group (
-    group_id INTEGER,
-    user_id INTEGER,
-    member_since TIMESTAMP,
-    CONSTRAINT pk_user_group PRIMARY KEY (group_id, user_id),
-    CONSTRAINT fk_user_group_grind_group FOREIGN KEY (group_id) REFERENCES grind_group(gid) ON DELETE CASCADE,
-    CONSTRAINT fk_user_group_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS follower (
-    follower_id INTEGER,
-    followee_id INTEGER,
-    CONSTRAINT fk_follower_users  FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_folowee_users FOREIGN KEY (followee_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT pk_follower PRIMARY KEY (follower_id, followee_id)
 );
 
 CREATE TABLE IF NOT EXISTS notification (
@@ -73,6 +51,31 @@ CREATE TABLE IF NOT EXISTS notification (
     type VARCHAR(25),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_notification_user FOREIGN KEY (recipient_id) REFERENCES users(id) on DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS grind_group (
+    group_id SERIAL PRIMARY KEY,
+    name VARCHAR(50),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS group_member (
+    group_id INTEGER,
+    user_id INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT pk_group_member PRIMARY KEY (group_id, user_id),
+    CONSTRAINT fk_group_member_grind_group FOREIGN KEY (group_id) REFERENCES grind_group(group_id) ON DELETE CASCADE,
+    CONSTRAINT fk_group_member_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS group_invite (
+    group_invite_id SERIAL PRIMARY KEY,
+    group_id INTEGER,
+    invitee_id INTEGER,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_invitee_user FOREIGN KEY (invitee_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_group FOREIGN KEY (group_id) REFERENCES grind_group(group_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friend_request (
