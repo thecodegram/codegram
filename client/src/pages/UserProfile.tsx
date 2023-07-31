@@ -36,12 +36,14 @@ export const UserProfilePage = () => {
   const { username: profileUsername } = useParams();
   const { cache, setCache } = useImageCache();
   const [profilePic, setProfilePic] = useState<string | null>(null);
+
   const [activeFeedTab, setActiveFeedTab] = useState<ActivityFeedTab>(
     ActivityFeedTab.all
   );
   const [profileUserData, setProfileUserData] = useState<UserInfoData>();
   const [feedData, setFeedData] = useState<feedData[]>([]);
-  const showAddFriendBtn = username !== profileUsername;
+  const [showAddFriendBtn, setShowAddFriendBtn] = useState<boolean>(false);
+  const isSessionProfile = username === profileUsername;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,6 +137,28 @@ export const UserProfilePage = () => {
     fetchProfilePic();
   }, [profileUsername, setCache]);
   /* eslint-disable react-hooks/exhaustive-deps */
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${userId}/is-friend/${profileUserData?.postgres.id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
+
+        setShowAddFriendBtn(!jsonData.is_friend);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if (userId && profileUserData && !isSessionProfile) {
+      fetchData();
+    }
+  }, [userId, isSessionProfile, profileUserData]);
 
   const onClickAddFriend = async () => {
     try {

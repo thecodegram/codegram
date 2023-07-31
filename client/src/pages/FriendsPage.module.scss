@@ -44,6 +44,10 @@
   justify-content: space-between;
 
   .userInfo {
+    a {
+      text-decoration: none;
+    }
+
     h3 {
       font-size: 1rem;
       color: #fff;
