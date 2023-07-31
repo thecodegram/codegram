@@ -15,6 +15,11 @@ import { FriendsPage } from "./pages/FriendsPage";
 import { FriendRequestsPage } from "./pages/FriendRequestsPage";
 import { AllFriendsPage } from "./pages/AllFriendsPage";
 import { UserContext } from "./components/UserContext";
+import { GroupProfilePage } from "./pages/GroupProfile";
+import { GroupProfileMembers } from "./pages/GroupMembers";
+import { GroupsPage } from "./pages/GroupsPage";
+import { GroupInvitesPage } from "./pages/GroupInvitesPage";
+import { AllGroupsPage } from "./pages/AllGroupsPage";
 import { ImageCacheProvider } from "./components/ImageCacheContext";
 
 function App() {
@@ -47,32 +52,73 @@ function App() {
                   </PrivateRoute>
                 }
               />
+            <Route
+              path="/groups/*"
+              element={
+                <PrivateRoute>
+                  <GroupsPage />
+                </PrivateRoute>
+              }
+            >
               <Route
-                path="/friends/*"
-                element={
-                  <PrivateRoute>
-                    <FriendsPage />
-                  </PrivateRoute>
-                }
-              >
-                <Route path="" element={<AllFriendsPage />} />
-                <Route path="requests" element={<FriendRequestsPage />} />
-              </Route>
-              <Route
-                path="/:username"
-                element={
-                  <PrivateRoute>
-                    <UserProfilePage />
-                  </PrivateRoute>
-                }
+                path=""
+                element={<AllGroupsPage />}
               />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </ImageCacheProvider>
-        </UserContext.Provider>
-      </div>
-    </Router>
-  );
-}
+              <Route
+                path="invites"
+                element={<GroupInvitesPage />}
+              />
+            </Route>
+            <Route
+              path="/u/:username"
+              element={
+                <PrivateRoute>
+                  <UserProfilePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/g/:groupId/*"
+              element={
+                <PrivateRoute>
+                  <GroupProfilePage />
+                </PrivateRoute>
+              }
+            >
+              {/* <Route
+                path=""
+                element={<AllGroupsPage />}
+              /> */}
+              <Route
+                path="members"
+                element={<GroupProfileMembers />}
+              />
+            </Route>
+            <Route
+              path="/friends/*"
+              element={
+                <PrivateRoute>
+                  <FriendsPage />
+                </PrivateRoute>
+              }
+            >
+              <Route path="" element={<AllFriendsPage />} />
+              <Route path="requests" element={<FriendRequestsPage />} />
+            </Route>
+            <Route
+              path="/:username"
+              element={
+                <PrivateRoute>
+                  <UserProfilePage />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </ImageCacheProvider>
+      </UserContext.Provider>
+    </div>
+  </Router>
+)}
 
 export default App;

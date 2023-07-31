@@ -16,6 +16,8 @@ import {
 } from "../../repository/NotificationRepository";
 import { FriendRepository } from "../../repository/FriendRepository";
 import { UserRepository } from "../../repository/UserRepository";
+import { GroupRepository } from "../../repository/GroupRepository";
+
 import sanitize from "sanitize-filename";
 import multer from "multer";
 import fs from "fs";
@@ -23,9 +25,10 @@ import fs from "fs";
 const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 
-const userRepository = new UserRepository();
-const notificationRepository = new NotificationRepository();
-const friendRepository = new FriendRepository();
+const userRepository = new UserRepository()
+const notificationRepository = new NotificationRepository()
+const friendRepository = new FriendRepository()
+const groupRepository = new GroupRepository()
 
 router.get(
   "/:username/latestSubmits",
@@ -379,10 +382,10 @@ router.post(
     const { friendRequestId } = req.params;
 
     try {
-      const newFriendRequest = await friendRepository.deactivateFriendRequest(
+      const updatedFriendRequest = await friendRepository.deactivateFriendRequest(
         +friendRequestId
       );
-      res.status(200).json(newFriendRequest);
+      res.status(200).json(updatedFriendRequest);
     } catch (err) {
       res.status(500).send("Failed to remove friend request");
     }
@@ -396,12 +399,42 @@ router.get(
     const { userId } = req.params;
 
     try {
-      const newFriendRequest = await friendRepository.getFriends(+userId);
-      res.status(200).json(newFriendRequest);
+      const friends = await friendRepository.getFriends(+userId);
+      res.status(200).json(friends);
     } catch (err) {
       res.status(500).send("Failed to get user's friends");
     }
   }
 );
+
+router.get('/:userId/groups', [
+  validateUsername('userId'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { userId } = req.params
+
+  try {
+    const groups = await groupRepository.getGroups(+userId)
+
+    res.status(200).json(groups)
+  } catch (err) {
+    res.status(500).send("Failed to get user's groups")
+  }
+})
+
+router.get('/:userId/group-invites', [
+  validateUsername('userId'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { userId } = req.params
+
+  try {
+    const groupInvites = await groupRepository.getGroupInvites(+userId)
+
+    res.status(200).json(groupInvites)
+  } catch (err) {
+    res.status(500).send("Failed to get user's group invites")
+  }
+})
 
 module.exports = router;
