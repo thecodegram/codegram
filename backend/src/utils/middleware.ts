@@ -10,7 +10,7 @@ declare module "express-session" {
 export const enforceLoggedIn = (req: Request, res: Response, next: NextFunction) => {
   if(req.session.username == null) {
     res.status(401).send("Not authorized!");
-    throw new Error("Not logged in!");
+    console.log("Not logged in!");
   }
   else {
     next();
