@@ -24,10 +24,10 @@ router.post("/login", async (req: Request, res: Response) => {
 
   const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
 
-  if (!isRecaptchaValid) {
-    res.status(400).send({ error: "Invalid reCAPTCHA token." });
-    return;
-  }
+  // if (!isRecaptchaValid) {
+  //   res.status(400).send({ error: "Invalid reCAPTCHA token." });
+  //   return;
+  // }
 
   if (isValidUsername(username)) {
     const password1 = decryptPassword(password);
@@ -36,7 +36,6 @@ router.post("/login", async (req: Request, res: Response) => {
         username: username,
         password: password1,
       });
-      console.log(user);
 
       if (user === null) {
         res.status(400).send();
