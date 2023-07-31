@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { GroupRepository } from "../repository/GroupRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { NotificationRepository, NotificationTypes } from "../repository/NotificationRepository";
-import { handleValidationErrors } from "../utils/middleware";
+import { handleValidationErrors, validateUsername } from "../utils/middleware";
 
 const router = express.Router();
 const groupRepository = new GroupRepository()
@@ -125,8 +125,6 @@ router.post('/:groupId/group-invites/:groupInviteId/accept', [
       res.status(500).send("Failed to accept group invite")
     }
   }
-
-
 })
 
 router.post('/:groupId/group-invites/:groupInviteId/remove', [
@@ -138,6 +136,21 @@ router.post('/:groupId/group-invites/:groupInviteId/remove', [
     const updatedGroupInvite = await groupRepository.deactivateGroupInvite(+groupInviteId)
 
     res.status(200).json(updatedGroupInvite)
+  } catch (err) {
+    res.status(500).send("Failed to remove group invite")
+  }
+})
+
+router.post('/:groupId/remove-member/:userId', [
+  validateUsername('userId'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { groupId, userId } = req.params
+
+  try {
+    const result = await groupRepository.removeGroupMember(+groupId, +userId)
+
+    res.status(200).json(result)
   } catch (err) {
     res.status(500).send("Failed to remove group invite")
   }

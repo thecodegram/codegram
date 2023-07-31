@@ -216,4 +216,28 @@ export class GroupRepository {
       client.release()
     }
   }
+
+  async removeGroupMember(groupId: number, userId: number) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const result = await client.query(`
+        DELETE FROM 
+          group_member
+        WHERE
+          group_id = $1 AND
+          user_id = $2
+      `, [groupId, userId])
+  
+      await client.query('COMMIT');
+  
+      return result.rows;
+    } catch (e) {
+      await client.query('ROLLBACK');
+    } finally {
+      client.release()
+    }
+  }
 }
