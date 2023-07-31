@@ -7,6 +7,7 @@ import { Avatar } from './Avatar';
 import { Dropdown } from './Dropdown';
 import { useState } from 'react';
 import { EmptyState } from './EmptyState';
+import { Button, ButtonVariant } from './Button';
 
 import styles from "./HeaderNav.module.scss"
 
@@ -64,6 +65,7 @@ export const HeaderNav = () => {
               </section>}
         </article>
       </Dropdown>
+      <Button variant={ButtonVariant.secondary}>Create a group</Button>
       <Link to={`/u/${username}`} relative='path'>
         <Avatar username={username || ""} />
       </Link>

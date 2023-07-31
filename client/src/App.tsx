@@ -18,6 +18,7 @@ import { FriendRequestsPage } from "./pages/FriendRequestsPage";
 import { AllFriendsPage } from "./pages/AllFriendsPage";
 import { UserContext } from "./components/UserContext";
 import { GroupProfilePage } from "./pages/GroupProfile";
+import { GroupProfileMembers } from "./pages/GroupMembers";
 
 function App() {
   const [username, setUsername] = useState<string | null>(null);
@@ -72,13 +73,22 @@ function App() {
               }
             />
             <Route
-              path="/g/:groupId"
+              path="/g/:groupId/*"
               element={
                 <PrivateRoute>
                   <GroupProfilePage />
                 </PrivateRoute>
               }
-            />
+            >
+              {/* <Route
+                path=""
+                element={<AllFriendsPage />}
+              /> */}
+              <Route
+                path="members"
+                element={<GroupProfileMembers />}
+              />
+            </Route>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </UserContext.Provider>

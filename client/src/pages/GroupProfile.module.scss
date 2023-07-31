@@ -41,3 +41,21 @@
     }
   }
 }
+
+.groupMemberItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  justify-content: space-between;
+  color: #fff;
+
+  a {
+    text-decoration: none;
+  }
+
+  h3 {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 400;
+  }
+} 

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom"
 import { GroupInfoHeader } from "../components/GroupInfoHeader"
 import { useState, useEffect } from "react"
 import { IconAddBtnPlus } from "../icons"
+import { useNavigate, Outlet, useLocation } from "react-router-dom"
 
 import axios from "axios"
 
@@ -21,8 +22,12 @@ interface GroupInfo {
 }
 
 export const GroupProfilePage = () => {
+  const navigate = useNavigate()
   const { groupId } = useParams()
   const [ groupInfoData, setGroupInfoData ] = useState<GroupInfo>()
+  const location = useLocation()
+  const [ activeTab, setActiveTab ] = useState<GroupProfilePageTab>(() =>
+  location.pathname.includes("/members") ? GroupProfilePageTab.members : GroupProfilePageTab.activity)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,8 +49,6 @@ export const GroupProfilePage = () => {
     fetchData();
   }, [groupId]);
 
-  const onClickGoToMembersTab = () => console.log("hello")
-
   const onClickInviteMember = () => console.log("test")
 
   return <>
@@ -59,16 +62,24 @@ export const GroupProfilePage = () => {
           <Button onClick={onClickInviteMember}><IconAddBtnPlus /> Invite Member</Button>
         </header>
         <nav className={styles.tabNav}>
-          <button className={styles.active}>
-            {GroupProfilePageTab.activity}
-          </ button>
-          <button onClick={onClickGoToMembersTab}>
-            {GroupProfilePageTab.members}
+          <button 
+            className={activeTab === GroupProfilePageTab.activity ? styles.active : ''} 
+            onClick={() => {
+              setActiveTab(GroupProfilePageTab.activity)
+              navigate("")
+            }}>
+              {GroupProfilePageTab.activity}
+          </button>
+          <button 
+            className={activeTab === GroupProfilePageTab.members ? styles.active : ''} 
+            onClick={() => {
+              setActiveTab(GroupProfilePageTab.members)
+              navigate("members")
+            }}>
+              {GroupProfilePageTab.members}
           </button>
         </nav>
-        {/* <main>
-          
-        </main> */}
+        <Outlet />
       </div>
     }
   </>
