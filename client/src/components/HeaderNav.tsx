@@ -68,7 +68,7 @@ export const HeaderNav = () => {
               : <section className={styles.dropdownList}>
                   {notifications.map(({ message, created_at, type }, index) => 
                     <div key={index} className={styles.dropdownItem}>
-                      <Link to={type === "friend" ? `/friends/requests` : "/dashboard"} relative='path'>
+                      <Link to={type === "friend" ? `/friends/requests` : "/groups/invites"} relative='path'>
                         <p className={styles.message}>{message}</p>
                         <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
                       </Link>

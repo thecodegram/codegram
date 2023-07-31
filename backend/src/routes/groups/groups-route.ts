@@ -112,16 +112,21 @@ router.get("/:groupId/is-member/:userId", [
 router.post('/:groupId/group-invites/:groupInviteId/accept', [
   handleValidationErrors
 ], async (req: Request, res: Response) => {
-  const { groupId, groupInviteId } = req.params
-
-  try {
-    const newGroupMember = await groupRepository.createGroupMember(+groupId, +groupInviteId)
-    await groupRepository.deactivateGroupInvite(+groupInviteId)
-
-    res.status(200).json(newGroupMember)
-  } catch (err) {
-    res.status(500).send("Failed to accept group invite")
+  if (req.session && req.session.username) {
+    const { groupId, groupInviteId } = req.params
+    const { userId } = req.body
+    
+    try {
+      const newGroupMember = await groupRepository.createGroupMember(+groupId, +userId)
+      await groupRepository.deactivateGroupInvite(+groupInviteId)
+  
+      res.status(200).json(newGroupMember)
+    } catch (err) {
+      res.status(500).send("Failed to accept group invite")
+    }
   }
+
+
 })
 
 router.post('/:groupId/group-invites/:groupInviteId/remove', [

@@ -52,8 +52,17 @@ export class GroupRepository {
       await client.query('BEGIN');
 
       const groupInvites = await client.query(`
-        SELECT * FROM group_invite
-        WHERE invitee_id = $1
+        SELECT 
+          group_invite.*, grind_group.name as group_name
+        FROM 
+          group_invite
+        INNER JOIN 
+          grind_group ON group_invite.group_id  = grind_group.group_id
+        WHERE 
+          group_invite.invitee_id = $1 AND 
+          is_active = true
+        ORDER BY 
+          created_at DESC;
       `, [userId])
   
       await client.query('COMMIT');
