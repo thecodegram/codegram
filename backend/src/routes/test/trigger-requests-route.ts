@@ -1,15 +1,15 @@
-import express, { Request, Response} from 'express'
+import express, { Request, Response } from 'express'
 
-import { getLatestAcceptedSubmits, getSubmitStats } from '../../api/leetcode'
+import { getSubmitStats } from '../../api/leetcode'
 import { validateUsername, handleValidationErrors } from '../../utils/middleware'
 import { getUserIDs } from '../../model/users';
 import { getSubmissionStats } from '../../api/vjudge';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { ExternalApiError } from '../../errors/external-api-error';
-import { User } from '../../model/schemas/userSchema';
-import { userUpdateEventEmitter } from '../../events/UserUpdateEventEmitter';
-import { UpdateEventData } from '../../model/UpdateEventData';
-import { getAndStoreLeetcodeUpdates, getUpdates } from '../../services/UpdatesCollectorService';
+import { getUpdates } from '../../services/UpdatesCollectorService';
+import { EventRepository } from '../../repository/EventRepository';
+import { isValidUsername } from '../../utils/utils';
+import { UserRepository } from '../../repository/UserRepository';
 
 const router = express.Router()
 
@@ -26,25 +26,25 @@ router.get('/', async (req: Request, res: Response) => {
     console.log(data);
 
     res.send(data);
-  } catch(e: any) {
-      console.log(e);
-      res.status(500).end();
+  } catch (e: any) {
+    console.log(e);
+    res.status(500).end();
   }
 });
 
 // trigger for specific user
 router.get('/leetcode/:userId', [
-    // Sanitize the userId variable
-    validateUsername('userId'),
-    handleValidationErrors
-  ], async (req: Request, res: Response) => {
-    const { userId } = req.params;
-    
-    const data = await getSubmitStats(userId);
-    console.log("data:", data);
-  
-    res.send(data);
-  });
+  // Sanitize the userId variable
+  validateUsername('userId'),
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  const data = await getSubmitStats(userId);
+  console.log("data:", data);
+
+  res.send(data);
+});
 
 // trigger for specific user
 router.get('/vjudge/:username', [
@@ -53,18 +53,18 @@ router.get('/vjudge/:username', [
   handleValidationErrors
 ], async (req: Request, res: Response) => {
   const { username } = req.params;
-  
+
   try {
     const data = await getSubmissionStats(username);
     console.log("data:", data);
 
     res.send(data);
-  } catch(e) {
-    if(e instanceof UserNameNotFoundError){
+  } catch (e) {
+    if (e instanceof UserNameNotFoundError) {
       res.status(404).send("Username not found");
-    } else if( e instanceof ExternalApiError) {
+    } else if (e instanceof ExternalApiError) {
       res.status(e.statusCode).send(e.message)
-    } else{
+    } else {
       console.error(e);
     }
   }
@@ -75,19 +75,48 @@ router.get('/updatesList/:username', [
   validateUsername('username'),
   handleValidationErrors
 ], async (req: Request, res: Response) => {
-  const {username} = req.params;
+  const { username } = req.params;
 
-  if(!username) {
+  if (!username) {
     res.status(400).send();
   }
   else {
     try {
       const updates = await getUpdates(username);
-      
+
       res.json(updates).send();
     }
-    catch(err){
-      if(err instanceof UserNameNotFoundError){
+    catch (err) {
+      if (err instanceof UserNameNotFoundError) {
+        res.status(404).send("user not found");
+      }
+      else {
+        res.status(500).send("Oops! Something went wrong");
+      }
+    }
+  }
+});
+
+router.get('/feed', [
+  handleValidationErrors
+], async (req: Request, res: Response) => {
+  const { username, offset, limit } = req.body;
+
+  const eventRepository = new EventRepository();
+  const userRepository = new UserRepository();
+
+  if (!username || !isValidUsername(username)) {
+    res.status(400).send();
+  }
+  else {
+    try {
+      const user = await userRepository.getUser(username);
+      const updates = await eventRepository.getEventsVisibleToUser(user.id, offset, limit);
+
+      res.json(updates).send();
+    }
+    catch (err) {
+      if (err instanceof UserNameNotFoundError) {
         res.status(404).send("user not found");
       }
       else {

@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_score ON users (score DESC);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users (username);
+CREATE INDEX IF NOT EXISTS idx_users_mongo_id ON users (mongo_id);
 
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
@@ -31,6 +33,8 @@ CREATE TABLE IF NOT EXISTS events (
     CONSTRAINT fk_events_platform FOREIGN KEY (pid) REFERENCES platform(pid) ON DELETE CASCADE,
     CONSTRAINT fk_events_users  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_events_event_timestamp ON events (event_timestamp DESC);
 
 CREATe TABLE IF NOT EXISTS likes (
     user_id INTEGER,

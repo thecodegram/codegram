@@ -15,7 +15,6 @@ export class UserUpdateEventEmitter {
     this.eventEmitter.on(
       this.EVENT_NAME,
       async (updateData: UpdateEventData) => {
-        console.log("Update event fired", updateData);
         await this.eventRepository.saveEvent(updateData);
       }
     );

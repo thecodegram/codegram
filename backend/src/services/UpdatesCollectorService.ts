@@ -15,6 +15,7 @@ export async function getAndStoreLeetcodeUpdates(username: string) {
   } else {
     const updates = await (async () => {
       if (u.leetcode?.username) {
+        console.log(`${new Date().toLocaleTimeString()} getting leetcode updates for ${username}`)
         const newData = await getSubmitStats(u.leetcode.username);
 
         // get difference in total solved count from old data and new
@@ -24,7 +25,7 @@ export async function getAndStoreLeetcodeUpdates(username: string) {
         // if it changed (note: cannot decrease), query for <n=difference> last solved questions
         if (solvedDifference > 0) {
           console.log(
-            `User ${u.username} has solved something new on leetcode. (username: ${u.leetcode.username})`
+            `User ${u.username} has ${solvedDifference} new submit(s) on leetcode. (username: ${u.leetcode.username})`
           );
           const updates = await getLatestAcceptedSubmits(
             u.leetcode.username,
@@ -38,7 +39,8 @@ export async function getAndStoreLeetcodeUpdates(username: string) {
               platform: "leetcode",
               problemTitle: upd.title,
               problemTitleSlug: upd.titleSlug,
-              timestamp: parseInt(upd.timestamp)
+              // leetcode updates are with 1 second precision, but js are 1 millisecond
+              timestamp: parseInt(upd.timestamp)*1000 
             }
             userUpdateEventEmitter.emit(updateData);
           });
@@ -64,7 +66,7 @@ function generateVjudgeUpdateEvent(username: string, platform: string, problemNa
     platform: "vjudge",
     problemTitle: platform + '-' + problemName,
     problemTitleSlug: platform + '-' + problemName,
-    timestamp: Math.floor(Date.now() / 1000)
+    timestamp: Date.now()
   }
 
   return updateData;
@@ -78,6 +80,8 @@ export async function getAndStoreVjudgeUpdates(username: string) {
   } else {
     const updates = await (async () => {
       if (u.vjudge?.username) {
+        
+        console.log(`${new Date().toLocaleTimeString()} getting vjudge updates for ${username}`);
         const latestData = await getSubmissionStats(u.vjudge.username);
 
         const storedAcData = u.vjudge.acRecords!!;
@@ -115,9 +119,13 @@ export async function getAndStoreVjudgeUpdates(username: string) {
                 ++j;
               }
             }
-          } else {
-            console.log(`No Vjudge updates for user ${username}`);
           }
+        }
+        if(!updates.length) {
+            console.log(`No Vjudge updates for user ${username}`);
+        }
+        else {
+          console.log(`${username} has ${updates.length} new submit(s) on VJudge`)
         }
         return updates;
       } else {
@@ -135,8 +143,6 @@ export async function getUpdates(username: string) {
 
   const leetcodeUpdates = await leetcodeUpdatesPromise;
   const vjudgeUpdates = await vjudgeUpdatesPromise;
-
-  console.log(leetcodeUpdates);
 
   return { leetcodeUpdates: leetcodeUpdates, vjudgeUpdates: vjudgeUpdates };
 }

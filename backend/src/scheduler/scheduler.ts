@@ -8,7 +8,7 @@ export class Scheduler {
   constructor() {
     this.userRepository = new UserRepository();
   }
-  private readonly leetcodeUpdatesCollectorJob = new CronJob('*/30 * * * *', async () => {
+  private readonly leetcodeUpdatesCollectorJob = new CronJob('* * * * *', async () => {
 
     const userData = await this.userRepository.getAllUsernames();
 
@@ -19,7 +19,7 @@ export class Scheduler {
 
   });
 
-  private readonly vjudgeUpdatesCollectorJob = new CronJob('5 * * * *', async () => {
+  private readonly vjudgeUpdatesCollectorJob = new CronJob('*/5 * * * *', async () => {
 
     const userData = await this.userRepository.getAllUsernames();
 
