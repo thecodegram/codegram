@@ -91,17 +91,14 @@ const DashboardPage = () => {
     fetchData();
   }, [username]);
 
-  //new for profile pic
+  //this is new for profile pic
   useEffect(() => {
     const fetchProfilePic = async () => {
-      // Check if username is not null or undefined
       if (username) {
-        // Check if username exists in cache
+        // this checks if username exists in cache and if  it exists, set profilePic to cached data and if not fetch data from API and then updates the cache
         if (cache[username]) {
-          // If exists, set profilePic to cached data
           setProfilePic(cache[username]);
         } else {
-          // If doesn't exist, fetch data from API
           try {
             console.log("Fetching profile picture I AM CALLED");
             const response = await axios.get(
@@ -111,13 +108,9 @@ const DashboardPage = () => {
                 withCredentials: true,
               }
             );
-            // creates a local URL for the Blob
             const profilePicURL = URL.createObjectURL(response.data);
 
-            // Update the cache
             setCache(username, profilePicURL);
-
-            // Set the profilePic state
             setProfilePic(profilePicURL);
           } catch (error) {
             console.error("Error fetching profile picture:", error);
