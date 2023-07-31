@@ -2,6 +2,13 @@ import { pool } from "../db/db";
 import { UpdateEventData } from "../model/UpdateEventData";
 
 export class EventRepository {
+  private withTransformedTimestamp = (rows : any[]) => {
+    return rows.map(r => {
+      r.event_timestamp = new Date(r.event_timestamp).getTime();
+      return r;
+    });
+  }
+
   async saveEvent(updateData: UpdateEventData) {
     console.log("Save event", updateData);
 
@@ -52,22 +59,26 @@ export class EventRepository {
   }
 
   async getEventsForOneUser(id: number, offset: number, limit: number, platform?: number) {
+    const queryParams = [id, offset, limit];
     var query = `
       WITH likes_count(event_id, likes) AS (
         SELECT e.id, count(l.user_id)
         FROM events e LEFT JOIN likes l ON e.id = l.event_id
         WHERE e.user_id = $1
         GROUP BY e.id
-      ),
-      SELECT e.id, p.pname, u.username, e.problem_name, e.problem_slug, e.event_timestamp
+      )
+      SELECT e.id AS event_id, u.id AS submitter_id, p.pname, u.username, e.problem_name, e.problem_slug, e.event_timestamp
        FROM events e 
         JOIN users u ON e.user_id = u.id
         JOIN platform p ON e.pid = p.pid
         JOIN likes_count lc ON e.id = lc.event_id
        WHERE u.id = $1 `;
-        
+       
+       // if platform is specified query from it
+       // otherwise query from all
        if(platform != undefined) {
         query += `AND p.pid = $4 `;
+        queryParams.push(platform);
        }
        query += `
         ORDER BY e.event_timestamp DESC
@@ -76,15 +87,17 @@ export class EventRepository {
       `
 
     try {
-      const results = await pool.query(query, [id, offset, limit, platform??0]);
+      const results = await pool.query(query, queryParams);
 
-      return results.rows;
+      return this.withTransformedTimestamp(results.rows);
     } catch(e) {
       console.error(e);
     }
   }
 
-  async getEventsForGroup(group_id: number, offset: number, limit: number, platform?: number) {
+  async getEventsForGroup(
+    user_id: number, group_id: number, offset: number, limit: number, platform?: number) {
+    const queryParams = [user_id, group_id, offset, limit];
     var query = `
       WITH likes_count(event_id, likes) AS (
         SELECT e.id, count(l.user_id)
@@ -93,11 +106,13 @@ export class EventRepository {
         GROUP BY e.id
       ),
       group_member_ids(id) AS (
-        SELECT user_id
-        FROM user_group
-        WHERE group_id = $1
+        SELECT ug2.user_id
+        FROM users u
+          JOIN user_group ug1 ON u.id = ug1.user_id
+          JOIN user_group ug2 ON ug1.group_id = ug2.group_id
+        WHERE u.id = $1 AND ug1.group_id = $2
       )
-      SELECT e.id, p.pname, u.username, e.problem_name, e.problem_slug, e.event_timestamp
+      SELECT e.id AS event_id, u.id AS submitter_id, p.pname, u.username, e.problem_name, e.problem_slug, e.event_timestamp
        FROM events e 
         JOIN users u ON e.user_id = u.id
         JOIN platform p ON e.pid = p.pid
@@ -105,18 +120,19 @@ export class EventRepository {
        WHERE u.id IN (SELECT * FROM group_member_ids)`;
         
        if(platform != undefined) {
-        query += `AND p.pid = $4 `;
+        query += `AND p.pid = $5 `;
+        queryParams.push(platform);
        }
        query += `
         ORDER BY e.event_timestamp DESC
-        OFFSET $2 ROWS
-        FETCH NEXT $3 ROWS ONLY;
+        OFFSET $3 ROWS
+        FETCH NEXT $4 ROWS ONLY;
       `
 
     try {
-      const results = await pool.query(query, [group_id, offset, limit, platform??0]);
+      const results = await pool.query(query, queryParams);
 
-      return results.rows;
+      return this.withTransformedTimestamp(results.rows);
     } catch(e) {
       console.error(e);
     }
@@ -150,7 +166,7 @@ export class EventRepository {
       )
     )
     SELECT
-      e.id event_id, e.user_id user_id, p.pname platform, u.username, e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
+    e.id AS event_id, u.id AS submitter_id, p.pname platform, u.username, e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
     FROM events e 
       JOIN users u ON e.user_id = u.id
       JOIN platform p ON e.pid = p.pid
@@ -166,10 +182,7 @@ export class EventRepository {
       try {
         const results = await pool.query(query, [id, offset, limit]);
   
-        return results.rows.map(r => {
-          r.event_timestamp = new Date(r.event_timestamp).getTime();
-          return r;
-        });
+        return this.withTransformedTimestamp(results.rows);
       } catch(e) {
         throw(e);
       }

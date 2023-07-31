@@ -9,8 +9,9 @@ import { env } from './config/env';
 import { Scheduler } from './scheduler/scheduler';
 
 const triggerRequestsRouter = require('./routes/test/trigger-requests-route')
-const usersRouter = require('./routes/users/users-route')
+const usersRouter = require('./routes/users-route')
 const authRouter = require('./routes/auth-route')
+const eventsRouter = require('./routes/events-route')
 
 // Create an Express.js app
 const app = express();
@@ -35,6 +36,7 @@ app.use('/', (req: Request, res: Response, next: NextFunction) => {
 app.use('/api/trigger-requests', [enforceLoggedIn], triggerRequestsRouter);
 app.use('/api/user', [enforceLoggedIn], usersRouter);
 app.use('/api/updates', [enforceLoggedIn], require('./routes/updates-route'));
+app.use('/api/events', [enforceLoggedIn], eventsRouter);
 app.use('/api/auth', authRouter);
 
 
