@@ -8,13 +8,15 @@ import { Dropdown } from './Dropdown';
 import { useState } from 'react';
 import { EmptyState } from './EmptyState';
 import { Button, ButtonVariant } from './Button';
+import { Modal } from './Modal';
 
 import styles from "./HeaderNav.module.scss"
 
 export const HeaderNav = () => {
   const { username, userId } = useUserContext();
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState([])
+  const [ notifications, setNotifications ] = useState([])
+  const [ showCreateGroupModal, setShowCreateGroupModal ] = useState<boolean>(false)
 
   const handleLogout = async () => {
     try {
@@ -32,6 +34,10 @@ export const HeaderNav = () => {
     }
   };
 
+  const onClickCreateGroup = (value: string) => {
+    console.log(value)
+  }
+
   const onClickShowNotifications = async () => {
     try {
       const response = await axios.get(
@@ -45,31 +51,41 @@ export const HeaderNav = () => {
     }
   }
 
-  return (<header className={styles.header}>
-    <section className={styles.left}><h1><Link to="/dashboard" relative='path'>Codegram</Link></h1></section>
-    <section className={styles.right}>
-      <Dropdown trigger={<IconInbox />} triggerAction={onClickShowNotifications}>
-        <article className={styles.dropdown}>
-          <h2>Notifications</h2>
-          {notifications.length === 0 
-            ? <EmptyState>All caught up!</EmptyState>
-            : <section className={styles.dropdownList}>
-                {notifications.map(({ message, created_at, type }, index) => 
-                  <div key={index} className={styles.dropdownItem}>
-                    <Link to={type === "friend" ? `/friends/requests` : "/dashboard"} relative='path'>
-                      <p className={styles.message}>{message}</p>
-                      <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
-                    </Link>
-                  </div>
-                )}
-              </section>}
-        </article>
-      </Dropdown>
-      <Button variant={ButtonVariant.secondary}>Create a group</Button>
-      <Link to={`/u/${username}`} relative='path'>
-        <Avatar username={username || ""} />
-      </Link>
-      <button className={styles.btnText} onClick={handleLogout}>Logout</button>
-    </section>
-  </header>)
+  return <>
+    <header className={styles.header}>
+      <section className={styles.left}><h1><Link to="/dashboard" relative='path'>Codegram</Link></h1></section>
+      <section className={styles.right}>
+        <Dropdown trigger={<IconInbox />} triggerAction={onClickShowNotifications}>
+          <article className={styles.dropdown}>
+            <h2>Notifications</h2>
+            {notifications.length === 0 
+              ? <EmptyState>All caught up!</EmptyState>
+              : <section className={styles.dropdownList}>
+                  {notifications.map(({ message, created_at, type }, index) => 
+                    <div key={index} className={styles.dropdownItem}>
+                      <Link to={type === "friend" ? `/friends/requests` : "/dashboard"} relative='path'>
+                        <p className={styles.message}>{message}</p>
+                        <p className={styles.timestamp}>{new Date(created_at).toDateString()}</p>
+                      </Link>
+                    </div>
+                  )}
+                </section>}
+          </article>
+        </Dropdown>
+        <Button variant={ButtonVariant.secondary} onClick={() => setShowCreateGroupModal(true)}>Create a group</Button>
+        <Link to={`/u/${username}`} relative='path'>
+          <Avatar username={username || ""} />
+        </Link>
+        <button className={styles.btnText} onClick={handleLogout}>Logout</button>
+      </section>
+    </header>
+    {showCreateGroupModal && <Modal
+      title="Create a group"
+      inputLabel="Group name"
+      inputPlaceholder="Enter a group name"
+      submitBtnLabel="Create group"
+      onClickClose={() => setShowCreateGroupModal(false)}
+      onClickSubmit={onClickCreateGroup}
+    />}
+  </>
 }

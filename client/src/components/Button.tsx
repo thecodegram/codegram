@@ -6,13 +6,19 @@ export enum ButtonVariant {
   tetriary = "tetriary",
 }
 
+export enum ButtonTypes {
+  text = "text",
+  submit = "submit",
+}
+
 interface ButtonProps {
   variant?: ButtonVariant,
   children?: any,
+  type?: string,
   onClick?: () => any;
 }
 
-export const Button = ({ variant = ButtonVariant.primary, children, onClick }: ButtonProps) => {
+export const Button = ({ variant = ButtonVariant.primary, children, type=ButtonTypes.text, onClick }: ButtonProps) => {
   return <button className={`${styles.btn} ${styles[variant]}`} onClick={onClick}>
     {children}
   </button>
