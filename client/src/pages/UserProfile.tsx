@@ -118,7 +118,7 @@ export const UserProfilePage = () => {
             );
             if (response.status !== 204) {
               const profilePicURL = URL.createObjectURL(response.data);
-              console.log("profilePicURL", profilePicURL);
+
               setCache(profileUsername, profilePicURL);
               setProfilePic(profilePicURL);
             } else {

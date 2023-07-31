@@ -61,7 +61,7 @@ export const FeedItem = ({
             );
             if (response.status !== 204) {
               const profilePicURL = URL.createObjectURL(response.data);
-              console.log("profilePicURL", profilePicURL);
+
               setCache(username, profilePicURL);
               setProfilePic(profilePicURL);
             } else {
