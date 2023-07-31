@@ -13,7 +13,7 @@ import { HeaderNav } from "../components/HeaderNav";
 import { FriendsList } from "../components/FriendsList";
 import { LoadingEllipsis } from "../components/LoadingEllipsis";
 import { EmptyState } from "../components/EmptyState";
-
+import { useImageCache } from "../components/ImageCacheContext";
 import styles from "./DashboardPage.module.scss";
 
 export interface UserInfoData {
@@ -28,10 +28,10 @@ export interface UserInfoData {
         }[];
       };
     };
-  },
+  };
   postgres: {
-    id: number
-  }
+    id: number;
+  };
 }
 
 export interface feedData {
@@ -68,6 +68,7 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const { username, userId } = useUserContext();
+  const { cache, setCache } = useImageCache();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,24 +94,40 @@ const DashboardPage = () => {
   //new for profile pic
   useEffect(() => {
     const fetchProfilePic = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
-          {
-            responseType: "blob",
-            withCredentials: true,
+      // Check if username is not null or undefined
+      if (username) {
+        // Check if username exists in cache
+        if (cache[username]) {
+          // If exists, set profilePic to cached data
+          setProfilePic(cache[username]);
+        } else {
+          // If doesn't exist, fetch data from API
+          try {
+            console.log("Fetching profile picture I AM CALLED");
+            const response = await axios.get(
+              `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
+              {
+                responseType: "blob",
+                withCredentials: true,
+              }
+            );
+            // creates a local URL for the Blob
+            const profilePicURL = URL.createObjectURL(response.data);
+
+            // Update the cache
+            setCache(username, profilePicURL);
+
+            // Set the profilePic state
+            setProfilePic(profilePicURL);
+          } catch (error) {
+            console.error("Error fetching profile picture:", error);
           }
-        );
-        // creates a local URL for the Blob
-        const profilePicURL = URL.createObjectURL(response.data); 
-        setProfilePic(profilePicURL);
-      } catch (error) {
-        console.error("Error fetching profile picture:", error);
+        }
       }
     };
 
     fetchProfilePic();
-  }, [username]);
+  }, [username, cache, setCache]);
 
   // const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   setUsername(event.target.value);
@@ -137,21 +154,22 @@ const DashboardPage = () => {
           {username && <UserStatsGrid username={username} />}
         </article>
         <article className={styles.feed}>
-          {loading 
-            ? <LoadingEllipsis />
-            : feedData.length === 0
-              ? <EmptyState>No activity yet</EmptyState>
-              : feedData.map(({ title, timestamp }, index) => (
-                  <FeedItem
-                    key={index}
-                    name={username || ""}
-                    username={username || ""}
-                    body={`${username} just solved ${title} on LeetCode!`}
-                    numOfLikes={Math.floor(Math.random() * 20) + 1}
-                    createdTime={new Date(+timestamp * 1000)}
-                  />
-                ))
-          }
+          {loading ? (
+            <LoadingEllipsis />
+          ) : feedData.length === 0 ? (
+            <EmptyState>No activity yet</EmptyState>
+          ) : (
+            feedData.map(({ title, timestamp }, index) => (
+              <FeedItem
+                key={index}
+                name={username || ""}
+                username={username || ""}
+                body={`${username} just solved ${title} on LeetCode!`}
+                numOfLikes={Math.floor(Math.random() * 20) + 1}
+                createdTime={new Date(+timestamp * 1000)}
+              />
+            ))
+          )}
         </article>
         <article className={styles.relationships}>
           {userId && <FriendsList userId={userId} />}
@@ -165,7 +183,7 @@ const DashboardPage = () => {
         </article>
       </main>
     </>
-  )
+  );
 };
 
 export default DashboardPage;
