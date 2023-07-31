@@ -36,11 +36,11 @@ interface ProfileFeedQuery {
 export const UserProfilePage = () => {
   const { username, userId } = useUserContext()
   const { username: profileUsername } = useParams()
-  const [activeFeedTab, setActiveFeedTab] = useState<ActivityFeedTab>(ActivityFeedTab.all)
-  const [profileUserData, setProfileUserData] = useState<UserInfoData>()
-  const [feedData, setFeedData] = useState<feedData[]>([])
-  const showAddFriendBtn = username !== profileUsername
-
+  const [ activeFeedTab, setActiveFeedTab ] = useState<ActivityFeedTab>(ActivityFeedTab.all)
+  const [ profileUserData, setProfileUserData ] = useState<UserInfoData>()
+  const [ feedData, setFeedData ] = useState<feedData[]>([])
+  const isSessionProfile = username === profileUsername
+  const [ showAddFriendBtn, setShowAddFriendBtn ] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,6 +97,28 @@ export const UserProfilePage = () => {
 
     fetchData();
   }, [profileUsername]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${userId}/is-friend/${profileUserData?.postgres.id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
+
+        setShowAddFriendBtn(!jsonData.is_friend);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    if (userId && profileUserData && !isSessionProfile) {
+      fetchData();
+    }
+  }, [userId, isSessionProfile, profileUserData]);
 
   const onClickAddFriend = async () => {
     try {

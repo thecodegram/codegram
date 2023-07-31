@@ -4,6 +4,7 @@ import { useUserContext } from "../components/UserContext"
 import { ListGroup } from "../components/ListGroup"
 import { Button, ButtonVariant } from "../components/Button"
 import { EmptyState } from "../components/EmptyState"
+import { Link } from "react-router-dom"
 
 import styles from "./FriendsPage.module.scss"
 
@@ -80,8 +81,10 @@ export const FriendRequestsPage = () => {
           {friendRequestsData.map(({ friend_request_id, requester_id, requester_username, created_at }, index) => 
             <article className={styles.friendRequestListItem} key={index}>
               <div className={styles.userInfo}>
-              <h3>@{requester_username}</h3>
-              <p>Sent {new Date(created_at).toDateString()}</p>
+                <Link to={`/u/${requester_username}`}>
+                  <h3>@{requester_username}</h3>
+                  <p>Sent {new Date(created_at).toDateString()}</p>
+                </Link>
               </div>
               <div className={styles.actions}>
               <Button 

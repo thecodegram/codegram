@@ -1,11 +1,12 @@
 import { HeaderNav } from "../components/HeaderNav"
-import { Button } from "../components/Button"
+import { Button, ButtonVariant } from "../components/Button"
 import { useParams } from "react-router-dom"
 import { GroupInfoHeader } from "../components/GroupInfoHeader"
 import { useState, useEffect } from "react"
 import { IconAddBtnPlus } from "../icons"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import { Modal } from "../components/Modal"
+import { useUserContext } from "../components/UserContext"
 
 import axios from "axios"
 
@@ -25,11 +26,14 @@ interface GroupInfo {
 export const GroupProfilePage = () => {
   const navigate = useNavigate()
   const { groupId } = useParams()
+  const { userId } = useUserContext()
   const [ groupInfoData, setGroupInfoData ] = useState<GroupInfo>()
   const location = useLocation()
   const [ activeTab, setActiveTab ] = useState<GroupProfilePageTab>(() =>
   location.pathname.includes("/members") ? GroupProfilePageTab.members : GroupProfilePageTab.activity)
   const [ showInviteMemberModal, setShowInviteMemberModal ] = useState<boolean>(false)
+  const [ forceRerender, setForceRerender ] = useState<boolean>(false)
+  const [ isSessionUserMember, setIsSessionUserMember ] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +55,26 @@ export const GroupProfilePage = () => {
     fetchData();
   }, [groupId]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/group/${groupId}/is-member/${userId}`,
+          {
+            withCredentials: true,
+          }
+        );
+        const jsonData = await response.data;
+  
+        setIsSessionUserMember(jsonData.is_group_member);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [groupId, userId, forceRerender]);
+
   const onClickInviteMember = async (value: string) => {
     try {
       await axios.post(`${process.env.REACT_APP_API_URL}/api/group/${groupId}/send-group-invite/${value}`, {},
@@ -64,6 +88,18 @@ export const GroupProfilePage = () => {
     }
   }
 
+  const onClickLeaveGroup = async () => {
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/group/${groupId}/remove-member/${userId}`, {},
+        { withCredentials: true }
+      )
+
+      setForceRerender(!forceRerender)
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  }
+
   return <>
     <HeaderNav />
     {groupInfoData && <div className={styles.groupProfilePage}>
@@ -72,7 +108,8 @@ export const GroupProfilePage = () => {
             groupName={groupInfoData.name}
             createdAt={groupInfoData.created_at}
             />
-          <Button onClick={() => setShowInviteMemberModal(true)}><IconAddBtnPlus /> Invite Member</Button>
+          {isSessionUserMember && <Button onClick={() => setShowInviteMemberModal(true)}><IconAddBtnPlus /> Invite Member</Button>}
+          {isSessionUserMember && <Button onClick={onClickLeaveGroup} variant={ButtonVariant.secondary}>Leave Group</Button>}
         </header>
         <nav className={styles.tabNav}>
           <button 
