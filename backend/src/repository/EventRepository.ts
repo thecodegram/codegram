@@ -67,7 +67,9 @@ export class EventRepository {
         WHERE e.user_id = $1
         GROUP BY e.id
       )
-      SELECT e.id AS event_id, u.id AS submitter_id, p.pname, u.username, e.problem_name, e.problem_slug, e.event_timestamp
+      SELECT
+       e.id AS event_id, u.id AS submitter_id, p.pname, u.username, e.problem_name,
+       e.problem_slug, e.event_timestamp, lc.likes
        FROM events e 
         JOIN users u ON e.user_id = u.id
         JOIN platform p ON e.pid = p.pid
@@ -112,7 +114,9 @@ export class EventRepository {
           JOIN user_group ug2 ON ug1.group_id = ug2.group_id
         WHERE u.id = $1 AND ug1.group_id = $2
       )
-      SELECT e.id AS event_id, u.id AS submitter_id, p.pname, u.username, e.problem_name, e.problem_slug, e.event_timestamp
+      SELECT 
+        e.id AS event_id, u.id AS submitter_id, p.pname, u.username,
+        e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
        FROM events e 
         JOIN users u ON e.user_id = u.id
         JOIN platform p ON e.pid = p.pid
