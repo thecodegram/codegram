@@ -20,37 +20,63 @@ import styles from "./UserProfile.module.scss"
 
 enum ActivityFeedTab {
   all = "all",
-  leetcode = "leedcode",
+  leetcode = "leetcode",
   vjudge = "vjudge"
 }
+
+interface ProfileFeedQuery {
+  username: string | undefined,
+  offset: number | undefined,
+  limit: number | undefined,
+  platform: number | undefined
+}
+
+
 
 export const UserProfilePage = () => {
   const { username, userId } = useUserContext()
   const { username: profileUsername } = useParams()
-  const [ activeFeedTab, setActiveFeedTab ] = useState<ActivityFeedTab>(ActivityFeedTab.all)
-  const [ profileUserData, setProfileUserData ] = useState<UserInfoData>()
+  const [activeFeedTab, setActiveFeedTab] = useState<ActivityFeedTab>(ActivityFeedTab.all)
+  const [profileUserData, setProfileUserData] = useState<UserInfoData>()
   const [feedData, setFeedData] = useState<feedData[]>([])
   const showAddFriendBtn = username !== profileUsername
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        var platform;
+        
+        if (activeFeedTab == ActivityFeedTab.leetcode) {
+          platform = 1
+        }
+        else if(activeFeedTab == ActivityFeedTab.vjudge){
+          platform = 2;
+        }
+
+        const payload: ProfileFeedQuery = {
+          username: profileUsername,
+          platform: platform,
+          offset: 0,
+          limit: 15
+        }
+        
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/user/${profileUsername}/latestSubmits`,
+          `${process.env.REACT_APP_API_URL}/api/events`,
           {
             withCredentials: true,
+            params: payload
           }
         );
         const jsonData = await response.data;
-  
+
         setFeedData(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
     fetchData();
-  }, [profileUsername]);
+  }, [profileUsername, activeFeedTab]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,7 +88,7 @@ export const UserProfilePage = () => {
           }
         );
         const jsonData = await response.data;
-  
+
         setProfileUserData(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -85,16 +111,16 @@ export const UserProfilePage = () => {
     }
   }
 
-  return(
+  return (
     <>
       <HeaderNav />
       <div className={styles.userProfilePage}>
         <header>
-          <UserInfoHeader 
-            username={profileUsername || ""} 
+          <UserInfoHeader
+            username={profileUsername || ""}
             name={profileUsername || ""}
             avatarSize={AvatarSize.large}
-            />
+          />
           <article className={styles.rankTag}>
             #12
             <span><IconRankingMovedUp />2</span>
@@ -110,11 +136,11 @@ export const UserProfilePage = () => {
           <article className={styles.relationships}>
             <FriendsList userId={profileUserData?.postgres.id || null} />
             <ListGroup title='Groups'>
-              {groupsDummyData.map(({name, handle}, index) => (
+              {groupsDummyData.map(({ name, handle }, index) => (
                 <li key={index}>
-                  <UserInfoHeader 
-                    username={name} 
-                    name={handle} 
+                  <UserInfoHeader
+                    username={name}
+                    name={handle}
                   />
                 </li>
               ))}
@@ -123,38 +149,39 @@ export const UserProfilePage = () => {
 
           <article className={styles.activityFeed}>
             <nav>
-              <button 
-                className={activeFeedTab === ActivityFeedTab.all ? styles.active : ''} 
+              <button
+                className={activeFeedTab === ActivityFeedTab.all ? styles.active : ''}
                 onClick={() => setActiveFeedTab(ActivityFeedTab.all)}>
-                  All Activity
+                All Activity
               </button>
-              <button 
-                className={activeFeedTab === ActivityFeedTab.leetcode ? styles.active : ''} 
+              <button
+                className={activeFeedTab === ActivityFeedTab.leetcode ? styles.active : ''}
                 onClick={() => setActiveFeedTab(ActivityFeedTab.leetcode)}>
-                  LeetCode
+                LeetCode
               </button>
-              <button 
-                className={activeFeedTab === ActivityFeedTab.vjudge ? styles.active : ''} 
+              <button
+                className={activeFeedTab === ActivityFeedTab.vjudge ? styles.active : ''}
                 onClick={() => setActiveFeedTab(ActivityFeedTab.vjudge)}>
-                  Vjudge
+                Vjudge
               </button>
             </nav>
             <section className={styles.feed}>
-              {feedData.length === 0 
+              {feedData.length === 0
                 ? <EmptyState>No activity yet</EmptyState>
-                : feedData.map(({title, timestamp}, index) => 
-                  <FeedItem 
+                : feedData.map(({ problemTitle, problemTitleSlug, timestamp, platform, likes }, index) =>
+                  <FeedItem
                     key={index}
-                    name={profileUsername || ""}
-                    username={profileUsername || ""}
-                    body={`${profileUsername} just solved ${title} on LeetCode!`} 
-                    numOfLikes={Math.floor(Math.random() * 20) + 1}
-                    createdTime={new Date(+timestamp * 1000)}
-                    showFullInfo={false}
+                    name={username || ""}
+                    username={username || ""}
+                    platform={platform}
+                    problemTitle={problemTitle}
+                    numOfLikes={likes}
+                    problemTitleSlug={problemTitleSlug}
+                    createdTime={new Date(timestamp)}
                   />
                 )
               }
-              
+
             </section>
           </article>
         </main>

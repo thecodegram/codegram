@@ -1,11 +1,22 @@
 import { pool } from "../db/db";
+import { EventModel } from "../model/EventModel";
 import { UpdateEventData } from "../model/UpdateEventData";
 
 export class EventRepository {
-  private withTransformedTimestamp = (rows : any[]) => {
+  private asEventModels = (rows : any[]) => {
     return rows.map(r => {
-      r.event_timestamp = new Date(r.event_timestamp).getTime();
-      return r;
+      const eventModel : EventModel = {
+        eventId: r.event_id,
+        submitterId: r.submitter_id,
+        platform: r.platform,
+        username: r.username,
+        problemTitle: r.problem_name,
+        problemTitleSlug: r.problem_slug,
+        timestamp: new Date(r.event_timestamp).getTime(),
+        likes: r.likes
+      };
+
+      return eventModel;
     });
   }
 
@@ -68,7 +79,7 @@ export class EventRepository {
         GROUP BY e.id
       )
       SELECT
-       e.id AS event_id, u.id AS submitter_id, p.pname, u.username, e.problem_name,
+       e.id AS event_id, u.id AS submitter_id, p.pname AS platform, u.username, e.problem_name,
        e.problem_slug, e.event_timestamp, lc.likes
        FROM events e 
         JOIN users u ON e.user_id = u.id
@@ -91,7 +102,7 @@ export class EventRepository {
     try {
       const results = await pool.query(query, queryParams);
 
-      return this.withTransformedTimestamp(results.rows);
+      return this.asEventModels(results.rows);
     } catch(e) {
       console.error(e);
     }
@@ -115,7 +126,7 @@ export class EventRepository {
         WHERE u.id = $1 AND ug1.group_id = $2
       )
       SELECT 
-        e.id AS event_id, u.id AS submitter_id, p.pname, u.username,
+        e.id AS event_id, u.id AS submitter_id, p.pname AS platform, u.username,
         e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
        FROM events e 
         JOIN users u ON e.user_id = u.id
@@ -136,7 +147,7 @@ export class EventRepository {
     try {
       const results = await pool.query(query, queryParams);
 
-      return this.withTransformedTimestamp(results.rows);
+      return this.asEventModels(results.rows);
     } catch(e) {
       console.error(e);
     }
@@ -186,7 +197,7 @@ export class EventRepository {
       try {
         const results = await pool.query(query, [id, offset, limit]);
   
-        return this.withTransformedTimestamp(results.rows);
+        return this.asEventModels(results.rows);
       } catch(e) {
         throw(e);
       }

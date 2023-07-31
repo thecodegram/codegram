@@ -35,12 +35,14 @@ export interface UserInfoData {
 }
 
 export interface feedData {
-  title: string;
-  titleSlug: string;
+  eventId: number,
+  submitterId: number,
+  platform: string,
+  username: string,
+  problemTitle: string;
+  problemTitleSlug: string;
   timestamp: string;
-  statusDisplay: string;
-  lang: string;
-  __typename: string;
+  likes: number
 }
 
 interface RelationshipProps {
@@ -72,10 +74,15 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const payload = {
+          offset: 0,
+          limit: 15
+        }
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/user/${username}/latestSubmits`,
+          `${process.env.REACT_APP_API_URL}/api/events/feed`,
           {
             withCredentials: true,
+            params: payload
           }
         );
         const jsonData = await response.data;
@@ -102,7 +109,7 @@ const DashboardPage = () => {
           }
         );
         // creates a local URL for the Blob
-        const profilePicURL = URL.createObjectURL(response.data); 
+        const profilePicURL = URL.createObjectURL(response.data);
         setProfilePic(profilePicURL);
       } catch (error) {
         console.error("Error fetching profile picture:", error);
@@ -137,20 +144,23 @@ const DashboardPage = () => {
           {username && <UserStatsGrid username={username} />}
         </article>
         <article className={styles.feed}>
-          {loading 
+          {loading
             ? <LoadingEllipsis />
             : feedData.length === 0
               ? <EmptyState>No activity yet</EmptyState>
-              : feedData.map(({ title, timestamp }, index) => (
-                  <FeedItem
-                    key={index}
-                    name={username || ""}
-                    username={username || ""}
-                    body={`${username} just solved ${title} on LeetCode!`}
-                    numOfLikes={Math.floor(Math.random() * 20) + 1}
-                    createdTime={new Date(+timestamp * 1000)}
-                  />
-                ))
+              : feedData.map((
+                { problemTitle, problemTitleSlug, timestamp, platform, likes }, index) => (
+                <FeedItem
+                  key={index}
+                  name={username || ""}
+                  username={username || ""}
+                  platform={platform}
+                  problemTitle={problemTitle}
+                  numOfLikes={likes}
+                  problemTitleSlug={problemTitleSlug}
+                  createdTime={new Date(timestamp)}
+                />
+              ))
           }
         </article>
         <article className={styles.relationships}>
