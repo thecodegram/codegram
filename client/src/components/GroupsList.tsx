@@ -34,7 +34,9 @@ export const GroupsList = ({ userId }: GroupsListProps) => {
       }
     };
 
-    fetchData();
+    if (userId) {
+      fetchData();
+    }
   }, [userId]);
 
   return <article className={styles.friendsList}>

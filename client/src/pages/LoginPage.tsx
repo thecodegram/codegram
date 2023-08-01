@@ -61,7 +61,6 @@ const LoginPage = () => {
 
   const handleRecaptcha = (token: any) => {
     setRecaptchaToken(token); // store the recaptcha token
-    console.log(token);
   };
 
   return (

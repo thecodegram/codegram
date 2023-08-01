@@ -87,7 +87,6 @@ const DashboardPage = () => {
         const currentCache = cache[username];
         if (currentCache === undefined || currentCache === null) {
           try {
-            console.log("Fetching profile picture I AM CALLED");
             const response = await axios.get(
               `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
               {

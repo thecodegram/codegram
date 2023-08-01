@@ -16,7 +16,7 @@ interface FriendsListProps {
 export const FriendsList = ({ userId }: FriendsListProps) => {
   const { userId: sessionUserId } = useUserContext();
   const { cache, setCache } = useImageCache();
-  const [friendsData, setFriendsData] = useState<FriendItem[]>([]);
+  const [ friendsData, setFriendsData ] = useState<FriendItem[]>([]);
   const showViewAllBtn = sessionUserId === userId;
 
   const fetchProfilePic = useCallback(
@@ -78,7 +78,9 @@ export const FriendsList = ({ userId }: FriendsListProps) => {
       }
     };
 
-    fetchData();
+    if (userId) {
+      fetchData();
+    }
   }, [userId, fetchProfilePic]);
   
   return (
