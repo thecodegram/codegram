@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ReCAPTCHA from 'react-google-recaptcha';
 import { GoogleLogin } from 'react-google-login';
-import { on } from "events";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -71,9 +70,50 @@ const LoginPage = () => {
   };
 
   const onGoogleSuccess = async (response: any) => {
-    console.log("success!")
-    console.log(response);
-  }
+    const { profileObj: { email } } = response;
+
+    const emailParts = email.split("@");
+    const localPartOfEmail = emailParts[0];
+    const username = `${localPartOfEmail}Gmail`;
+
+    const payload = {
+        username: username,
+        email,
+        password: "test123",  
+        recaptchaToken: "123",
+      };
+
+    handleGoogleLogin(payload);
+  };
+
+  const handleGoogleLogin = async (payload: any) => {
+    if (!payload.email) {
+      setError("Please enter all fields");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/login`,
+        payload,
+        {
+          withCredentials: true,
+        }
+      );
+      
+      if (response.status === 200) {
+        // this is gonna flag for onboarding or dashboard
+        if (response.data.status === "onboarding") {
+          navigate("/onboarding");
+        } else if (response.data.status === "dashboard") {
+          navigate("/dashboard");
+        }
+      } else {
+        setError("Invalid username or password. Please try again.");
+      }
+    } catch (error) {
+      setError("Failed to login. Please try again.");
+    }
+  };
 
 
     
@@ -104,7 +144,7 @@ const LoginPage = () => {
                     Continue with Google
                 </button>
             )}
-        />
+      />
         <span className={styles.orLine}>OR</span>
         {error && <p className={styles.error}>{error}</p>}
         <input
