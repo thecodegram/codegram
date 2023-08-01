@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -21,10 +21,21 @@ import { GroupsPage } from "./pages/GroupsPage";
 import { GroupInvitesPage } from "./pages/GroupInvitesPage";
 import { AllGroupsPage } from "./pages/AllGroupsPage";
 import { ImageCacheProvider } from "./components/ImageCacheContext";
+import { gapi } from "gapi-script";
 
 function App() {
   const [username, setUsername] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId: "967455002287-6ck3jmsbapm0jfj0h46k5cc5ha2kg414.apps.googleusercontent.com",
+        scope: "",
+      })
+    }
+    gapi.load("client:auth2", start);
+  }, []);
 
   return (
     <Router>

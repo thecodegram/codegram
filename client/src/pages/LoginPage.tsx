@@ -5,6 +5,8 @@ import { IconGoogleLogo } from "../icons/icon-google-logo";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ReCAPTCHA from 'react-google-recaptcha';
+import { GoogleLogin } from 'react-google-login';
+import { on } from "events";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -64,6 +66,17 @@ const LoginPage = () => {
     console.log(token);
   };
 
+  const onGoogleFailure = (response: any) => {
+    console.log(response);
+  };
+
+  const onGoogleSuccess = async (response: any) => {
+    console.log("success!")
+    console.log(response);
+  }
+
+
+    
   return (
     <main className={styles.loginPage}>
       <header className={styles.header}>
@@ -74,13 +87,24 @@ const LoginPage = () => {
         <p>Please Log In with your email to continue</p>
       </header>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <button
-          type="button"
-          className={`${styles.btn} ${styles.googleLoginBtn}`}
-        >
-          <IconGoogleLogo />
-          Continue with Google
-        </button>
+      <GoogleLogin
+            clientId="967455002287-6ck3jmsbapm0jfj0h46k5cc5ha2kg414.apps.googleusercontent.com"
+            onSuccess={onGoogleSuccess}
+            onFailure={onGoogleFailure}
+            cookiePolicy={'single_host_origin'}
+            isSignedIn={true}
+            render={renderProps => (
+                <button
+                    type="button"
+                    onClick={renderProps.onClick}
+                    disabled={renderProps.disabled}
+                    className={`${styles.btn} ${styles.googleLoginBtn}`}
+                >
+                    <IconGoogleLogo />
+                    Continue with Google
+                </button>
+            )}
+        />
         <span className={styles.orLine}>OR</span>
         {error && <p className={styles.error}>{error}</p>}
         <input
