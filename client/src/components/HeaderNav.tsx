@@ -12,6 +12,7 @@ import { Modal } from "./Modal";
 import { useImageCache } from "./ImageCacheContext";
 
 import styles from "./HeaderNav.module.scss";
+import { gapi } from "gapi-script";
 
 export const HeaderNav = () => {
   const { username, userId } = useUserContext();
@@ -39,6 +40,12 @@ export const HeaderNav = () => {
       if (response.status === 200) {
         Cookies.remove("mysession");
         clearCache();
+        
+        const auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(() => {
+          console.log('User signed out of Google session');
+        });
+
         navigate("/login");
       } else {
         console.error("Error logging out: Invalid response status");
