@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import { EventRepository } from "../repository/EventRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { UserNameNotFoundError } from "../errors/username-not-found-error";
-import { StringLiteral } from "typescript";
 
 const router = express.Router();
 
