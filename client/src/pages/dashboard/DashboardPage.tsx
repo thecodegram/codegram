@@ -115,7 +115,8 @@ const DashboardPage = () => {
         }
       }
     };
-    if(username) {
+
+    if (username) {
       fetchProfilePic();
     }
   }, [username, setCache]);

@@ -24,10 +24,10 @@ export const HeaderNav = () => {
   const { clearCache, cache } = useImageCache();
 
   useEffect(() => {
-    if (username && cache[username] !== undefined) {
+    if (username && cache[username] !== undefined && !profilePic) {
       setProfilePic(cache[username]);
     }
-  }, [username, cache]);
+  }, [username, cache, profilePic]);
 
   const handleLogout = async () => {
     try {
