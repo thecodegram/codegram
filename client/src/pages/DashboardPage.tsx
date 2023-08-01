@@ -36,14 +36,14 @@ export interface UserInfoData {
 }
 
 export interface feedData {
-  eventId: number,
-  submitterId: number,
-  platform: string,
-  username: string,
+  eventId: number;
+  submitterId: number;
+  platform: string;
+  username: string;
   problemTitle: string;
   problemTitleSlug: string;
   timestamp: string;
-  likes: number
+  likes: number;
 }
 
 const DashboardPage = () => {
@@ -58,13 +58,13 @@ const DashboardPage = () => {
       try {
         const payload = {
           offset: 0,
-          limit: 15
-        }
+          limit: 15,
+        };
         const response = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/events/feed`,
           {
             withCredentials: true,
-            params: payload
+            params: payload,
           }
         );
         const jsonData = await response.data;
@@ -96,6 +96,7 @@ const DashboardPage = () => {
             );
             if (response.status !== 204) {
               const profilePicURL = URL.createObjectURL(response.data);
+
               setCache(username, profilePicURL);
               setProfilePic(profilePicURL);
             } else {
@@ -140,12 +141,16 @@ const DashboardPage = () => {
           {username && <UserStatsGrid username={username} />}
         </article>
         <article className={styles.feed}>
-          {loading
-            ? <LoadingEllipsis />
-            : feedData.length === 0
-              ? <EmptyState>No activity yet</EmptyState>
-              : feedData.map((
-                { problemTitle, problemTitleSlug, timestamp, platform, likes }, index) => (
+          {loading ? (
+            <LoadingEllipsis />
+          ) : feedData.length === 0 ? (
+            <EmptyState>No activity yet</EmptyState>
+          ) : (
+            feedData.map(
+              (
+                { problemTitle, problemTitleSlug, timestamp, platform, likes },
+                index
+              ) => (
                 <FeedItem
                   key={index}
                   name={username || ""}
@@ -156,8 +161,9 @@ const DashboardPage = () => {
                   problemTitleSlug={problemTitleSlug}
                   createdTime={new Date(timestamp)}
                 />
-              ))
-          }
+              )
+            )
+          )}
         </article>
         <article className={styles.relationships}>
           {userId && <FriendsList userId={userId} />}
