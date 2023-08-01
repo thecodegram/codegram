@@ -20,7 +20,7 @@ const app = express();
 
 // Apply rate limiting middleware to all routes starting with '/api'
 const rateLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
+  windowMs: 1 * 60 * 1000, // 1 minutes
   max: 100, // limit each IP to 100 requests per windowMs
 });
 
