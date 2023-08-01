@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors'
 import session from 'express-session'
+import rateLimit from 'express-rate-limit';
 import { enforceLoggedIn } from './utils/middleware';
 import { setUpDB } from './db/db';
 import { corsOptions } from './config/corsConfig';
@@ -17,7 +18,11 @@ const groupRouter = require('./routes/groups-route')
 // Create an Express.js app
 const app = express();
 
-
+// Apply rate limiting middleware to all routes starting with '/api'
+const rateLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
 
 const port = env.PORT || 8080;
 
@@ -26,6 +31,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.use(session(sessionOptions));
 app.set('trust proxy', 1);
+app.use('/api', rateLimiter)
 
 // request logging
 app.use('/', (req: Request, res: Response, next: NextFunction) => {
