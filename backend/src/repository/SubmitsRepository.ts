@@ -1,18 +1,18 @@
 import { UserNameNotFoundError } from "../errors/username-not-found-error";
-import { LeetcodeData } from "../model/LeetcodeData";
+import { LeetcodeRefreshDataModel } from "../model/LeetcodeRefreshDataModel";
 import { VjudgeProblemData } from "../model/VjudgeProblemData";
 import { User} from "../model/schemas/userSchema";
 
 export class SubmitsRepository {
-    public async saveLeetcodeSubmissionStats(stats: LeetcodeData) {
+    public async saveLeetcodeSubmissionStats(leetcodeRefreshData: LeetcodeRefreshDataModel) {
     
-        const user = await User.findOne({username:stats.username}, {vjudge:0});
+        const user = await User.findOne({username:leetcodeRefreshData.codegramUsername}, {vjudge:0});
         
         if(!user) {
-            throw new UserNameNotFoundError(stats.username, "leetcode");
+            throw new UserNameNotFoundError(leetcodeRefreshData.codegramUsername, "leetcode");
         }
 
-        user.leetcode = stats;
+        user.leetcode = leetcodeRefreshData.leetcodeData;
         await user.save();
     }
 
