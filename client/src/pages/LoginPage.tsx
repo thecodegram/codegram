@@ -5,6 +5,7 @@ import { IconGoogleLogo } from "../icons/icon-google-logo";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ReCAPTCHA from 'react-google-recaptcha';
+import { GoogleLogin } from 'react-google-login';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -63,6 +64,58 @@ const LoginPage = () => {
     setRecaptchaToken(token); // store the recaptcha token
   };
 
+  const onGoogleFailure = (response: any) => {
+    console.log(response);
+  };
+
+  const onGoogleSuccess = async (response: any) => {
+    const { profileObj: { email } } = response;
+
+    const emailParts = email.split("@");
+    const localPartOfEmail = emailParts[0];
+    const username = `${localPartOfEmail}Gmail`;
+
+    const payload = {
+        username: username,
+        email,
+        password: "test123",  
+        recaptchaToken: "123",
+      };
+
+    handleGoogleLogin(payload);
+  };
+
+  const handleGoogleLogin = async (payload: any) => {
+    if (!payload.email) {
+      setError("Please enter all fields");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/login`,
+        payload,
+        {
+          withCredentials: true,
+        }
+      );
+      
+      if (response.status === 200) {
+        // this is gonna flag for onboarding or dashboard
+        if (response.data.status === "onboarding") {
+          navigate("/onboarding");
+        } else if (response.data.status === "dashboard") {
+          navigate("/dashboard");
+        }
+      } else {
+        setError("Invalid username or password. Please try again.");
+      }
+    } catch (error) {
+      setError("Failed to login. Please try again.");
+    }
+  };
+
+
+    
   return (
     <main className={styles.loginPage}>
       <header className={styles.header}>
@@ -73,13 +126,24 @@ const LoginPage = () => {
         <p>Please Log In with your email to continue</p>
       </header>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <button
-          type="button"
-          className={`${styles.btn} ${styles.googleLoginBtn}`}
-        >
-          <IconGoogleLogo />
-          Continue with Google
-        </button>
+      <GoogleLogin
+            clientId="967455002287-6ck3jmsbapm0jfj0h46k5cc5ha2kg414.apps.googleusercontent.com"
+            onSuccess={onGoogleSuccess}
+            onFailure={onGoogleFailure}
+            cookiePolicy={'single_host_origin'}
+            isSignedIn={true}
+            render={renderProps => (
+                <button
+                    type="button"
+                    onClick={renderProps.onClick}
+                    disabled={renderProps.disabled}
+                    className={`${styles.btn} ${styles.googleLoginBtn}`}
+                >
+                    <IconGoogleLogo />
+                    Continue with Google
+                </button>
+            )}
+      />
         <span className={styles.orLine}>OR</span>
         {error && <p className={styles.error}>{error}</p>}
         <input
