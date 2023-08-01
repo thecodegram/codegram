@@ -34,7 +34,9 @@ export const AllGroupsPage = () => {
       }
     };
 
-    fetchData();
+    if(userId) {
+      fetchData();
+    }
   }, [userId]);
 
   return <article>
