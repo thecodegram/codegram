@@ -233,7 +233,7 @@ router.get(
     } else {
       res
         .status(200)
-        .json({ mongo: userMongoData, postgres: { id: userPostgresData.id } });
+        .json({ mongo: userMongoData, postgres: userPostgresData });
     }
   }
 );

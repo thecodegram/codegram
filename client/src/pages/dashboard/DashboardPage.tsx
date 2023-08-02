@@ -32,6 +32,9 @@ export interface UserInfoData {
   };
   postgres: {
     id: number;
+    current_rank: number,
+    previous_rank: number,
+    score: number;
   };
 }
 
