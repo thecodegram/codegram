@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors'
 import session from 'express-session'
 import rateLimit from 'express-rate-limit';
-import { enforceLoggedIn } from './utils/middleware';
+import { enforceInternalUser, enforceLoggedIn } from './utils/middleware';
 import { setUpDB } from './db/db';
 import { corsOptions } from './config/corsConfig';
 import { sessionOptions } from './config/sessionConfig';
@@ -15,6 +15,7 @@ const usersRouter = require('./routes/users-route')
 const authRouter = require('./routes/auth-route')
 const eventsRouter = require('./routes/events-route')
 const groupRouter = require('./routes/groups-route')
+const jobsRouter = require('./routes/private/jobs-route')
 
 // Create an Express.js app
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api/trigger-requests', [enforceLoggedIn], triggerRequestsRouter);
 app.use('/api/user', [enforceLoggedIn], usersRouter);
 app.use('/api/group', [enforceLoggedIn], groupRouter);
 app.use('/api/events', [enforceLoggedIn], eventsRouter);
+app.use('/api/secure/jobs', [enforceInternalUser], jobsRouter);
 app.use('/api/auth', authRouter);
 
 const scheduler = new Scheduler();
@@ -59,7 +61,7 @@ const scheduler = new Scheduler();
     });
 
     console.log("Starting updates collector scheduler");
-    scheduler.start();
+    // scheduler.start();
 
     // run ranking job on startup
     new UpdateRankingsJob().run();
