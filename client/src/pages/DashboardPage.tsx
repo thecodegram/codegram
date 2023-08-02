@@ -44,6 +44,7 @@ export interface feedData {
   problemTitleSlug: string;
   timestamp: string;
   likes: number;
+  likedByCurrentUser: boolean;
 }
 
 const DashboardPage = () => {
