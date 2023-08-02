@@ -35,7 +35,6 @@ app.use('/', (req: Request, res: Response, next: NextFunction) => {
 app.use('/api/trigger-requests', [enforceLoggedIn], triggerRequestsRouter);
 app.use('/api/user', [enforceLoggedIn], usersRouter);
 app.use('/api/group', [enforceLoggedIn], groupRouter);
-app.use('/api/updates', [enforceLoggedIn], require('./routes/updates-route'));
 app.use('/api/events', [enforceLoggedIn], eventsRouter);
 app.use('/api/auth', authRouter);
 

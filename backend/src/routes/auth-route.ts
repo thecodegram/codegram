@@ -15,12 +15,12 @@ const decryptPassword = (pwd: String) => {
 router.post("/login", async (req: Request, res: Response) => {
   const { username, password, recaptchaToken } = req.body;
 
-  // const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+  const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
 
-  // if (!isRecaptchaValid) {
-  //   res.status(400).send({ error: "Invalid reCAPTCHA token." });
-  //   return;
-  // }
+  if (!isRecaptchaValid) {
+    res.status(400).send({ error: "Invalid reCAPTCHA token." });
+    return;
+  }
 
   if (isValidUsername(username)) {
     const password1 = decryptPassword(password);
