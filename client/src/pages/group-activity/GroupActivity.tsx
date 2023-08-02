@@ -25,7 +25,7 @@ export const GroupProfileActivity = () => {
   const [ offset, setOffset ] = useState<number>(0)
   const [ loading, setLoading ] = useState<boolean>(false)
   const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
-  const [isDelayActive, setIsDelayActive] = useState<boolean>(false)
+  const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
   
   useEffect(() => {
     const delayMs: number = 1000
