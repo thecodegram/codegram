@@ -5,22 +5,22 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import DashboardPage from "./pages/DashboardPage";
-import PrivateRoute from "./components/PrivateRoute";
-import OnBoardingPage from "./pages/OnBoardingPage";
-import { UserProfilePage } from "./pages/UserProfile";
-import { FriendsPage } from "./pages/FriendsPage";
-import { FriendRequestsPage } from "./pages/FriendRequestsPage";
-import { AllFriendsPage } from "./pages/AllFriendsPage";
-import { UserContext } from "./components/UserContext";
-import { GroupProfilePage } from "./pages/GroupProfile";
-import { GroupProfileMembers } from "./pages/GroupMembers";
-import { GroupsPage } from "./pages/GroupsPage";
-import { GroupInvitesPage } from "./pages/GroupInvitesPage";
-import { AllGroupsPage } from "./pages/AllGroupsPage";
-import { ImageCacheProvider } from "./components/ImageCacheContext";
+import LoginPage from "./pages/login/LoginPage";
+import SignupPage from "./pages/signup/SignupPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
+import PrivateRoute from "./routes/PrivateRoute";
+import OnBoardingPage from "./pages/onboarding/OnBoardingPage";
+import { UserProfilePage } from "./pages/user-profile/UserProfile";
+import { FriendsPage } from "./pages/friends/FriendsPage";
+import { FriendRequestsPage } from "./pages/friend-requests/FriendRequestsPage";
+import { AllFriendsPage } from "./pages/all-friends/AllFriendsPage";
+import { UserContext } from "./contexts/UserContext";
+import { GroupProfilePage } from "./pages/group-profile/GroupProfile";
+import { GroupProfileMembers } from "./pages/group-members/GroupMembers";
+import { GroupsPage } from "./pages/groups/GroupsPage";
+import { GroupInvitesPage } from "./pages/group-invites/GroupInvitesPage";
+import { AllGroupsPage } from "./pages/all-groups/AllGroupsPage";
+import { ImageCacheProvider } from "./components/image-cache-context/ImageCacheContext";
 import { gapi } from "gapi-script";
 
 function App() {
