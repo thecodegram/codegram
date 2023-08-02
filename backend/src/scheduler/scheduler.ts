@@ -12,8 +12,8 @@ export class Scheduler {
   // schedule to Vjudge Updates collection job every 5 minutes
   private readonly vjudgeUpdatesCollectorCronJob = new CronJob('*/5 * * * *', new VjudgeUpdateCollectingJob().run);
 
-  // schedule to run Update Rankings job every 0th minute (every hour at 2:00 PM, 3:00 PM, etc.)
-  private readonly updateRankingsCronJob = new CronJob('0 * * * *', new UpdateRankingsJob().run)
+  // schedule to run Update Rankings job every 12 hours (12:00PM and 12:00 AM)
+  private readonly updateRankingsCronJob = new CronJob('0 */12 * * *', new UpdateRankingsJob().run)
 
   public start() {
     this.leetcodeUpdatesCollectorCronJob.start();
