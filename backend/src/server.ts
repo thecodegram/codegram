@@ -17,8 +17,6 @@ const groupRouter = require('./routes/groups-route')
 // Create an Express.js app
 const app = express();
 
-
-
 const port = env.PORT || 8080;
 
 // middleware

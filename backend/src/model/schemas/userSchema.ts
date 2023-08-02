@@ -3,7 +3,10 @@ import { leetcodeStatsSchema } from './leetcodeStatsSchema';
 import { vjudgeStatsSchema } from './vjudgeStatsSchema';
 
 const userSchema = new Schema({
-  username: String,
+  username: {
+    type: String,
+    required: true
+  },
   email: {
     type: String,
     required: true,
