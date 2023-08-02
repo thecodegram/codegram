@@ -22,7 +22,7 @@ const app = express();
 // Apply rate limiting middleware to all routes starting with '/api'
 const rateLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 250, // limit each IP to 100 requests per windowMs
 });
 
 const port = env.PORT || 8080;
@@ -46,8 +46,6 @@ app.use('/api/user', [enforceLoggedIn], usersRouter);
 app.use('/api/group', [enforceLoggedIn], groupRouter);
 app.use('/api/events', [enforceLoggedIn], eventsRouter);
 app.use('/api/auth', authRouter);
-
-
 
 const scheduler = new Scheduler();
 
