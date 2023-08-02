@@ -55,7 +55,7 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
           <h2>Vjudge</h2>
           <div className={styles.card}> 
             <p>{statsData?.postgres.score - statsData?.mongo.leetcode?.submitStats?.acSubmissionNum[0].count}</p>
-            <h3>All solved</h3>
+            <h3>Total solved</h3>
           </div>
         </div>}
     </div>
