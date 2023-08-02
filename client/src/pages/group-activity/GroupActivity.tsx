@@ -20,14 +20,14 @@ interface ActivityItem {
 }
 
 export const GroupProfileActivity = () => {
-  const { groupId } = useParams();
-  const [activityData, setActivityData] = useState<ActivityItem[]>([]);
-  const bottomOfFeedRef = useRef<HTMLDivElement>(null);
+  const { groupId } = useParams()
+  const [ activityData, setActivityData ] = useState<ActivityItem[]>([])
+  const bottomOfFeedRef = useRef<HTMLDivElement>(null)
+  const [ offset, setOffset ] = useState<number>(0)
+  const [ loading, setLoading ] = useState<boolean>(false)
+  const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
+  const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
   const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
-  const [offset, setOffset] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [isEndOfOffset, setIsEndOfOffset] = useState<boolean>(false);
-  const [isDelayActive, setIsDelayActive] = useState<boolean>(false);
 
   useEffect(() => {
     const delayMs: number = 1000;

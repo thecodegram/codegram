@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import {
   UserInfoHeader,
@@ -51,18 +51,35 @@ export interface feedData {
 }
 
 const DashboardPage = () => {
-  const [feedData, setFeedData] = useState<feedData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [ profilePic, setProfilePic ] = useState<string | null>(null);
   const { username, userId } = useUserContext();
   const { cache, setCache } = useImageCache();
 
+  const [ feedData, setFeedData ] = useState<feedData[]>([]);
+  const bottomOfFeedRef = useRef<HTMLDivElement>(null)
+  const [ offset, setOffset ] = useState<number>(0)
+  const [ loading, setLoading ] = useState<boolean>(false)
+  const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
+  const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
+  const [ scrollPosition, setScrollPosition ] = useState<number>(window.scrollY)
+  const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchData = async () => {
+      window.scrollTo(0, scrollPosition)
+      setLoading(true);
+
+      if (!doneFirstRequest) {
+        setDoneFirstRequest(true)
+        return
+      }
+
       try {
+        const limit: number = 25
         const payload = {
-          offset: 0,
-          limit: 15,
+          username,
+          offset,
+          limit,
         };
         const response = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/events/feed`,
@@ -73,19 +90,42 @@ const DashboardPage = () => {
         );
         const jsonData = await response.data;
 
-        setFeedData(jsonData);
+        if (jsonData && jsonData.length === 0) {
+          setIsEndOfOffset(true)
+          return
+        }
+
+        setFeedData((f) => [...f, ...jsonData]);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
+
     if (username) {
-      setLoading(true);
-      fetchData();
-    } else {
-      setLoading(false);
+      fetchData()
     }
-  }, [username]);
+  }, [username, offset, scrollPosition, doneFirstRequest]);
+
+  useEffect(() => {
+    if (!bottomOfFeedRef.current) return
+
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    }
+
+    const scrollObserver = new IntersectionObserver((entries) => {
+      if (!isDelayActive && entries?.[0]?.isIntersecting && !loading && !isEndOfOffset) {
+        setScrollPosition(window.scrollY)
+        setOffset(() => offset + 1)
+        setIsDelayActive(true)
+      }
+    }, options);
+
+    scrollObserver.observe(bottomOfFeedRef.current);
+  })
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
@@ -157,35 +197,39 @@ const DashboardPage = () => {
           ) : feedData.length === 0 ? (
             <EmptyState>No activity yet</EmptyState>
           ) : (
-            feedData.map(
-              (
-                {
-                  username,
-                  problemTitle,
-                  problemTitleSlug,
-                  timestamp,
-                  platform,
-                  likes,
-                  likedByCurrentUser,
-                  eventId,
-                },
-                index
-              ) => (
-                <FeedItem
-                  key={index}
-                  name={username || ""}
-                  username={username || ""}
-                  platform={platform}
-                  problemTitle={problemTitle}
-                  numOfLikes={likes}
-                  problemTitleSlug={problemTitleSlug}
-                  createdTime={new Date(timestamp)}
-                  isLikedByCurrentUser={likedByCurrentUser}
-                  currentEventid={eventId}
-                />
-              )
-            )
-          )}
+            <>
+              {feedData.map(
+                (
+                  {
+                    username,
+                    problemTitle,
+                    problemTitleSlug,
+                    timestamp,
+                    platform,
+                    likes,
+                    likedByCurrentUser,
+                    eventId,
+                  },
+                  index
+                ) => (
+                  <FeedItem
+                    key={index}
+                    name={username || ""}
+                    username={username || ""}
+                    platform={platform}
+                    problemTitle={problemTitle}
+                    numOfLikes={likes}
+                    problemTitleSlug={problemTitleSlug}
+                    createdTime={new Date(timestamp)}
+                    isLikedByCurrentUser={likedByCurrentUser}
+                    currentEventid={eventId}
+                  />
+                )
+              )}
+              <div ref={bottomOfFeedRef} style={{ width: "100%", height: "1px" }}></div>
+            </>
+          )
+        }
         </article>
         <article className={styles.relationships}>
           {userId && <FriendsList userId={userId} />}
