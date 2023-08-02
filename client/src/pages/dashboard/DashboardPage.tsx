@@ -62,11 +62,17 @@ const DashboardPage = () => {
   const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
   const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
   const [ scrollPosition, setScrollPosition ] = useState<number>(window.scrollY)
+  const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       window.scrollTo(0, scrollPosition)
       setLoading(true);
+
+      if (!doneFirstRequest) {
+        setDoneFirstRequest(true)
+        return
+      }
 
       try {
         const limit: number = 25
@@ -90,7 +96,6 @@ const DashboardPage = () => {
         }
 
         setFeedData((f) => [...f, ...jsonData]);
-        setScrollPosition(window.scrollY)
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -100,7 +105,7 @@ const DashboardPage = () => {
     if (username) {
       fetchData()
     }
-  }, [username, offset, scrollPosition]);
+  }, [username, offset, scrollPosition, doneFirstRequest]);
 
   useEffect(() => {
     if (!bottomOfFeedRef.current) return
@@ -113,6 +118,7 @@ const DashboardPage = () => {
 
     const scrollObserver = new IntersectionObserver((entries) => {
       if (!isDelayActive && entries?.[0]?.isIntersecting && !loading && !isEndOfOffset) {
+        setScrollPosition(window.scrollY)
         setOffset(() => offset + 1)
         setIsDelayActive(true)
       }
@@ -220,7 +226,7 @@ const DashboardPage = () => {
                   />
                 )
               )}
-              <div ref={bottomOfFeedRef} style={{ width: "100%", height: "1px", background: "red"}}></div>
+              <div ref={bottomOfFeedRef} style={{ width: "100%", height: "1px" }}></div>
             </>
           )
         }
