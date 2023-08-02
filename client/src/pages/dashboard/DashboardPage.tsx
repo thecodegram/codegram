@@ -155,6 +155,7 @@ const DashboardPage = () => {
             feedData.map(
               (
                 {
+                  username,
                   problemTitle,
                   problemTitleSlug,
                   timestamp,
