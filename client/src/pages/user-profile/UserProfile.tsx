@@ -246,9 +246,10 @@ export const UserProfilePage = () => {
                       problemTitle,
                       problemTitleSlug,
                       timestamp,
-                      username,
                       platform,
                       likes,
+                      likedByCurrentUser,
+                      eventId,
                     },
                     index
                   ) => (
@@ -261,6 +262,8 @@ export const UserProfilePage = () => {
                       numOfLikes={likes}
                       problemTitleSlug={problemTitleSlug}
                       createdTime={new Date(timestamp)}
+                      isLikedByCurrentUser={likedByCurrentUser}
+                      currentEventid={eventId}
                     />
                   )
                 )
