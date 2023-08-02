@@ -60,7 +60,6 @@ export const FeedItem = ({
         const currentCache = cache[username];
         if (currentCache === undefined || currentCache === null) {
           try {
-            console.log("Fetching profile picture I AM CALLED");
             const response = await axios.get(
               `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
               {
@@ -86,7 +85,9 @@ export const FeedItem = ({
       }
     };
 
-    fetchProfilePic();
+    if (username) {
+      fetchProfilePic();
+    }
   }, [username, setCache]);
   /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -143,7 +144,7 @@ export const FeedItem = ({
       </section>
       <section className={styles.footer}>
         <button onClick={handleLikeClick}>
-          <IconLikeBtnHeart fill={isLiked ? "red" : "#D7D6D5"} /> {likesCount}
+          <IconLikeBtnHeart fill={isLiked ? "#FF1569" : "#D7D6D5"} /> {likesCount}
         </button>
       </section>
     </article>

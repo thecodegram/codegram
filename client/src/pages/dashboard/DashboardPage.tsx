@@ -116,6 +116,8 @@ const DashboardPage = () => {
         }
       }
     };
+
+    
     if (username) {
       fetchProfilePic();
     }
