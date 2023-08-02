@@ -21,6 +21,7 @@ import { GroupsPage } from "./pages/groups/GroupsPage";
 import { GroupInvitesPage } from "./pages/group-invites/GroupInvitesPage";
 import { AllGroupsPage } from "./pages/all-groups/AllGroupsPage";
 import { ImageCacheProvider } from "./components/image-cache-context/ImageCacheContext";
+import { GroupProfileActivity } from "./pages/group-activity/GroupActivity";
 import { gapi } from "gapi-script";
 
 function App() {
@@ -96,10 +97,10 @@ function App() {
                 </PrivateRoute>
               }
             >
-              {/* <Route
+              <Route
                 path=""
-                element={<AllGroupsPage />}
-              /> */}
+                element={<GroupProfileActivity />}
+              />
               <Route
                 path="members"
                 element={<GroupProfileMembers />}
