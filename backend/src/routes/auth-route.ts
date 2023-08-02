@@ -10,13 +10,6 @@ const router = express.Router();
 
 const userRepository = new UserRepository();
 
-// Add some parameters to the session
-declare module "express-session" {
-  interface SessionData {
-    username: string; // whatever property you like
-  }
-}
-
 const decryptPassword = (pwd: String) => {
   return pwd;
 };
@@ -37,11 +30,13 @@ router.post("/login", async (req: Request, res: Response) => {
         username: username,
         password: password1,
       });
+      const postgresUser = await userRepository.getUser(username);
 
-      if (user === null) {
+      if (user === null || !postgresUser) {
         res.status(400).send();
       } else {
         req.session.username = user.username;
+        req.session.userId = postgresUser.id;
         req.session.save();
 
         if (!user.leetcode?.username && !user.vjudge?.username) {
@@ -67,6 +62,10 @@ router.post("/signup", async (req: Request, res: Response) => {
 
   const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
 
+  if(!username) {
+    res.status(400).json({error: "username is empty"});
+    return;
+  }
   if (!isRecaptchaValid) {
     res.status(400).send({ error: "Invalid reCAPTCHA token." });
     return;
@@ -88,21 +87,17 @@ router.post("/signup", async (req: Request, res: Response) => {
       });
 
       const registedUser = await newUser.save();
-
-      console.log(registedUser);
-      console.log("this is the id: " + registedUser._id.toString());
+      console.log("New user mongoId: " + registedUser._id.toString());
       //save to postgresql
-      if (registedUser.username && registedUser._id) {
-        userRepository.saveUser(
-          registedUser._id.toString(),
-          registedUser.username
-        );
-      } else {
-        console.log("username is undefined");
-      }
+      
+      const userId = await userRepository.saveUser(
+        registedUser._id.toString(),
+        registedUser.username
+      );
 
       // Init the user session
       req.session.username = newUser.username;
+      req.session.userId = userId;
       req.session.save();
 
       await sendWelcomeEmail(email, username);

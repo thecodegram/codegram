@@ -83,7 +83,7 @@ export async function getAndStoreVjudgeUpdates(username: string) {
   const u = await User.findOne({ username: username }, { leetcode: 0 });
 
   if (!u) {
-    throw new UserNameNotFoundError(username, "vjudge");
+    console.error(`User ${username} was not found in MongoDB. Data mismatch between the databases`);
   } else {
     try {
       const updates = await (async () => {

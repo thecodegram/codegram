@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS events (
     problem_name VARCHAR(255),
     problem_slug VARCHAR(255),
     event_timestamp TIMESTAMP,
+    like_count INTEGER DEFAULT 0,
     CONSTRAINT fk_events_platform FOREIGN KEY (pid) REFERENCES platform(pid) ON DELETE CASCADE,
     CONSTRAINT fk_events_users  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -43,6 +44,9 @@ CREATE TABLE IF NOT EXISTS likes (
     CONSTRAINT fk_likes_events FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     CONSTRAINT pk_likes PRIMARY KEY (user_id, event_id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_likes_user_id ON likes (user_id);
+CREATE INDEX IF NOT EXISTS idx_likes_event_id ON likes (event_id);
 
 CREATE TABLE IF NOT EXISTS notification (
     notification_id SERIAL PRIMARY KEY,

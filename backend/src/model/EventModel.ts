@@ -6,5 +6,6 @@ export interface EventModel {
     problemTitle: string,
     problemTitleSlug: string,
     timestamp: number,
-    likes: number
+    likes: number,
+    likedByCurrentUser?: boolean|undefined
 }

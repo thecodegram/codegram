@@ -13,7 +13,8 @@ export class EventRepository {
         problemTitle: r.problem_name,
         problemTitleSlug: r.problem_slug,
         timestamp: new Date(r.event_timestamp).getTime(),
-        likes: r.likes
+        likes: r.like_count,
+        likedByCurrentUser: r.liked_by_current_user
       };
 
       return eventModel;
@@ -64,34 +65,28 @@ export class EventRepository {
     }
   }
 
-  async getEventsForOneUser(id: number, offset: number, limit: number, platform?: number) {
-    const queryParams = [id, offset, limit];
+  async getEventsForOneUser(id: number, currentUserId: number, offset: number, limit: number, platform?: number) {
+    const queryParams = [id, currentUserId, offset, limit];
     var query = `
-      WITH likes_count(event_id, likes) AS (
-        SELECT e.id, count(l.user_id)
-        FROM events e LEFT JOIN likes l ON e.id = l.event_id
-        WHERE e.user_id = $1
-        GROUP BY e.id
-      )
       SELECT
        e.id AS event_id, u.id AS submitter_id, p.pname AS platform, u.username, e.problem_name,
-       e.problem_slug, e.event_timestamp, lc.likes
+       e.problem_slug, e.event_timestamp, e.like_count, (L.user_id IS NOT NULL) AS liked_by_current_user
        FROM events e 
         JOIN users u ON e.user_id = u.id
         JOIN platform p ON e.pid = p.pid
-        JOIN likes_count lc ON e.id = lc.event_id
+        LEFT JOIN likes L ON L.event_id = e.id AND L.user_id = $2
        WHERE u.id = $1 `;
 
     // if platform is specified query from it
     // otherwise query from all
     if (platform != undefined) {
-      query += `AND p.pid = $4 `;
+      query += `AND p.pid = $5 `;
       queryParams.push(platform);
     }
     query += `
         ORDER BY e.event_timestamp DESC
-        OFFSET $2 ROWS
-        FETCH NEXT $3 ROWS ONLY;
+        OFFSET $3 ROWS
+        FETCH NEXT $4 ROWS ONLY;
       `
 
     try {
@@ -107,13 +102,7 @@ export class EventRepository {
     user_id: number, group_id: number, offset: number, limit: number, platform?: number) {
     const queryParams = [user_id, group_id, offset, limit];
     var query = `
-      WITH likes_count(event_id, likes) AS (
-        SELECT e.id, count(l.user_id)
-        FROM events e LEFT JOIN likes l ON e.id = l.event_id
-        WHERE e.user_id = $1
-        GROUP BY e.id
-      ),
-      group_member_ids(id) AS (
+      WITH group_member_ids(id) AS (
         SELECT ug2.user_id
         FROM users u
           JOIN group_member ug1 ON u.id = ug1.user_id
@@ -122,11 +111,11 @@ export class EventRepository {
       )
       SELECT 
         e.id AS event_id, u.id AS submitter_id, p.pname AS platform, u.username,
-        e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
+        e.problem_name, e.problem_slug, e.event_timestamp, e.like_count, (L.user_id IS NOT NULL) AS liked_by_current_user
        FROM events e 
         JOIN users u ON e.user_id = u.id
         JOIN platform p ON e.pid = p.pid
-        JOIN likes_count lc ON e.id = lc.event_id
+        LEFT JOIN likes L ON L.event_id = e.id AND L.user_id = $1
        WHERE u.id IN (SELECT * FROM group_member_ids)`;
 
     if (platform != undefined) {
@@ -150,13 +139,7 @@ export class EventRepository {
 
   async getEventsVisibleToUser(id: number, offset: number, limit: number) {
     const query = `
-      WITH likes_count(event_id, likes) AS (
-        SELECT e.id, count(l.user_id)
-        FROM events e LEFT JOIN likes l ON e.id = l.event_id
-        WHERE e.user_id = $1
-        GROUP BY e.id
-      ),
-      group_member_ids(id) AS (
+      WITH group_member_ids(id) AS (
         SELECT DISTINCT other.user_id
         FROM group_member current
           JOIN group_member other ON current.group_id = other.group_id
@@ -176,11 +159,12 @@ export class EventRepository {
         )
       )
       SELECT
-        e.id AS event_id, u.id AS submitter_id, p.pname platform, u.username, e.problem_name, e.problem_slug, e.event_timestamp, lc.likes
+        e.id AS event_id, u.id AS submitter_id, p.pname platform, u.username, e.problem_name,
+        e.problem_slug, e.event_timestamp, e.like_count, (L.user_id IS NOT NULL) AS liked_by_current_user
       FROM events e 
         JOIN users u ON e.user_id = u.id
         JOIN platform p ON e.pid = p.pid
-        JOIN likes_count lc ON e.id = lc.event_id
+        LEFT JOIN likes L ON L.event_id = e.id AND L.user_id = $1
       WHERE 
         u.id = $1 
         OR u.id IN (SELECT * FROM group_member_ids)
@@ -200,23 +184,46 @@ export class EventRepository {
   async toggleLike(user_id: number, event_id: number) {
     const client = await pool.connect();
 
-    try {
-      const deleteLikeQuery =
-        "DELETE FROM likes WHERE user_id = $1 AND event_id = $2 RETURNING *";
-      const deletedLike = await client.query(deleteLikeQuery, [
-        user_id,
-        event_id,
-      ]);
+    const isLikedQuery = `
+      SELECT count(*) as count FROM likes WHERE user_id = $1 AND event_id = $2 
+    `
+    const deleteLikeQuery =
+      "DELETE FROM likes WHERE user_id = $1 AND event_id = $2 RETURNING *";
+    const reduceLikesCountQuery = `
+      UPDATE events
+      SET like_count = like_count - 1
+      WHERE id = $1
+    `;
+    const insertLikeQuery = "INSERT INTO likes(user_id, event_id) VALUES ($1, $2)";
+    const increaseLikesCountQuery = `
+      UPDATE events
+      SET like_count = like_count + 1
+      WHERE id = $1
+    `
 
-      if (deletedLike.rowCount > 0) {
+    try {
+      await client.query('BEGIN');
+
+      const isLikedResult = await client.query(isLikedQuery, [user_id, event_id]);
+      const isLiked = isLikedResult.rows[0].count
+      if (+isLiked) {
+        // the event was liked by current user, so remove like
+        await client.query(deleteLikeQuery, [user_id, event_id,]);
+        await client.query(reduceLikesCountQuery, [event_id]);
+
+        await client.query('COMMIT');
         return { success: true, message: "Event was unliked successfully." };
+
       } else {
-        const insertLikeQuery =
-          "INSERT INTO likes(user_id, event_id) VALUES ($1, $2) RETURNING *";
+        // the event was not liked by current user, so add a like
         await client.query(insertLikeQuery, [user_id, event_id]);
+        await client.query(increaseLikesCountQuery, [event_id]);
+
+        await client.query('COMMIT');
         return { success: true, message: "Event was liked successfully." };
       }
     } catch (error) {
+      await client.query('ROLLBACK');
       console.error("An error occurred:", error);
       return {
         success: false,

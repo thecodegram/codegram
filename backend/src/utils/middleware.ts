@@ -4,13 +4,14 @@ import { validUsername } from './utils';
 
 declare module "express-session" {
   interface SessionData {
-      username: string // whatever property you like
+      username: string,
+      userId: number
   }
 }
 export const enforceLoggedIn = (req: Request, res: Response, next: NextFunction) => {
-  if(!req.session?.username) {
-    console.log("Not logged in!");
+  if(!req.session.username || !req.session.userId) {
     res.status(401).send("Not authorized!");
+    console.log("Not logged in!");
     return;
   }
   
