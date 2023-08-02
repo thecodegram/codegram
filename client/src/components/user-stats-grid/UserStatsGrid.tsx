@@ -22,7 +22,7 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
           }
         );
         const jsonData = await response.data;
-  
+
         setStatsData(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -32,14 +32,31 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
     fetchData();
   }, [username]);
 
-  return !statsData 
-    ? <EmptyState>No stats yet</EmptyState> 
+  return !statsData
+    ? <EmptyState>No stats yet</EmptyState>
     : <div className={styles.statsGrid}>
-      {statsData && statsData?.mongo.leetcode?.submitStats?.acSubmissionNum.map((item, index) => (
-        <div key={index}>
-          <p>{item.count.toString()}</p>
-          <h3>{item.difficulty}</h3>
+        <div className={styles.card}>
+          <p>{statsData?.postgres.score}</p>
+          <h3>Total solved</h3>
         </div>
-      ))}
+        <div className={styles.leetcode}>
+          <h2>Leetcode</h2>
+          <div className={styles.grid}>
+            {statsData && statsData?.mongo.leetcode?.submitStats?.acSubmissionNum.map((item, index) => (
+              <div key={index} className={styles.card}>
+                <p>{item.count.toString()}</p>
+                <h3>{item.difficulty}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+        {(statsData?.postgres.score && statsData?.mongo.leetcode?.submitStats?.acSubmissionNum[0].count) &&
+        <div className={styles.vjudge}>
+          <h2>Vjudge</h2>
+          <div className={styles.card}> 
+            <p>{statsData?.postgres.score - statsData?.mongo.leetcode?.submitStats?.acSubmissionNum[0].count}</p>
+            <h3>Total solved</h3>
+          </div>
+        </div>}
     </div>
 }

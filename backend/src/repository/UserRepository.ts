@@ -57,15 +57,68 @@ export class UserRepository {
     return [];
   }
 
-  async getAll() {
-    const query = `SELECT username from users;`;
+  async getAllMongoIds() {
+    const query = `SELECT mongo_id from users;`;
 
     try {
       const result = await pool.query(query);
 
-      return result.rows;
+      return result.rows.map(r => r.mongo_id);
     } catch(e) {
       console.error('Failed to query postgres db for usernames');
+    }
+    return [];
+  }
+
+  async recomputeRanksForAllUsers() {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+  
+      // Update previous-rank with current_rank
+      await client.query("UPDATE users SET previous_rank = current_rank;");
+  
+      // Update current-rank based on score field in psql and it doest bring the rank in the nodejs
+      await client.query(`
+            WITH ranked_users AS (
+                SELECT id, ROW_NUMBER() OVER(ORDER BY score DESC) as rank
+                FROM users
+            )
+            UPDATE users
+            SET current_rank = ranked_users.rank
+            FROM ranked_users
+            WHERE users.id = ranked_users.id;
+        `);
+  
+      await client.query("COMMIT");
+    } catch (e) {
+      await client.query("ROLLBACK");
+      console.error("Failed to update ranks:", e);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  async updateUserScore(mongoId: string, newScore: number) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+  
+      const updateScoreQuery = `
+          UPDATE users
+          SET score = $1
+          WHERE mongo_id = $2
+        `;
+      await client.query(updateScoreQuery, [newScore, mongoId]);
+  
+      await client.query("COMMIT");
+    } catch (e) {
+      await client.query("ROLLBACK");
+      console.error("Failed to update score:", e);
+      throw e;
+    } finally {
+      client.release();
     }
   }
 }

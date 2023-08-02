@@ -32,11 +32,13 @@ export interface UserInfoData {
   };
   postgres: {
     id: number;
+    current_rank: number,
+    previous_rank: number,
+    score: number;
   };
 }
 
 export interface feedData {
-  eventId: number;
   submitterId: number;
   platform: string;
   username: string;
@@ -44,6 +46,8 @@ export interface feedData {
   problemTitleSlug: string;
   timestamp: string;
   likes: number;
+  likedByCurrentUser: boolean;
+  eventId: number;
 }
 
 const DashboardPage = () => {
@@ -96,7 +100,7 @@ const DashboardPage = () => {
     if (username) {
       fetchData()
     }
-  }, [username, offset]);
+  }, [username, offset, scrollPosition]);
 
   useEffect(() => {
     if (!bottomOfFeedRef.current) return
@@ -150,6 +154,7 @@ const DashboardPage = () => {
       }
     };
 
+    
     if (username) {
       fetchProfilePic();
     }
@@ -189,7 +194,16 @@ const DashboardPage = () => {
             <>
               {feedData.map(
                 (
-                  { problemTitle, problemTitleSlug, timestamp, platform, likes },
+                  {
+                    username,
+                    problemTitle,
+                    problemTitleSlug,
+                    timestamp,
+                    platform,
+                    likes,
+                    likedByCurrentUser,
+                    eventId,
+                  },
                   index
                 ) => (
                   <FeedItem
@@ -201,13 +215,15 @@ const DashboardPage = () => {
                     numOfLikes={likes}
                     problemTitleSlug={problemTitleSlug}
                     createdTime={new Date(timestamp)}
+                    isLikedByCurrentUser={likedByCurrentUser}
+                    currentEventid={eventId}
                   />
                 )
               )}
               <div ref={bottomOfFeedRef} style={{ width: "100%", height: "1px", background: "red"}}></div>
             </>
-            )
-          }
+          )
+        }
         </article>
         <article className={styles.relationships}>
           {userId && <FriendsList userId={userId} />}

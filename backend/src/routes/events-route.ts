@@ -3,7 +3,7 @@ import { pool } from "../db/db";
 import { EventRepository } from "../repository/EventRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { UserNameNotFoundError } from "../errors/username-not-found-error";
-import updateRankingsJob from "../job/RankingJob";
+import updateRankingsJob, { UpdateRankingsJob } from "../job/UpdateRankingsJob";
 
 const router = express.Router();
 
@@ -122,7 +122,7 @@ router.post("/like", async (req: Request, res: Response) => {
 ////TESTING ONLY
 router.get("/testUpdateRankings", async (req: Request, res: Response) => {
     try {
-      await updateRankingsJob();
+      await new UpdateRankingsJob().run();
       res.status(200).send("Rankings updated successfully.");
     } catch (err) {
       console.error("An error occurred:", err);
