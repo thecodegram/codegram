@@ -8,6 +8,7 @@ import { corsOptions } from './config/corsConfig';
 import { sessionOptions } from './config/sessionConfig';
 import { env } from './config/env';
 import { Scheduler } from './scheduler/scheduler';
+import UpdateRankingsJob from './job/UpdateRankingsJob';
 
 const triggerRequestsRouter = require('./routes/test/trigger-requests-route')
 const usersRouter = require('./routes/users-route')
@@ -61,6 +62,9 @@ const scheduler = new Scheduler();
 
     console.log("Starting updates collector scheduler");
     scheduler.start();
+
+    // run ranking job on startup
+    new UpdateRankingsJob().run();
   }
 })();
 
