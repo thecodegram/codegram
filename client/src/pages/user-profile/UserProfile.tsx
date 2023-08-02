@@ -200,11 +200,11 @@ export const UserProfilePage = () => {
             {userRank.currentRank?'#'+userRank.currentRank:''}
               {userRank.movedUp !== undefined && (
                 userRank.movedUp > 0 ? 
-                <span style={{color: "green"}}><IconRankingMovedUp />{userRank.movedUp}</span>:
+                <span style={{color: "#60FF15"}}><IconRankingMovedUp />{userRank.movedUp}</span>:
                 (userRank.movedUp === 0 ? (
                   <span style={{color: "gray"}}>--</span>
                 ) : (
-                <span style={{color: "red"}}><IconRankingMovedDown />{-userRank.movedUp}</span>
+                <span style={{color: "#FF2315"}}><IconRankingMovedDown />{-userRank.movedUp}</span>
               )))}
           </article>
           {showAddFriendBtn && (
