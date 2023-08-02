@@ -61,7 +61,7 @@ export const GroupProfileActivity = () => {
           return
         }
   
-        setActivityData([...activityData, ...jsonData]);
+        setActivityData((a) => [...a, ...jsonData]);
         setLoading(false)
       } catch (error) {
         console.error('Error fetching data:', error);
