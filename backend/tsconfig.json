@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "target": "ES2019",
+    "module": "CommonJS",
+    "outDir": "dist",
     "strict": true,
     "esModuleInterop": true
-  }
+  },
+  "include": ["src", "src/db/db_init.sql"]
 }

@@ -6,19 +6,19 @@ import VjudgeUpdateCollectingJob from "../../job/VjudgeUpdateCollectingJob";
 const router = express.Router();
 
 router.post("/leetcode", async (req: Request, res: Response) => {
-    new LeetcodeUpdateCollectingJob().run();
+    await new LeetcodeUpdateCollectingJob().run();
 
     res.status(200).json({message: 'started the leetcode updates job'})
 });
 
 router.post("/vjudge", async (req: Request, res: Response) => {
-    new VjudgeUpdateCollectingJob().run();
+    await new VjudgeUpdateCollectingJob().run();
 
     res.status(200).json({message: 'started the vjudge updates job'})
 });
 
 router.post("/rank", async (req: Request, res: Response) => {
-    new UpdateRankingsJob().run();
+    await new UpdateRankingsJob().run();
 
     res.status(200).json({message: 'started the ranking job'})
 });
