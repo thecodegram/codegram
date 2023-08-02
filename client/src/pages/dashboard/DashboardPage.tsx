@@ -36,7 +36,6 @@ export interface UserInfoData {
 }
 
 export interface feedData {
-  eventId: number;
   submitterId: number;
   platform: string;
   username: string;
@@ -45,6 +44,7 @@ export interface feedData {
   timestamp: string;
   likes: number;
   likedByCurrentUser: boolean;
+  eventId: number;
 }
 
 const DashboardPage = () => {
@@ -76,7 +76,7 @@ const DashboardPage = () => {
         console.error("Error fetching data:", error);
       }
     };
-    if(username) {
+    if (username) {
       setLoading(true);
       fetchData();
     } else {
@@ -116,7 +116,7 @@ const DashboardPage = () => {
         }
       }
     };
-    if(username) {
+    if (username) {
       fetchProfilePic();
     }
   }, [username, setCache]);
@@ -154,7 +154,15 @@ const DashboardPage = () => {
           ) : (
             feedData.map(
               (
-                { problemTitle, problemTitleSlug, timestamp, platform, likes },
+                {
+                  problemTitle,
+                  problemTitleSlug,
+                  timestamp,
+                  platform,
+                  likes,
+                  likedByCurrentUser,
+                  eventId,
+                },
                 index
               ) => (
                 <FeedItem
@@ -166,6 +174,8 @@ const DashboardPage = () => {
                   numOfLikes={likes}
                   problemTitleSlug={problemTitleSlug}
                   createdTime={new Date(timestamp)}
+                  isLikedByCurrentUser={likedByCurrentUser}
+                  currentEventid={eventId}
                 />
               )
             )

@@ -1,4 +1,7 @@
-import { UserInfoHeader, UserInfoHeaderVariant } from "../user-info-header/UserInfoHeader";
+import {
+  UserInfoHeader,
+  UserInfoHeaderVariant,
+} from "../user-info-header/UserInfoHeader";
 import { IconLikeBtnHeart } from "../../icons";
 import { useImageCache } from "../image-cache-context/ImageCacheContext";
 import styles from "./FeedItem.module.scss";
@@ -14,6 +17,8 @@ interface FeedItemProps {
   numOfLikes: number;
   createdTime: Date;
   showFullInfo?: boolean;
+  isLikedByCurrentUser?: boolean;
+  currentEventid: number;
 }
 
 const prettifyPlatform = (platform: string) => {
@@ -39,9 +44,13 @@ export const FeedItem = ({
   numOfLikes,
   createdTime,
   showFullInfo = true,
+  isLikedByCurrentUser,
+  currentEventid,
 }: FeedItemProps) => {
   const { cache, setCache } = useImageCache();
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [isLiked, setIsLiked] = useState(isLikedByCurrentUser || false);
+  const [likesCount, setLikesCount] = useState(numOfLikes);
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
@@ -81,6 +90,30 @@ export const FeedItem = ({
   }, [username, setCache]);
   /* eslint-disable react-hooks/exhaustive-deps */
 
+  const handleLikeClick = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/events/like`,
+        {
+          event_id: currentEventid,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        if (isLiked) {
+          setLikesCount(likesCount - 1); 
+        } else {
+          setLikesCount(likesCount + 1); 
+        }
+        setIsLiked(!isLiked); 
+        console.log(response.data); 
+      }
+    } catch (error) {
+      console.error("Error liking the event:", error);
+    }
+  };
+
   return (
     <article className={styles.feedItem}>
       <section className={styles.header}>
@@ -109,9 +142,8 @@ export const FeedItem = ({
         </p>
       </section>
       <section className={styles.footer}>
-        <button>
-          <IconLikeBtnHeart />
-          {numOfLikes}
+        <button onClick={handleLikeClick}>
+          <IconLikeBtnHeart fill={isLiked ? "red" : "#D7D6D5"} /> {likesCount}
         </button>
       </section>
     </article>
