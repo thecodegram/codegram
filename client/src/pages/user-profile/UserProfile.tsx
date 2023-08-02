@@ -17,6 +17,7 @@ import { useImageCache } from "../../components/image-cache-context/ImageCacheCo
 import axios from "axios";
 
 import styles from "./UserProfile.module.scss";
+import { IconRankingMovedDown } from "../../icons/icon-ranking-moved-up-down";
 
 enum ActivityFeedTab {
   all = "all",
@@ -31,6 +32,11 @@ interface ProfileFeedQuery {
   platform: number | undefined;
 }
 
+interface UserRank {
+  currentRank: number | undefined;
+  movedUp: number | undefined;
+}
+
 export const UserProfilePage = () => {
   const { username, userId } = useUserContext();
   const { username: profileUsername } = useParams();
@@ -43,6 +49,8 @@ export const UserProfilePage = () => {
   const [profileUserData, setProfileUserData] = useState<UserInfoData>();
   const [feedData, setFeedData] = useState<feedData[]>([]);
   const [showAddFriendBtn, setShowAddFriendBtn] = useState<boolean>(false);
+  const [userRank, setUserRank] = useState<UserRank>({currentRank: undefined, movedUp: 0});
+
   const isSessionProfile = username === profileUsername;
 
   useEffect(() => {
@@ -92,6 +100,10 @@ export const UserProfilePage = () => {
         const jsonData = await response.data;
 
         setProfileUserData(jsonData);
+        if(jsonData.postgres) {
+          const {current_rank, previous_rank} = jsonData.postgres;
+          setUserRank({currentRank: current_rank, movedUp: current_rank-previous_rank});
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -185,10 +197,15 @@ export const UserProfilePage = () => {
             profilePic={profilePic}
           />
           <article className={styles.rankTag}>
-            #12
-            <span>
-              <IconRankingMovedUp />2
-            </span>
+            {userRank.currentRank?'#'+userRank.currentRank:''}
+              {userRank.movedUp !== undefined && (
+                userRank.movedUp > 0 ? 
+                <span style={{color: "green"}}><IconRankingMovedUp />{userRank.movedUp}</span>:
+                (userRank.movedUp === 0 ? (
+                  <span style={{color: "gray"}}>--</span>
+                ) : (
+                <span style={{color: "red"}}><IconRankingMovedDown />{-userRank.movedUp}</span>
+              )))}
           </article>
           {showAddFriendBtn && (
             <Button onClick={onClickAddFriend}>
