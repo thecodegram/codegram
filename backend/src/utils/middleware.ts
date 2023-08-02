@@ -12,9 +12,22 @@ export const enforceLoggedIn = (req: Request, res: Response, next: NextFunction)
   if(!req.session.username || !req.session.userId) {
     res.status(401).send("Not authorized!");
     console.log("Not logged in!");
+    return;
+  }
+  
+  // Check session expiration
+  const currentTime = new Date();
+  const cookie = req.session.cookie;
+  if (cookie.expires && cookie.expires <= currentTime) {
+    console.log("Invalid cookie");
+    // The session has expired, so delete the session and treat the request as unauthenticated
+    req.session.destroy((err) => {
+      console.error(`error destroying session ${err}`);
+    });
+    return res.status(401).json({ error: 'Session has expired' }).end();
   }
   else {
-    next();
+    next()
   }
 }
 // Make sure an incoming parameter does not have invalid symbols, propagate error

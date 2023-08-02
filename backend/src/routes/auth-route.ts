@@ -4,6 +4,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { isValidUsername } from "../utils/utils";
 import { sendWelcomeEmail } from "../services/EmailService";
 import { verifyRecaptcha } from "../services/RecaptchaService";
+import { enforceLoggedIn } from "../utils/middleware";
 
 const router = express.Router();
 
@@ -45,9 +46,11 @@ router.post("/login", async (req: Request, res: Response) => {
         }
       }
     } catch (e: any) {
+      console.log(e);
       res.status(400).end();
     }
   } else {
+    console.log("Invalid username");
     res.status(400).end();
   }
 });
@@ -75,7 +78,6 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     if (user !== null) {
       res.status(400).send("User already exists!");
-      console.log(user);
       return;
     } else {
       const newUser = new User({
@@ -122,7 +124,7 @@ router.post("/logout", (req, res) => {
   });
 });
 
-router.get("/check", async (req: Request, res: Response) => {
+router.get("/check", [enforceLoggedIn], async (req: Request, res: Response) => {
   if (req.session && req.session.username) {
     const userInfo = await userRepository.getUser(req.session.username);
 
