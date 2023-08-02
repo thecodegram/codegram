@@ -79,3 +79,10 @@ function shutdown() {
 process.on('SIGINT', shutdown); // Capturing SIGINT (Ctrl+C)
 process.on('SIGTERM', shutdown); // Capturing SIGTERM (kill command)
 process.on('SIGUSR2', shutdown); // Capturing SIGUSR2 - restart from nodemon
+
+process.on('beforeExit', (code) => {
+  // Code to run just before the process exits
+  console.log('Process is about to exit with code:', code);
+
+  shutdown();
+});
