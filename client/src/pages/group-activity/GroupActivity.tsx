@@ -23,6 +23,7 @@ export const GroupProfileActivity = () => {
   const { groupId } = useParams();
   const [activityData, setActivityData] = useState<ActivityItem[]>([]);
   const bottomOfFeedRef = useRef<HTMLDivElement>(null);
+  const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
   const [offset, setOffset] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [isEndOfOffset, setIsEndOfOffset] = useState<boolean>(false);
@@ -45,6 +46,11 @@ export const GroupProfileActivity = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!doneFirstRequest) {
+        setDoneFirstRequest(true)
+        return
+      }
+
       const limit: number = 25;
       setLoading(true);
 
@@ -72,7 +78,7 @@ export const GroupProfileActivity = () => {
     if (groupId) {
       fetchData();
     }
-  }, [groupId, offset]);
+  }, [groupId, offset, doneFirstRequest]);
 
   useEffect(() => {
     if (!bottomOfFeedRef.current) return;
