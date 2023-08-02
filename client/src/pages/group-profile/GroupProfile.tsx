@@ -51,8 +51,9 @@ export const GroupProfilePage = () => {
         console.error('Error fetching data:', error);
       }
     };
-
-    fetchData();
+    if(groupId) {
+      fetchData();
+    }
   }, [groupId]);
 
   useEffect(() => {
@@ -71,8 +72,9 @@ export const GroupProfilePage = () => {
         console.error('Error fetching data:', error);
       }
     };
-
-    fetchData();
+    if(groupId && userId) {
+      fetchData();
+    }
   }, [groupId, userId, forceRerender]);
 
   const onClickInviteMember = async (value: string) => {

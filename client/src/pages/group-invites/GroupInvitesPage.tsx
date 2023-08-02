@@ -37,8 +37,9 @@ export const GroupInvitesPage = () => {
         console.error('Error fetching data:', error);
       }
     };
-
-    fetchData();
+    if(userId) {
+      fetchData();
+    }
   }, [userId, forceRerender]);
 
   const onClickRemoveGroupInvite = async (groupId: number, groupInviteId: number) => {

@@ -37,8 +37,10 @@ export const GroupProfileMembers = () => {
         console.error('Error fetching data:', error);
       }
     };
-
-    fetchData();
+    if(groupId) {
+      console.log(groupId);
+      fetchData();
+    }
   }, [groupId]);
 
   return <article>

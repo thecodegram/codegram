@@ -75,8 +75,12 @@ const DashboardPage = () => {
         console.error("Error fetching data:", error);
       }
     };
-
-    fetchData();
+    if(username) {
+      setLoading(true);
+      fetchData();
+    } else {
+      setLoading(false);
+    }
   }, [username]);
 
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -111,8 +115,9 @@ const DashboardPage = () => {
         }
       }
     };
-
-    fetchProfilePic();
+    if(username) {
+      fetchProfilePic();
+    }
   }, [username, setCache]);
   /* eslint-disable react-hooks/exhaustive-deps */
 

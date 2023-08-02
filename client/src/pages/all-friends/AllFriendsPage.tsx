@@ -36,8 +36,9 @@ export const AllFriendsPage = () => {
         console.error('Error fetching data:', error);
       }
     };
-
-    fetchData();
+    if(userId) {
+      fetchData();
+    }
   }, [userId]);
 
   return <article>
