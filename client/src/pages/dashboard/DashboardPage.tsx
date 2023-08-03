@@ -92,6 +92,7 @@ const DashboardPage = () => {
 
         if (jsonData && jsonData.length === 0) {
           setIsEndOfOffset(true)
+          setLoading(false)
           return
         }
 
