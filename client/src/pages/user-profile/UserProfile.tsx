@@ -267,11 +267,12 @@ export const UserProfilePage = () => {
                       likes,
                       likedByCurrentUser,
                       eventId,
+                      username
                     },
                     index
                   ) => (
                     <FeedItem
-                      key={index}
+                      key={`${index}-${username}-${platform}`}
                       name={username || ""}
                       username={username || ""}
                       platform={platform}
