@@ -5,14 +5,12 @@ import { isValidUsername } from "../utils/utils";
 import { sendWelcomeEmail } from "../services/EmailService";
 import { verifyRecaptcha } from "../services/RecaptchaService";
 import { enforceLoggedIn } from "../utils/middleware";
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
 const userRepository = new UserRepository();
 
-const decryptPassword = (pwd: String) => {
-  return pwd;
-};
 router.post("/login", async (req: Request, res: Response) => {
   const { username, password, recaptchaToken } = req.body;
 
@@ -24,12 +22,21 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 
   if (isValidUsername(username)) {
-    const password1 = decryptPassword(password);
     try {
-      const user = await User.findOne({
-        username: username,
-        password: password1,
-      });
+      const user = await User.findOne({ username: username }); // if the username doesn't exist, we don't need to check for password
+
+      if (user === null) {
+        res.status(400).send({error: 'User does not exist!'});
+        return;
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        res.status(400).send({error: 'Invalid password'});
+        return;
+      }
+
       const postgresUser = await userRepository.getUser(username);
 
       if (user === null || !postgresUser) {
@@ -76,13 +83,16 @@ router.post("/signup", async (req: Request, res: Response) => {
       $or: [{ username: username }, { email: email }],
     });
 
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     if (user !== null) {
       res.status(400).send("User already exists!");
       return;
     } else {
       const newUser = new User({
         username: username,
-        password: password,
+        password: hashedPassword,
         email: email,
       });
 
