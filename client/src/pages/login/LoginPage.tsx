@@ -32,7 +32,7 @@ const LoginPage = () => {
       password: password,
       recaptchaToken: recaptchaToken,
     };
-
+    setError("");
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/auth/login`,
@@ -77,50 +77,26 @@ const LoginPage = () => {
   };
 
   const onGoogleSuccess = async (response: any) => {
-    const {
-      profileObj: { email },
-    } = response;
-
-    const emailParts = email.split("@");
-    const localPartOfEmail = emailParts[0];
-    const username = `${localPartOfEmail}Gmail`;
-
-    const payload = {
-      username: username,
-      email,
-      password: "test123",
-      recaptchaToken: "123",
-    };
-
-    handleGoogleLogin(payload);
-  };
-
-  const handleGoogleLogin = async (payload: any) => {
-    if (!payload.email) {
-      setError("Please enter all fields");
-      return;
-    }
+    setError("");
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/login`,
-        payload,
-        {
-          withCredentials: true,
-        }
+      // Send the Google access token to your backend for verification
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/googleSignin`, {
+        access_token: response.accessToken,
+      },
+      { withCredentials: true }
       );
-
-      if (response.status === 200) {
-        // this is gonna flag for onboarding or dashboard
-        if (response.data.status === "onboarding") {
-          navigate("/onboarding");
-        } else if (response.data.status === "dashboard") {
-          navigate("/dashboard");
-        }
-      } else {
-        setError("Invalid username or password. Please try again.");
-        setRecaptchaToken(null);
-        resetRecaptcha(); // Call the reset function here
+      console.log(res.data.status);
+      if (res.data.status === "onboarding") {
+        navigate("/onboarding");
+      } else if (res.data.status === "dashboard") {
+        navigate("/dashboard");
       }
+      else {
+      setError("Invalid username or password. Please try again.");
+      setRecaptchaToken(null);
+        resetRecaptcha();
+    }
+      
     } catch (error) {
       setError("Failed to login. Please try again.");
       setRecaptchaToken(null);
@@ -138,24 +114,23 @@ const LoginPage = () => {
         <p>Please Log In with your email to continue</p>
       </header>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <GoogleLogin
-          clientId="967455002287-6ck3jmsbapm0jfj0h46k5cc5ha2kg414.apps.googleusercontent.com"
-          onSuccess={onGoogleSuccess}
-          onFailure={onGoogleFailure}
-          cookiePolicy={"single_host_origin"}
-          isSignedIn={true}
-          render={(renderProps) => (
-            <button
-              type="button"
-              onClick={renderProps.onClick}
-              disabled={renderProps.disabled}
-              className={`${styles.btn} ${styles.googleLoginBtn}`}
-            >
-              <IconGoogleLogo />
-              Continue with Google
-            </button>
-          )}
-        />
+      <GoogleLogin
+            clientId="967455002287-6ck3jmsbapm0jfj0h46k5cc5ha2kg414.apps.googleusercontent.com"
+            onSuccess={onGoogleSuccess}
+            onFailure={onGoogleFailure}
+            cookiePolicy={'single_host_origin'}
+            render={renderProps => (
+                <button
+                    type="button"
+                    onClick={renderProps.onClick}
+                    disabled={renderProps.disabled}
+                    className={`${styles.btn} ${styles.googleLoginBtn}`}
+                >
+                    <IconGoogleLogo />
+                    Continue with Google
+                </button>
+            )}
+      />
         <span className={styles.orLine}>OR</span>
         {error && <p className={styles.error}>{error}</p>}
         <input

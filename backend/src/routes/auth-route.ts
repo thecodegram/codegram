@@ -5,16 +5,81 @@ import { isValidUsername } from "../utils/utils";
 import { sendWelcomeEmail } from "../services/EmailService";
 import { verifyRecaptcha } from "../services/RecaptchaService";
 import { enforceLoggedIn } from "../utils/middleware";
-const bcrypt = require('bcryptjs');
+import axios from "axios";
+const bcrypt = require("bcryptjs");
 
 const router = express.Router();
 
 const userRepository = new UserRepository();
+const GOOGLE_TOKENINFO_URL = "https://www.googleapis.com/oauth2/v3/tokeninfo";
+
+router.post("/googleSignIn", async (req: Request, res: Response) => {
+  const { access_token } = req.body;
+
+  try {
+    const response = await axios.get(
+      `${GOOGLE_TOKENINFO_URL}?access_token=${access_token}`
+    );
+    console.log(response.data);
+    const { email_verified, email } = response.data;
+
+    if (email_verified == "true") {
+      const user = await User.findOne({ email: email });
+      if (user) {
+        const username = user.username;
+        const postgresUser = await userRepository.getUser(username);
+        console.log(postgresUser)
+
+        req.session.username = username;
+        req.session.userId = postgresUser.id;
+        req.session.save();
+
+        if (!user.leetcode?.username && !user.vjudge?.username) {
+          res.status(200).json({ status: "onboarding" });
+        } else {
+          res.status(200).json({ status: "dashboard" });
+        }
+      } 
+      else {
+        const newUser = new User({
+          username: '',
+          password: '',
+          email: email,
+        });
+
+        newUser.username = 'user' + newUser._id;
+        await newUser.save();
+        const postgresId = await userRepository.saveUser(newUser._id.toString(), newUser.username);
+        req.session.username = newUser.username;
+        req.session.userId = postgresId;
+        req.session.save();
+
+        if (!newUser.leetcode?.username && !newUser.vjudge?.username) {
+          res.status(200).json({ status: "onboarding" });
+        } else {
+          res.status(200).json({ status: "dashboard" });
+        }
+        return;
+      }
+    } else {
+      res.status(200).json({ verified: false });
+      return;
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 router.post("/login", async (req: Request, res: Response) => {
   const { username, password, recaptchaToken } = req.body;
 
   const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+
+  if (password == '') {
+    res.status(400).send({ error: "Password must not be blank!"});
+  }
+
 
   if (!isRecaptchaValid) {
     res.status(400).send({ error: "Invalid reCAPTCHA token." });
@@ -26,14 +91,14 @@ router.post("/login", async (req: Request, res: Response) => {
       const user = await User.findOne({ username: username }); // if the username doesn't exist, we don't need to check for password
 
       if (user === null) {
-        res.status(400).send({error: 'User does not exist!'});
+        res.status(400).send({ error: "User does not exist!" });
         return;
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
-        res.status(400).send({error: 'Invalid password'});
+        res.status(400).send({ error: "Invalid password" });
         return;
       }
 
@@ -69,8 +134,8 @@ router.post("/signup", async (req: Request, res: Response) => {
 
   const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
 
-  if(!username) {
-    res.status(400).json({error: "username is empty"});
+  if (!username) {
+    res.status(400).json({ error: "username is empty" });
     return;
   }
   if (!isRecaptchaValid) {
@@ -99,7 +164,7 @@ router.post("/signup", async (req: Request, res: Response) => {
       const registedUser = await newUser.save();
       console.log("New user mongoId: " + registedUser._id.toString());
       //save to postgresql
-      
+
       const userId = await userRepository.saveUser(
         registedUser._id.toString(),
         registedUser.username
@@ -140,9 +205,12 @@ router.get("/check", [enforceLoggedIn], async (req: Request, res: Response) => {
 
     // Check if userInfo is defined
     if (!userInfo) {
-      res.status(404).send({ error: 'User not found' }).end();
+      res.status(404).send({ error: "User not found" }).end();
     } else {
-      res.status(200).send({ username: req.session.username, userId: userInfo.id }).end();
+      res
+        .status(200)
+        .send({ username: req.session.username, userId: userInfo.id })
+        .end();
     }
   } else {
     res.status(401).end();
