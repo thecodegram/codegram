@@ -85,7 +85,6 @@ const LoginPage = () => {
       },
       { withCredentials: true }
       );
-      console.log(res.data.status);
       if (res.data.status === "onboarding") {
         navigate("/onboarding");
       } else if (res.data.status === "dashboard") {

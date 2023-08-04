@@ -146,7 +146,7 @@ export const UserProfilePage = () => {
     };
 
     fetchProfilePic();
-  }, [profileUsername, cache]);
+  }, [profileUsername, cache, setCache]);
   /* eslint-disable react-hooks/exhaustive-deps */
 
   useEffect(() => {

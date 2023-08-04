@@ -23,7 +23,6 @@ export const FriendsList = ({ userId }: FriendsListProps) => {
     async (username: string) => {
       
       if(loadingCache.has(username)){
-        console.log("This pfp is to be loaded by another component");
         return;
       }
       const currentCache = cache[username];

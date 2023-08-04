@@ -78,7 +78,6 @@ const SignupPage = () => {
 
   const handleRecaptcha = (token: any) => {
     setRecaptchaToken(token); // store the recaptcha token
-    console.log(token);
   };
 
   const onGoogleFailure = (response: any) => {
@@ -94,7 +93,6 @@ const SignupPage = () => {
       },
       { withCredentials: true }
       );
-      console.log(res.data.status);
       if (res.data.status === "onboarding") {
         navigate("/onboarding");
       } else if (res.data.status === "dashboard") {

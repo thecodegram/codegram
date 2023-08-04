@@ -57,7 +57,6 @@ export const FeedItem = ({
     const fetchProfilePic = async () => {
       if (username) {
         if(loadingCache.has(username)){
-          console.log("This pfp is to be loaded by another component");
           return;
         }
         // this checks if username exists in cache and if  it exists, set profilePic to cached data and if not fetch data from API and then updates the cache
@@ -73,7 +72,6 @@ export const FeedItem = ({
               }
             );
             if (response.status !== 204) {
-              console.log(response.data)
               const profilePicURL = URL.createObjectURL(response.data);
 
               setCache(username, profilePicURL);
