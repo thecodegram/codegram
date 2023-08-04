@@ -40,10 +40,10 @@ export const HeaderNav = () => {
       if (response.status === 200) {
         Cookies.remove("mysession");
         clearCache();
-        
+
         const auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut().then(() => {
-          console.log('User signed out of Google session');
+          console.log("User signed out of Google session");
         });
 
         navigate("/login");
@@ -126,12 +126,31 @@ export const HeaderNav = () => {
           >
             Create a group
           </Button>
-          <Link to={`/u/${username}`} relative="path">
-            <Avatar
-              username={username || ""}
-              profilePic={profilePic}
-            />
-          </Link>
+
+          <Dropdown
+            className={styles.userProfileDropdownHolder}
+            trigger={
+              <Avatar username={username || ""} profilePic={profilePic} />
+            }
+          >
+            <article
+              className={`${styles.dropdown} ${styles.userProfileDropdown}`}
+            >
+              <section className={styles.dropdownList}>
+                <div className={styles.dropdownItem}>
+                  <Link to={`/u/${username}`} relative="path">
+                    View Profile
+                  </Link>
+                </div>
+                <div className={styles.dropdownItem}>
+                  <Link to={`/editProfile`} relative="path">
+                    Edit Profile
+                  </Link>
+                </div>
+              </section>
+            </article>
+          </Dropdown>
+
           <button className={styles.btnText} onClick={handleLogout}>
             Logout
           </button>
