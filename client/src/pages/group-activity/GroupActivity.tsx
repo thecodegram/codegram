@@ -81,6 +81,7 @@ export const GroupProfileActivity = () => {
     if (groupId) {
       fetchData();
     }
+    // eslint-disable-next-line
   }, [groupId, offset, doneFirstRequest]);
 
   useEffect(() => {
@@ -106,7 +107,8 @@ export const GroupProfileActivity = () => {
     }, options);
     console.log("Now observing the scroll bar");
     scrollObserver.observe(bottomOfFeedRef.current);
-  });
+    // eslint-disable-next-line
+  }, [startedObserving, isDelayActive, loading, offset]);
 
   return (
     <article className={styles.groupProfileActivity}>

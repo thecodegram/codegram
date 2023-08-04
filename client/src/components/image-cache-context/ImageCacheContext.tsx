@@ -136,6 +136,7 @@ export const ImageCacheProvider = ({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     // Clear expired cache items on component mount
     clearExpiredCacheItems();
+    // eslint-disable-next-line
   }, []);
 
   return (

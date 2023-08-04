@@ -40,7 +40,7 @@ interface UserRank {
 export const UserProfilePage = () => {
   const { username, userId } = useUserContext();
   const { username: profileUsername } = useParams();
-  const { cache, setCache, loadingCache, addUsernameToLoadingCache } = useImageCache();
+  const { cache, setCache } = useImageCache();
   const [profilePic, setProfilePic] = useState<string | null>(null);
 
   const [activeFeedTab, setActiveFeedTab] = useState<ActivityFeedTab>(

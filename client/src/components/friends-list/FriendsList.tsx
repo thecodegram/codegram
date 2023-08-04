@@ -52,7 +52,7 @@ export const FriendsList = ({ userId }: FriendsListProps) => {
         return currentCache;
       }
     },
-    [cache, setCache]
+    [cache, setCache, addUsernameToLoadingCache, loadingCache]
   );
 
   useEffect(() => {
