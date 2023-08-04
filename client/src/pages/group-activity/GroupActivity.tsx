@@ -68,7 +68,6 @@ export const GroupProfileActivity = () => {
         if (jsonData && jsonData.length < limit) {
           setIsEndOfOffset(true);
           setOffset(prevOffset => prevOffset - limit + jsonData.length);
-          return;
         }
 
         setActivityData((a) => [...a, ...jsonData]);
