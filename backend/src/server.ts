@@ -59,10 +59,10 @@ const scheduler = new Scheduler();
     });
 
     console.log("Starting updates collector scheduler");
-    scheduler.start();
+    // scheduler.start();
 
     // run ranking job on startup
-    new UpdateRankingsJob().run();
+    // new UpdateRankingsJob().run();
   }
 })();
 
