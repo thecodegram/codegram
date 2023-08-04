@@ -73,7 +73,7 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
     };
 
     fetchData();
-  }, [username]);
+  }, [username, statsData]);
 
   return <div className={styles.statsGrid}>
         <div className={styles.card}>
