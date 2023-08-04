@@ -5,11 +5,34 @@ import { isValidUsername } from "../utils/utils";
 import { sendWelcomeEmail } from "../services/EmailService";
 import { verifyRecaptcha } from "../services/RecaptchaService";
 import { enforceLoggedIn } from "../utils/middleware";
+import axios from "axios";
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
 const userRepository = new UserRepository();
+const GOOGLE_TOKENINFO_URL = 'https://www.googleapis.com/oauth2/v3/tokeninfo';
+
+router.post('/verify-google-token', async (req: Request, res: Response) => {
+  const { access_token } = req.body;
+
+  try {
+    const response = await axios.get(`${GOOGLE_TOKENINFO_URL}?access_token=${access_token}`);
+    console.log(response.data)
+    console.log(response.data.email_verified)
+    const { email_verified } = response.data;
+
+    if (email_verified == 'true') {
+      res.status(200).json({ verified: true });
+    } else {
+      res.status(200).json({ verified: false });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 
 router.post("/login", async (req: Request, res: Response) => {
   const { username, password, recaptchaToken } = req.body;
