@@ -183,7 +183,7 @@ const DashboardPage = () => {
     if (username) {
       fetchProfilePic();
     }
-  }, [username, setCache]);
+  }, [username, cache, loadingCache]);
   /* eslint-disable react-hooks/exhaustive-deps */
 
   // const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
