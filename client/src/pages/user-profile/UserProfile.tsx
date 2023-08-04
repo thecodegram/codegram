@@ -152,15 +152,23 @@ export const UserProfilePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
+        const isFriendResponse = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/user/${userId}/is-friend/${profileUserData?.postgres.id}`,
           {
             withCredentials: true,
           }
         );
-        const jsonData = await response.data;
+        const isFriend = await isFriendResponse.data;
 
-        setShowAddFriendBtn(!jsonData.is_friend);
+        const hasSentFriendRequestResponse = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user/${userId}/sent-friend-request/${profileUserData?.postgres.id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        const hasSentFriendRequest = await hasSentFriendRequestResponse.data;
+
+        setShowAddFriendBtn(!isFriend.is_friend && !hasSentFriendRequest.has_sent_friend_request);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -180,6 +188,7 @@ export const UserProfilePage = () => {
           withCredentials: true,
         }
       );
+      setShowAddFriendBtn(false)
     } catch (error) {
       console.error("Error sending friend request:", error);
     }

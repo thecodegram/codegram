@@ -473,6 +473,21 @@ router.get(
 );
 
 router.get(
+  "/:userId/sent-friend-request/:user2Id",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId, user2Id } = req.params;
+
+    try {
+      const hasSentFriendRequest = await friendRepository.hasSentFriendRequest(+userId, +user2Id);
+      res.status(200).json({ has_sent_friend_request: hasSentFriendRequest });
+    } catch (err) {
+      res.status(500).send("Failed to check if already sent friend request");
+    }
+  }
+);
+
+router.get(
   "/:userId/groups",
   [validateUsername("userId"), handleValidationErrors],
   async (req: Request, res: Response) => {

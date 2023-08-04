@@ -58,6 +58,31 @@ export class FriendRepository {
     }
   }
 
+  async hasSentFriendRequest(requesterId: number, requesteeId: number) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      const result = await client.query(`
+        SELECT EXISTS (
+          SELECT 1
+          FROM friend_request
+          WHERE (requester_id = $1 AND requestee_id = $2)
+        ) AS has_sent_friend_request;
+      `, [requesterId, requesteeId]);
+
+      await client.query('COMMIT');
+      
+      return result.rows[0].has_sent_friend_request;
+    } catch(e) {
+      await client.query('ROLLBACK');
+      console.error("Failed to see if already sent friend request:", e);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
   async deactivateFriendRequest(friend_request_id: number) {
     const client = await pool.connect();
 
