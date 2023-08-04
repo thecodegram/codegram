@@ -40,7 +40,7 @@ interface UserRank {
 export const UserProfilePage = () => {
   const { username, userId } = useUserContext();
   const { username: profileUsername } = useParams();
-  const { cache, setCache } = useImageCache();
+  const { cache, setCache, loadingCache, addUsernameToLoadingCache } = useImageCache();
   const [profilePic, setProfilePic] = useState<string | null>(null);
 
   const [activeFeedTab, setActiveFeedTab] = useState<ActivityFeedTab>(
@@ -140,13 +140,13 @@ export const UserProfilePage = () => {
             console.error("Error fetching profile picture:", error);
           }
         } else {
-          setProfilePic(currentCache);
+          setProfilePic(currentCache.imageData);
         }
       }
     };
 
     fetchProfilePic();
-  }, [profileUsername, setCache]);
+  }, [profileUsername, cache]);
   /* eslint-disable react-hooks/exhaustive-deps */
 
   useEffect(() => {

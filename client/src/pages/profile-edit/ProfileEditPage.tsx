@@ -18,7 +18,7 @@ const ProfileEditPage = () => {
   const [currentUsername, setCurrentUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [currentEmail, setCurrentEmail] = useState("");
-  const { cache, setCache } = useImageCache();
+  const { cache, setCache, removeFromCache } = useImageCache();
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
   const { username, setUsername } = useContext(UserContext);
@@ -81,7 +81,7 @@ const ProfileEditPage = () => {
     setCurrentUsername(username ? username : "");
     const fetchProfilePic = async () => {
       if (username) {
-        // this checks if username exists in cache and if  it exists, set profilePic to cached data and if not fetch data from API and then updates the cache
+        // this checks if username exists in cache and if it exists, set profilePic to cached data and if not fetch data from API and then updates the cache
         const currentCache = cache[username];
         if (currentCache === undefined || currentCache === null) {
           try {
@@ -105,7 +105,7 @@ const ProfileEditPage = () => {
             console.error("Error fetching profile picture:", error);
           }
         } else {
-          setImageUrl(currentCache);
+          setImageUrl(currentCache.imageData);
         }
       }
     };
@@ -174,7 +174,8 @@ const ProfileEditPage = () => {
       );
 
       if (response.status === 200) {
-        setCache(currentUsername, null);
+        removeFromCache(currentUsername);
+        removeFromCache(oldUsername);
         setImageUrl("");
         setUsername(currentUsername);
         navigate("/dashboard");

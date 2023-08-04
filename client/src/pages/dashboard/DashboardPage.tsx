@@ -156,7 +156,7 @@ const DashboardPage = () => {
             console.error("Error fetching profile picture:", error);
           }
         } else {
-          setProfilePic(currentCache);
+          setProfilePic(currentCache.imageData);
         }
       }
     };

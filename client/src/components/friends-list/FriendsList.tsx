@@ -15,14 +15,20 @@ interface FriendsListProps {
 
 export const FriendsList = ({ userId }: FriendsListProps) => {
   const { userId: sessionUserId } = useUserContext();
-  const { cache, setCache } = useImageCache();
+  const { cache, setCache, loadingCache, addUsernameToLoadingCache } = useImageCache();
   const [ friendsData, setFriendsData ] = useState<FriendItem[]>([]);
   const showViewAllBtn = sessionUserId === userId;
 
   const fetchProfilePic = useCallback(
     async (username: string) => {
+      
+      if(loadingCache.has(username)){
+        console.log("This pfp is to be loaded by another component");
+        return;
+      }
       const currentCache = cache[username];
       if (currentCache === undefined || currentCache === null) {
+        addUsernameToLoadingCache(username);
         try {
           const response = await axios.get(
             `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,

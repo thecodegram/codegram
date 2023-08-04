@@ -28,7 +28,9 @@ export const GroupProfileActivity = () => {
   const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
   const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
   const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
+  const [startedObserving, setStartedObserving] = useState<boolean>(false);
 
+  const limit = 25;
   useEffect(() => {
     const delayMs: number = 1000;
     let delayTimer: NodeJS.Timeout | null = null;
@@ -45,13 +47,13 @@ export const GroupProfileActivity = () => {
   }, [isDelayActive]);
 
   useEffect(() => {
+    if(isEndOfOffset) return;
     const fetchData = async () => {
       if (!doneFirstRequest) {
         setDoneFirstRequest(true)
         return
       }
 
-      const limit: number = 25;
       setLoading(true);
 
       try {
@@ -63,8 +65,9 @@ export const GroupProfileActivity = () => {
         );
         const jsonData = await response.data;
 
-        if (jsonData && jsonData.length === 0) {
+        if (jsonData && jsonData.length < limit) {
           setIsEndOfOffset(true);
+          setOffset(prevOffset => prevOffset - limit + jsonData.length);
           return;
         }
 
@@ -81,8 +84,8 @@ export const GroupProfileActivity = () => {
   }, [groupId, offset, doneFirstRequest]);
 
   useEffect(() => {
-    if (!bottomOfFeedRef.current) return;
-
+    if (!bottomOfFeedRef.current || startedObserving) return;
+    setStartedObserving(true);
     const options = {
       root: null,
       rootMargin: "0px",
@@ -90,17 +93,20 @@ export const GroupProfileActivity = () => {
     };
 
     const scrollObserver = new IntersectionObserver((entries) => {
+      console.log("moved", !isDelayActive, entries?.[0]?.isIntersecting, !loading, !isEndOfOffset);
+      console.log(offset);
       if (
         !isDelayActive &&
         entries?.[0]?.isIntersecting &&
         !loading &&
         !isEndOfOffset
       ) {
-        setOffset(() => offset + 1);
+        setOffset(prevOffset => prevOffset + limit);
+        console.log("changed offset to", offset);
         setIsDelayActive(true);
       }
     }, options);
-
+    console.log("Now observing the scroll bar");
     scrollObserver.observe(bottomOfFeedRef.current);
   });
 
