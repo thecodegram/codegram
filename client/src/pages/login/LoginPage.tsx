@@ -71,12 +71,21 @@ const LoginPage = () => {
   const onGoogleSuccess = async (response: any) => {
     try {
       // Send the Google access token to your backend for verification
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/verify-google-token`, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/googleSignin`, {
         access_token: response.accessToken,
-      });
-
-      // Handle the response from the backend, which can include user information
-      console.log('Backend Response:', res.data);
+      },
+      { withCredentials: true }
+      );
+      console.log(res.data.status);
+      if (res.data.status === "onboarding") {
+        navigate("/onboarding");
+      } else if (res.data.status === "dashboard") {
+        navigate("/dashboard");
+      }
+      else {
+      setError("Invalid username or password. Please try again.");
+    }
+      
     } catch (error) {
       console.error('Error sending access token:', error);
     }
