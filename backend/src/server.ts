@@ -3,7 +3,7 @@ import cors from 'cors'
 import session from 'express-session'
 import rateLimit from 'express-rate-limit';
 import { enforceInternalUser, enforceLoggedIn } from './utils/middleware';
-import { setUpDB } from './db/db';
+import { pool, setUpDB } from './db/db';
 import { corsOptions } from './config/corsConfig';
 import { sessionOptions } from './config/sessionConfig';
 import { env } from './config/env';
@@ -68,10 +68,10 @@ const scheduler = new Scheduler();
   }
 })();
 
-function shutdown() {
+async function shutdown() {
   console.log('Server is shutting down...');
   // scheduler.stop();
-
+  await pool.end();
   console.log("Server was shutdown");
   process.exit(0); // Exit the process gracefully
 }
@@ -80,9 +80,9 @@ process.on('SIGINT', shutdown); // Capturing SIGINT (Ctrl+C)
 process.on('SIGTERM', shutdown); // Capturing SIGTERM (kill command)
 process.on('SIGUSR2', shutdown); // Capturing SIGUSR2 - restart from nodemon
 
-process.on('beforeExit', (code) => {
+process.on('beforeExit', async (code) => {
   // Code to run just before the process exits
   console.log('Process is about to exit with code:', code);
 
-  shutdown();
+  await shutdown();
 });
