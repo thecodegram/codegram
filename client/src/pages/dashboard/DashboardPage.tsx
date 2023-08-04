@@ -62,7 +62,6 @@ const DashboardPage = () => {
   const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
   const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
   const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
-  const [startedObserving, setStartedObserving] = useState<boolean>(false);
 
   const limit = 25;
   useEffect(() => {
@@ -140,7 +139,7 @@ const DashboardPage = () => {
     }, options);
     scrollObserver.observe(bottomOfFeedRef.current);
     // eslint-disable-next-line
-  }, [startedObserving, isDelayActive, loading, offset, isEndOfOffset]);
+  }, [isDelayActive, loading, offset, isEndOfOffset]);
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
