@@ -101,11 +101,9 @@ export const GroupProfileActivity = () => {
         !isEndOfOffset
       ) {
         setOffset(prevOffset => prevOffset + limit);
-        console.log("changed offset to", offset);
         setIsDelayActive(true);
       }
     }, options);
-    console.log("Now observing the scroll bar");
     scrollObserver.observe(bottomOfFeedRef.current);
     // eslint-disable-next-line
   }, [startedObserving, isDelayActive, loading, offset]);

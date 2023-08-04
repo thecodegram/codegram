@@ -53,7 +53,7 @@ export interface feedData {
 const DashboardPage = () => {
   const [ profilePic, setProfilePic ] = useState<string | null>(null);
   const { username, userId } = useUserContext();
-  const { cache, setCache } = useImageCache();
+  const { cache, setCache, loadingCache, addUsernameToLoadingCache } = useImageCache();
 
   const [ feedData, setFeedData ] = useState<feedData[]>([]);
   const bottomOfFeedRef = useRef<HTMLDivElement>(null)
@@ -61,81 +61,100 @@ const DashboardPage = () => {
   const [ loading, setLoading ] = useState<boolean>(false)
   const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
   const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
-  const [ scrollPosition, setScrollPosition ] = useState<number>(window.scrollY)
   const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
+  const [startedObserving, setStartedObserving] = useState<boolean>(false);
+
+  const limit = 25;
+  useEffect(() => {
+    const delayMs: number = 1000;
+    let delayTimer: NodeJS.Timeout | null = null;
+
+    if (isDelayActive) {
+      delayTimer = setTimeout(() => setIsDelayActive(false), delayMs);
+    }
+
+    return () => {
+      if (delayTimer) {
+        clearTimeout(delayTimer);
+      }
+    };
+  }, [isDelayActive]);
 
   useEffect(() => {
+    if(isEndOfOffset) return;
     const fetchData = async () => {
-      window.scrollTo(0, scrollPosition)
-      setLoading(true);
-
       if (!doneFirstRequest) {
         setDoneFirstRequest(true)
         return
       }
 
+      setLoading(true);
+
       try {
-        const limit: number = 25
-        const payload = {
-          username,
-          offset,
-          limit,
-        };
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/events/feed`,
+          `${process.env.REACT_APP_API_URL}/api/events/feed?offset=${offset}&limit=${limit}`,
           {
             withCredentials: true,
-            params: payload,
           }
         );
         const jsonData = await response.data;
 
-        if (jsonData && jsonData.length === 0) {
-          setIsEndOfOffset(true)
-          setLoading(false)
-          return
+        if (jsonData && jsonData.length < limit) {
+          setIsEndOfOffset(true);
+          setOffset(prevOffset => prevOffset - limit + jsonData.length);
         }
 
-        setFeedData((f) => [...f, ...jsonData]);
+        setFeedData((a) => [...a, ...jsonData]);
         setLoading(false);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     if (username) {
-      fetchData()
+      fetchData();
     }
-  }, [username, offset, scrollPosition, doneFirstRequest]);
+    // eslint-disable-next-line
+  }, [username, offset, doneFirstRequest]);
 
   useEffect(() => {
-    if (!bottomOfFeedRef.current) return
-
+    if (!bottomOfFeedRef.current) return;
+    // setStartedObserving(true);
     const options = {
       root: null,
       rootMargin: "0px",
       threshold: 1.0,
-    }
+    };
 
     const scrollObserver = new IntersectionObserver((entries) => {
-      if (!isDelayActive && entries?.[0]?.isIntersecting && !loading && !isEndOfOffset) {
-        setScrollPosition(window.scrollY)
-        setOffset(() => offset + 1)
-        setIsDelayActive(true)
+      if (
+        !isDelayActive &&
+        entries?.[0]?.isIntersecting &&
+        !loading &&
+        !isEndOfOffset
+      ) {
+        setOffset(prevOffset => prevOffset + limit);
+        setIsDelayActive(true);
       }
     }, options);
-
     scrollObserver.observe(bottomOfFeedRef.current);
-  })
+    // eslint-disable-next-line
+  }, [startedObserving, isDelayActive, loading, offset, isEndOfOffset]);
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const fetchProfilePic = async () => {
       if (username) {
+        if(loadingCache.has(username)){
+          return;
+        }
         // this checks if username exists in cache and if  it exists, set profilePic to cached data and if not fetch data from API and then updates the cache
         const currentCache = cache[username];
         if (currentCache === undefined || currentCache === null) {
           try {
+            // notify other components not to load this image again
+            addUsernameToLoadingCache(username);
             const response = await axios.get(
               `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
               {
