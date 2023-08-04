@@ -25,7 +25,7 @@ export const HeaderNav = () => {
 
   useEffect(() => {
     if (username && cache[username] !== undefined && !profilePic) {
-      setProfilePic(cache[username]);
+      setProfilePic(cache[username].imageData);
     }
   }, [username, cache, profilePic]);
 

@@ -1,5 +1,3 @@
-// PrivateRoute.tsx
-
 import React, { FC, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -30,13 +28,14 @@ const PrivateRoute: FC<PrivateRouteProps> = ({ children }) => {
       });
   }, [setUsername, setUserId]);
 
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
   if (isAuthenticated === null) return null;
-  return isAuthenticated
-    ? children
-    : (() => {
-        navigate("/login");
-        return null;
-      })();
+  return isAuthenticated ? children : null;
 };
 
 export default PrivateRoute;

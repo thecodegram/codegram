@@ -68,7 +68,7 @@ export const UserProfilePage = () => {
           username: profileUsername,
           platform: platform,
           offset: 0,
-          limit: 15,
+          limit: 25,
         };
 
         const response = await axios.get(
@@ -140,13 +140,13 @@ export const UserProfilePage = () => {
             console.error("Error fetching profile picture:", error);
           }
         } else {
-          setProfilePic(currentCache);
+          setProfilePic(currentCache.imageData);
         }
       }
     };
 
     fetchProfilePic();
-  }, [profileUsername, setCache]);
+  }, [profileUsername, cache, setCache]);
   /* eslint-disable react-hooks/exhaustive-deps */
 
   useEffect(() => {
@@ -232,7 +232,7 @@ export const UserProfilePage = () => {
                 }
                 onClick={() => setActiveFeedTab(ActivityFeedTab.all)}
               >
-                All Activity
+                All latest activity
               </button>
               <button
                 className={

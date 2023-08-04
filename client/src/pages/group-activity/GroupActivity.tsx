@@ -28,7 +28,9 @@ export const GroupProfileActivity = () => {
   const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
   const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
   const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
+  const [startedObserving, setStartedObserving] = useState<boolean>(false);
 
+  const limit = 25;
   useEffect(() => {
     const delayMs: number = 1000;
     let delayTimer: NodeJS.Timeout | null = null;
@@ -45,13 +47,13 @@ export const GroupProfileActivity = () => {
   }, [isDelayActive]);
 
   useEffect(() => {
+    if(isEndOfOffset) return;
     const fetchData = async () => {
       if (!doneFirstRequest) {
         setDoneFirstRequest(true)
         return
       }
 
-      const limit: number = 25;
       setLoading(true);
 
       try {
@@ -63,8 +65,9 @@ export const GroupProfileActivity = () => {
         );
         const jsonData = await response.data;
 
-        if (jsonData && jsonData.length === 0) {
+        if (jsonData && jsonData.length < limit) {
           setIsEndOfOffset(true);
+          setOffset(prevOffset => prevOffset - limit + jsonData.length);
           return;
         }
 
@@ -78,11 +81,12 @@ export const GroupProfileActivity = () => {
     if (groupId) {
       fetchData();
     }
+    // eslint-disable-next-line
   }, [groupId, offset, doneFirstRequest]);
 
   useEffect(() => {
-    if (!bottomOfFeedRef.current) return;
-
+    if (!bottomOfFeedRef.current || startedObserving) return;
+    setStartedObserving(true);
     const options = {
       root: null,
       rootMargin: "0px",
@@ -96,13 +100,13 @@ export const GroupProfileActivity = () => {
         !loading &&
         !isEndOfOffset
       ) {
-        setOffset(() => offset + 1);
+        setOffset(prevOffset => prevOffset + limit);
         setIsDelayActive(true);
       }
     }, options);
-
     scrollObserver.observe(bottomOfFeedRef.current);
-  });
+    // eslint-disable-next-line
+  }, [startedObserving, isDelayActive, loading, offset]);
 
   return (
     <article className={styles.groupProfileActivity}>

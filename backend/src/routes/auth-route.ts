@@ -75,15 +75,13 @@ router.post("/login", async (req: Request, res: Response) => {
   const { username, password, recaptchaToken } = req.body;
 
   const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
-
-  if (password == '') {
-    res.status(400).send({ error: "Password must not be blank!"});
-  }
-
-
   if (!isRecaptchaValid) {
     res.status(400).send({ error: "Invalid reCAPTCHA token." });
     return;
+  }
+
+  if (password == '') {
+    res.status(400).send({ error: "Password must not be blank!"});
   }
 
   if (isValidUsername(username)) {

@@ -21,3 +21,6 @@ logs/
 
 # Google Cloud Key file
 gcloudkey.json
+
+# Gcloud deploy
+app.yaml

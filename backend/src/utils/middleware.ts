@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { param, validationResult } from 'express-validator'
 import { validUsername } from './utils';
+import { env } from '../config/env';
 
 declare module "express-session" {
   interface SessionData {
@@ -45,3 +46,18 @@ export const handleValidationErrors = (
     }
     next();
   };
+
+export const enforceInternalUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const arrivingToken = req.body?.gcloudToken;
+  const expectedToken = env.GCLOUD_TOKEN;
+
+  if(arrivingToken !== expectedToken) {
+    res.status(403).json({error: "You don't have access to this endpoint"}).end();
+  } else {
+    next();
+  }
+}
