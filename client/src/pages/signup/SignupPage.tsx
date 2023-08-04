@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./SignupPage.module.css";
 import axios from "axios";
 import { IconGoogleLogo } from "../../icons/icon-google-logo";
@@ -18,8 +18,13 @@ const SignupPage = () => {
   const [error, setError] = useState("");
   const [passwordType, setPasswordType] = useState("password");
   const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const navigate = useNavigate();
+
+  const resetRecaptcha = () => {
+    recaptchaRef.current?.reset();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +40,7 @@ const SignupPage = () => {
       password: password,
       recaptchaToken: recaptchaToken,
     };
-
+    setError("");
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/auth/signup`,
@@ -55,6 +60,8 @@ const SignupPage = () => {
       }
     } catch (error) {
       setError("Failed to signup. Please try again.");
+      setRecaptchaToken(null);
+      resetRecaptcha();
     }
   };
 
@@ -79,6 +86,7 @@ const SignupPage = () => {
   };
 
   const onGoogleSuccess = async (response: any) => {
+    setError("");
     try {
       // Send the Google access token to your backend for verification
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/googleSignin`, {
@@ -94,10 +102,14 @@ const SignupPage = () => {
       }
       else {
       setError("Invalid username or password. Please try again.");
+      setRecaptchaToken(null);
+        resetRecaptcha();
     }
       
     } catch (error) {
-      console.error('Error sending access token:', error);
+      setError("Failed to signup. Please try again.");
+      setRecaptchaToken(null);
+      resetRecaptcha();
     }
   };
     
@@ -161,6 +173,7 @@ const SignupPage = () => {
           </i>
         </div>
         <ReCAPTCHA
+          ref={recaptchaRef}
           className={styles.recaptcha}
           sitekey="6Lev7GcnAAAAAI5flktV2-RN7p1ZSf7otKpReIP2"
           onChange={handleRecaptcha}

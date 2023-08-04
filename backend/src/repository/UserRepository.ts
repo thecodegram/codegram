@@ -1,4 +1,5 @@
 import { pool } from "../db/db";
+import { User } from "../model/schemas/userSchema";
 
 
 export class UserRepository {
@@ -121,4 +122,50 @@ export class UserRepository {
       client.release();
     }
   }
+
+  async updateUsername(userId: number, username: string) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+  
+      const updateUserQuery = `
+          UPDATE users
+          SET username = $2
+          WHERE id = $1
+        `;
+      await client.query(updateUserQuery, [userId, username]);
+  
+      await client.query("COMMIT");
+    } catch (e) {
+      await client.query("ROLLBACK");
+      console.error("Failed to update user:", e);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+   async calculateNewScoreForUser(mongoId: string) {
+    console.log(`Updating score for user ${mongoId}`);
+    const user = await User.findById(mongoId, { password: 0 });
+    let leetcodeCount = 0;
+    if (
+      user?.leetcode?.submitStats?.acSubmissionNum[0]?.count != undefined
+    ) {
+      leetcodeCount = user.leetcode.submitStats.acSubmissionNum[0].count;
+    }
+
+    let vjudgeCount = 0;
+    if (user?.vjudge?.acRecords) {
+      for (const platform in user.vjudge.acRecords) {
+        const platformKey = platform as keyof typeof user.vjudge.acRecords;
+        if (Array.isArray(user.vjudge.acRecords[platformKey])) {
+          vjudgeCount += user.vjudge.acRecords[platformKey].length;
+        }
+      }
+    }
+
+    return leetcodeCount + vjudgeCount;
+  }
+  
 }

@@ -1,15 +1,17 @@
 import express, { Request, Response } from "express";
 
-import {
-  validateUsername,
-  handleValidationErrors,
-} from "../utils/middleware";
+import { validateUsername, handleValidationErrors } from "../utils/middleware";
 import { getUserIDs, addUserID } from "../model/users";
 import { User } from "../model/schemas/userSchema";
 import { UserNameNotFoundError } from "../errors/username-not-found-error";
+import { UsernameAlreadyTakenError } from "../errors/username-already-taken-error";
 import { getSubmissionStats } from "../api/vjudge";
 import { getLatestAcceptedSubmits, getSubmitStats } from "../api/leetcode";
-import { uploadFile, getFile } from "../repository/ImageBucket";
+import {
+  uploadFile,
+  getFile,
+  deletePictureIfExists,
+} from "../repository/ImageBucket";
 import {
   NotificationRepository,
   NotificationTypes,
@@ -25,10 +27,11 @@ import fs from "fs";
 const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 
-const userRepository = new UserRepository()
-const notificationRepository = new NotificationRepository()
-const friendRepository = new FriendRepository()
-const groupRepository = new GroupRepository()
+const userRepository = new UserRepository();
+const notificationRepository = new NotificationRepository();
+const friendRepository = new FriendRepository();
+const groupRepository = new GroupRepository();
+const bcrypt = require("bcryptjs");
 
 router.get(
   "/:username/latestSubmits",
@@ -121,18 +124,38 @@ router.put(
           res.status(500).send("Authorized user was not found in the db");
         } else {
           try {
-            if (req.file) {
-              const filePath = req.file.path;
-              const sanitizedOriginalName = sanitize(req.file.originalname);
-              const fileName = `profile_pics/${username}/${sanitizedOriginalName}`;
-              // Upload the file to GCS
-              await uploadFile(fileName, filePath);
-              // Store the file name in the user document
-              user.profilePic = fileName;
-              try {
-                fs.unlinkSync(filePath);
-              } catch (err) {
-                console.error("Failed to delete the file of fs: ", err);
+            if (data.password && data.password.length > 0) {
+              const salt = await bcrypt.genSalt(10);
+              const hashedPassword = await bcrypt.hash(data.password, salt);
+              user.password = hashedPassword;
+            }
+            if (data.email && data.email != user.email) {
+              const existingEmail = await User.findOne({ email: data.email });
+              if (existingEmail) {
+                throw new Error("Email is already in use by another user");
+              }
+              user.email = data.email;
+            }
+            if (data.username && data.username != user.username) {
+              const existingUser = await User.findOne({
+                username: data.username,
+              });
+              if (existingUser) {
+                throw new Error("Username is already in use by another user");
+              }
+
+              userRepository.updateUsername(
+                req.session.userId!!,
+                data.username
+              );
+
+              user.username = data.username;
+              req.session.username = data.username;
+              req.session.save();
+
+              if (user.profilePic) {
+                await deletePictureIfExists(user.profilePic);
+                user.profilePic = undefined;
               }
             }
 
@@ -140,16 +163,17 @@ router.put(
             // ensure this is a valid name
             // update the vjudge username and latest data
             const updateVjudge = (async () => {
-              const existingUser = await User.findOne({
-                "vjudge.username": data.vjudgeUsername,
-              });
-              if (existingUser) {
-                throw new Error(
-                  "VJudge username is already in use by another user"
-                );
-              }
-
               if (data.vjudgeUsername) {
+                const existingUser = await User.findOne({
+                  "vjudge.username": data.vjudgeUsername,
+                });
+                if (existingUser) {
+                  throw new UsernameAlreadyTakenError(
+                    data.leetcodeUsername,
+                    "leetcode"
+                  );
+                }
+
                 const vjudgeStats = await getSubmissionStats(
                   data.vjudgeUsername
                 );
@@ -162,17 +186,17 @@ router.put(
             // ensure this is a valid name
             // update the vjudge username and latest data
             const updateLeetcode = (async () => {
-              const existingUser = await User.findOne({
-                "leetcode.username": data.leetcodeUsername,
-              });
-              if (existingUser) {
-                throw new Error(
-                  "Leetcode username is already in use by another user"
-                );
-              }
-
               // console.log(data.leetcodeUsername);
               if (data.leetcodeUsername) {
+                const existingUser = await User.findOne({
+                  "leetcode.username": data.leetcodeUsername,
+                });
+                if (existingUser) {
+                  throw new UsernameAlreadyTakenError(
+                    data.leetcodeUsername,
+                    "leetcode"
+                  );
+                }
                 const leetcodeStats = await getSubmitStats(
                   data.leetcodeUsername
                 );
@@ -181,19 +205,46 @@ router.put(
               }
             })();
 
+            console.log("this is req.file:" + req.file);
+            if (req.file) {
+              if (user.profilePic) {
+                await deletePictureIfExists(user.profilePic);
+              }
+              const filePath = req.file.path;
+              const sanitizedOriginalName = sanitize(req.file.originalname);
+              console.log(
+                "this is sanitizedOriginalName: " + sanitizedOriginalName
+              );
+              const fileName = `profile_pics/${username}/${sanitizedOriginalName}`;
+              // Upload the file to GCS
+              await uploadFile(fileName, filePath);
+              // Store the file name in the user document
+              user.profilePic = fileName;
+              try {
+                fs.unlinkSync(filePath);
+              } catch (err) {
+                console.error("Failed to delete the file of fs: ", err);
+              }
+            }
+
             // update in parallel
             // await updateVjudge;
             // await updateLeetcode;
             await Promise.all([updateVjudge, updateLeetcode]);
             await user.save();
 
+            const mongoId = user._id.toString();
+            const newScore = await userRepository.calculateNewScoreForUser(
+              mongoId
+            );
+            await userRepository.updateUserScore(mongoId, newScore);
+
             res.sendStatus(200);
           } catch (err) {
             if (err instanceof UserNameNotFoundError) {
               res.status(404).send(err.message);
-            } else if (err instanceof Error) {
-              console.error(err);
-              res.status(500).send(`${err.message}`);
+            } else if (err instanceof UsernameAlreadyTakenError) {
+              res.status(400).send(err.message);
             } else {
               // err is something unexpected (not an Error instance)
               console.error(err);
@@ -382,9 +433,8 @@ router.post(
     const { friendRequestId } = req.params;
 
     try {
-      const updatedFriendRequest = await friendRepository.deactivateFriendRequest(
-        +friendRequestId
-      );
+      const updatedFriendRequest =
+        await friendRepository.deactivateFriendRequest(+friendRequestId);
       res.status(200).json(updatedFriendRequest);
     } catch (err) {
       res.status(500).send("Failed to remove friend request");
@@ -415,41 +465,78 @@ router.get(
 
     try {
       const isFriend = await friendRepository.isFriend(+userId, +user2Id);
-      res.status(200).json({ is_friend: isFriend })
+      res.status(200).json({ is_friend: isFriend });
     } catch (err) {
       res.status(500).send("Failed to get user's friends");
     }
   }
 );
 
-router.get('/:userId/groups', [
-  validateUsername('userId'),
-  handleValidationErrors
-], async (req: Request, res: Response) => {
-  const { userId } = req.params
+router.get(
+  "/:userId/groups",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
 
-  try {
-    const groups = await groupRepository.getGroups(+userId)
+    try {
+      const groups = await groupRepository.getGroups(+userId);
 
-    res.status(200).json(groups)
-  } catch (err) {
-    res.status(500).send("Failed to get user's groups")
+      res.status(200).json(groups);
+    } catch (err) {
+      res.status(500).send("Failed to get user's groups");
+    }
   }
-})
+);
 
-router.get('/:userId/group-invites', [
-  validateUsername('userId'),
-  handleValidationErrors
-], async (req: Request, res: Response) => {
-  const { userId } = req.params
+router.get(
+  "/:userId/group-invites",
+  [validateUsername("userId"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
 
-  try {
-    const groupInvites = await groupRepository.getGroupInvites(+userId)
+    try {
+      const groupInvites = await groupRepository.getGroupInvites(+userId);
 
-    res.status(200).json(groupInvites)
-  } catch (err) {
-    res.status(500).send("Failed to get user's group invites")
+      res.status(200).json(groupInvites);
+    } catch (err) {
+      res.status(500).send("Failed to get user's group invites");
+    }
   }
-})
+);
+
+router.get(
+  "/getCurrent/:username",
+  [validateUsername("username"), handleValidationErrors],
+  async (req: Request, res: Response) => {
+    const { username } = req.params;
+    try {
+      console.log("this is username:" + username);
+      const userMongoData = await User.findOne(
+        { username: username },
+        {
+          email: 1,
+          _id: 0,
+          leetcode: 1,
+          vjudge: 1,
+        }
+      );
+
+      if (!userMongoData) {
+        res.status(404).send("User not found");
+      } else {
+        const jsonData = {
+          username: userMongoData.username,
+          email: userMongoData.email,
+          leetcode: userMongoData.leetcode?.username,
+          vjudge: userMongoData.vjudge?.username,
+        };
+        res.status(200).json(jsonData);
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("An error occurred");
+    }
+  }
+);
 
 module.exports = router;

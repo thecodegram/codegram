@@ -23,6 +23,7 @@ import { AllGroupsPage } from "./pages/all-groups/AllGroupsPage";
 import { ImageCacheProvider } from "./components/image-cache-context/ImageCacheContext";
 import { GroupProfileActivity } from "./pages/group-activity/GroupActivity";
 import { gapi } from "gapi-script";
+import ProfileEditPage from "./pages/profile-edit/ProfileEditPage";
 
 function App() {
   const [username, setUsername] = useState<string | null>(null);
@@ -86,6 +87,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <UserProfilePage />
+                </PrivateRoute>
+              }
+            />
+            <Route 
+              path="/editProfile"
+              element={
+                <PrivateRoute>
+                  <ProfileEditPage />
                 </PrivateRoute>
               }
             />
