@@ -14,7 +14,7 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false,
   },
   leetcode:  leetcodeStatsSchema,
   vjudge:  vjudgeStatsSchema,
