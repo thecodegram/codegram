@@ -29,7 +29,7 @@ router.post("/googleSignIn", async (req: Request, res: Response) => {
         const username = user.username;
         const postgresUser = await userRepository.getUser(username);
         console.log(postgresUser)
-        
+
         req.session.username = username;
         req.session.userId = postgresUser.id;
         req.session.save();
@@ -48,7 +48,8 @@ router.post("/googleSignIn", async (req: Request, res: Response) => {
         });
 
         newUser.username = 'user' + newUser._id;
-        const postgresId = await userRepository.saveUser(newUser._id.toString(), newUser.username)
+        await newUser.save();
+        const postgresId = await userRepository.saveUser(newUser._id.toString(), newUser.username);
         req.session.username = newUser.username;
         req.session.userId = postgresId;
         req.session.save();
