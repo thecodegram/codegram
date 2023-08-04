@@ -64,13 +64,13 @@ const scheduler = new Scheduler();
     // scheduler.start();
 
     // run ranking job on startup
-    new UpdateRankingsJob().run();
+    // new UpdateRankingsJob().run();
   }
 })();
 
 function shutdown() {
   console.log('Server is shutting down...');
-  scheduler.stop();
+  // scheduler.stop();
 
   console.log("Server was shutdown");
   process.exit(0); // Exit the process gracefully

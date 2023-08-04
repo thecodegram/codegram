@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import styles from "./LoginPage.module.css";
 import { IconGoogleLogo } from "../../icons/icon-google-logo";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import ReCAPTCHA from 'react-google-recaptcha';
-import { GoogleLogin } from 'react-google-login';
+import ReCAPTCHA from "react-google-recaptcha";
+import { GoogleLogin } from "react-google-login";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -13,8 +13,12 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [passwordType, setPasswordType] = useState("password");
   const [recaptchaToken, setRecaptchaToken] = useState(null);
-
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const navigate = useNavigate();
+
+  const resetRecaptcha = () => {
+    recaptchaRef.current?.reset();
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -28,7 +32,7 @@ const LoginPage = () => {
       password: password,
       recaptchaToken: recaptchaToken,
     };
-
+    setError("");
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/auth/login`,
@@ -45,9 +49,13 @@ const LoginPage = () => {
         }
       } else {
         setError("Invalid username or password. Please try again.");
+        setRecaptchaToken(null);
+        resetRecaptcha();
       }
     } catch (error) {
       setError("Failed to login. Please try again.");
+      setRecaptchaToken(null);
+      resetRecaptcha();
     }
   };
 
@@ -69,53 +77,33 @@ const LoginPage = () => {
   };
 
   const onGoogleSuccess = async (response: any) => {
-    const { profileObj: { email } } = response;
-
-    const emailParts = email.split("@");
-    const localPartOfEmail = emailParts[0];
-    const username = `${localPartOfEmail}Gmail`;
-
-    const payload = {
-        username: username,
-        email,
-        password: "test123",  
-        recaptchaToken: "123",
-      };
-
-    handleGoogleLogin(payload);
-  };
-
-  const handleGoogleLogin = async (payload: any) => {
-    if (!payload.email) {
-      setError("Please enter all fields");
-      return;
-    }
+    setError("");
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/login`,
-        payload,
-        {
-          withCredentials: true,
-        }
+      // Send the Google access token to your backend for verification
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/googleSignin`, {
+        access_token: response.accessToken,
+      },
+      { withCredentials: true }
       );
-      
-      if (response.status === 200) {
-        // this is gonna flag for onboarding or dashboard
-        if (response.data.status === "onboarding") {
-          navigate("/onboarding");
-        } else if (response.data.status === "dashboard") {
-          navigate("/dashboard");
-        }
-      } else {
-        setError("Invalid username or password. Please try again.");
+      console.log(res.data.status);
+      if (res.data.status === "onboarding") {
+        navigate("/onboarding");
+      } else if (res.data.status === "dashboard") {
+        navigate("/dashboard");
       }
+      else {
+      setError("Invalid username or password. Please try again.");
+      setRecaptchaToken(null);
+        resetRecaptcha();
+    }
+      
     } catch (error) {
       setError("Failed to login. Please try again.");
+      setRecaptchaToken(null);
+      resetRecaptcha(); // Call the reset function here
     }
   };
 
-
-    
   return (
     <main className={styles.loginPage}>
       <header className={styles.header}>
@@ -131,7 +119,6 @@ const LoginPage = () => {
             onSuccess={onGoogleSuccess}
             onFailure={onGoogleFailure}
             cookiePolicy={'single_host_origin'}
-            isSignedIn={true}
             render={renderProps => (
                 <button
                     type="button"
@@ -150,7 +137,7 @@ const LoginPage = () => {
           className={styles.inputText}
           type="text"
           name="email"
-          placeholder="Email"
+          placeholder="username"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -163,18 +150,19 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          
+
           <i className={styles.eyeIcon} onClick={togglePassword}>
             {passwordType === "password" ? <FaEye /> : <FaEyeSlash />}
           </i>
-          
+
           <a href="/">
             <p>Forgot your password?</p>
           </a>
         </div>
         <ReCAPTCHA
+          ref={recaptchaRef}
           className={styles.recaptcha}
-          sitekey="6Lev7GcnAAAAAI5flktV2-RN7p1ZSf7otKpReIP2" 
+          sitekey="6Lev7GcnAAAAAI5flktV2-RN7p1ZSf7otKpReIP2"
           onChange={handleRecaptcha}
         />
         <div>

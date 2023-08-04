@@ -27,7 +27,8 @@ export const GroupProfileActivity = () => {
   const [ loading, setLoading ] = useState<boolean>(false)
   const [ isEndOfOffset, setIsEndOfOffset ] = useState<boolean>(false)
   const [ isDelayActive, setIsDelayActive ] = useState<boolean>(false)
-  
+  const [ doneFirstRequest, setDoneFirstRequest ] = useState<boolean>(false);
+
   useEffect(() => {
     const delayMs: number = 1000;
     let delayTimer: NodeJS.Timeout | null = null;
@@ -45,6 +46,11 @@ export const GroupProfileActivity = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!doneFirstRequest) {
+        setDoneFirstRequest(true)
+        return
+      }
+
       const limit: number = 25;
       setLoading(true);
 
@@ -72,7 +78,7 @@ export const GroupProfileActivity = () => {
     if (groupId) {
       fetchData();
     }
-  }, [groupId, offset]);
+  }, [groupId, offset, doneFirstRequest]);
 
   useEffect(() => {
     if (!bottomOfFeedRef.current) return;

@@ -22,33 +22,12 @@ export class UpdateRankingsJob {
     const mongoIDs = await this.userRepository.getAllMongoIds();
 
     for (const mongoId of mongoIDs) {
-      const newScore = await this.calculateNewScoreForUser(mongoId);
+      const newScore = await this.userRepository.calculateNewScoreForUser(mongoId);
       await this.userRepository.updateUserScore(mongoId, newScore);
     }
   }
 
-  private async calculateNewScoreForUser(mongoId: string) {
-    console.log(`Updating score for user ${mongoId}`);
-    const user = await User.findById(mongoId, { password: 0 });
-    let leetcodeCount = 0;
-    if (
-      user?.leetcode?.submitStats?.acSubmissionNum[0]?.count != undefined
-    ) {
-      leetcodeCount = user.leetcode.submitStats.acSubmissionNum[0].count;
-    }
-
-    let vjudgeCount = 0;
-    if (user?.vjudge?.acRecords) {
-      for (const platform in user.vjudge.acRecords) {
-        const platformKey = platform as keyof typeof user.vjudge.acRecords;
-        if (Array.isArray(user.vjudge.acRecords[platformKey])) {
-          vjudgeCount += user.vjudge.acRecords[platformKey].length;
-        }
-      }
-    }
-
-    return leetcodeCount + vjudgeCount;
-  }
+  
 
 
 }

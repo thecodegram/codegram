@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./SignupPage.module.css";
 import axios from "axios";
 import { IconGoogleLogo } from "../../icons/icon-google-logo";
@@ -18,8 +18,13 @@ const SignupPage = () => {
   const [error, setError] = useState("");
   const [passwordType, setPasswordType] = useState("password");
   const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const navigate = useNavigate();
+
+  const resetRecaptcha = () => {
+    recaptchaRef.current?.reset();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +40,7 @@ const SignupPage = () => {
       password: password,
       recaptchaToken: recaptchaToken,
     };
-
+    setError("");
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/auth/signup`,
@@ -55,6 +60,8 @@ const SignupPage = () => {
       }
     } catch (error) {
       setError("Failed to signup. Please try again.");
+      setRecaptchaToken(null);
+      resetRecaptcha();
     }
   };
 
@@ -79,50 +86,33 @@ const SignupPage = () => {
   };
 
   const onGoogleSuccess = async (response: any) => {
-    const {
-      profileObj: { email },
-    } = response;
-    const emailParts = email.split("@");
-    const localPartOfEmail = emailParts[0];
-    const username = `${localPartOfEmail}Gmail`;
-
-    const payload = {
-      username: username,
-      email,
-      password: "test123",
-      recaptchaToken: "123",
-    };
-
-    handleGoogleSignup(payload);
-  };
-
-  const handleGoogleSignup = async (payload: any) => {
-    if (!payload.email) {
-      setError("Please enter all fields");
-      return;
-    }
+    setError("");
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/signup`,
-        payload,
-        {
-          withCredentials: true,
-        }
+      // Send the Google access token to your backend for verification
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/googleSignin`, {
+        access_token: response.accessToken,
+      },
+      { withCredentials: true }
       );
-
-      if (response.status === 200) {
-        // Successful signup
-        localStorage.setItem("isLoggedIn", "true");
-
-        navigate("/onboarding", { state: { username: payload.username } });
-      } else {
-        setError("Invalid signup information. Please try again.");
+      console.log(res.data.status);
+      if (res.data.status === "onboarding") {
+        navigate("/onboarding");
+      } else if (res.data.status === "dashboard") {
+        navigate("/dashboard");
       }
+      else {
+      setError("Invalid username or password. Please try again.");
+      setRecaptchaToken(null);
+        resetRecaptcha();
+    }
+      
     } catch (error) {
       setError("Failed to signup. Please try again.");
+      setRecaptchaToken(null);
+      resetRecaptcha();
     }
   };
-
+    
   return (
     <main className={styles.SignupPage}>
       <header className={styles.header}>
@@ -183,6 +173,7 @@ const SignupPage = () => {
           </i>
         </div>
         <ReCAPTCHA
+          ref={recaptchaRef}
           className={styles.recaptcha}
           sitekey="6Lev7GcnAAAAAI5flktV2-RN7p1ZSf7otKpReIP2"
           onChange={handleRecaptcha}
