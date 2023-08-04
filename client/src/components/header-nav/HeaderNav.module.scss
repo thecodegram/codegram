@@ -5,7 +5,7 @@
   height: 4rem;
   padding: 1rem;
   justify-content: space-between;
-  color: #B0AEAA;
+  color: #b0aeaa;
   position: sticky;
   z-index: 98;
   top: 0;
@@ -18,7 +18,7 @@
   }
 
   h1 a {
-    color: #FFA115;
+    color: #ffa115;
     font-size: 1rem;
     font-weight: 500;
   }
@@ -33,7 +33,7 @@
   border: none;
   width: fit-content;
   cursor: pointer;
-  color: #B0AEAA;
+  color: #b0aeaa;
   font-weight: 600;
 }
 
@@ -50,22 +50,22 @@
     max-height: 30vh;
     overflow-y: scroll;
     padding-right: 0.5rem;
-  
+
     /* width */
     &::-webkit-scrollbar {
       width: 6px;
     }
-  
+
     /* Track */
     &::-webkit-scrollbar-track {
-      background: #2C2C2C;
+      background: #2c2c2c;
     }
-  
+
     /* Handle */
     &::-webkit-scrollbar-thumb {
-      background: #5B5955;
+      background: #5b5955;
     }
-  
+
     /* Handle on hover */
     &::-webkit-scrollbar-thumb:hover {
       background: #84827e;
@@ -74,7 +74,7 @@
     .dropdownItem + .dropdownItem {
       border-top: 1px solid #444340;
     }
-    
+
     .dropdownItem {
       padding: 1.5rem 0;
 
@@ -85,8 +85,36 @@
       .timestamp {
         margin-top: 0.5rem;
         font-size: 0.88rem;
-        color: #9C9995;
+        color: #9c9995;
       }
     }
+  }
+}
+
+/* User Profile Dropdown Styles */
+.userProfileDropdown {
+  min-width: 12rem; // Adjust the width as desired
+
+  .dropdownList {
+    .dropdownItem {
+      padding: 0.75rem 1rem; // Adjust padding as desired
+
+      a {
+        display: flex;
+        align-items: center;
+        color: #b0aeaa; // Color for the text in the dropdown
+        text-decoration: none;
+
+        &:hover {
+          color: #ffa115; // Color for the text on hover
+        }
+      }
+    }
+  }
+}
+.userProfileDropdownHolder {
+  article {
+    margin-top: 0.85rem; // Adjust this value as desired
+    padding-top: 0;
   }
 }
