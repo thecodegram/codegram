@@ -128,7 +128,7 @@ const SignupPage = () => {
           onSuccess={onGoogleSuccess}
           onFailure={onGoogleFailure}
           cookiePolicy={"single_host_origin"}
-          isSignedIn={true}
+          isSignedIn={false}
           render={(renderProps) => (
             <button
               type="button"

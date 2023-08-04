@@ -119,6 +119,7 @@ const LoginPage = () => {
             onSuccess={onGoogleSuccess}
             onFailure={onGoogleFailure}
             cookiePolicy={'single_host_origin'}
+            isSignedIn={false}
             render={renderProps => (
                 <button
                     type="button"
