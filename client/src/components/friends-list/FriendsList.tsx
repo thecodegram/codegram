@@ -1,13 +1,12 @@
 import { ListGroup } from "../list-group/ListGroup";
 import { UserInfoHeader } from "../user-info-header/UserInfoHeader";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { FriendItem } from "../../pages/all-friends/AllFriendsPage";
 import { EmptyState } from "../empty-state/EmptyState";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext";
 import styles from "../list-group/ListGroup.module.scss";
 import axios from "axios";
-import { useImageCache } from "../image-cache-context/ImageCacheContext";
 
 interface FriendsListProps {
   userId: number | null;
@@ -15,7 +14,6 @@ interface FriendsListProps {
 
 export const FriendsList = ({ userId }: FriendsListProps) => {
   const { userId: sessionUserId } = useUserContext();
-  const { cache, setCache, loadingCache, addUsernameToLoadingCache } = useImageCache();
   const [ friendsData, setFriendsData ] = useState<FriendItem[]>([]);
   const showViewAllBtn = sessionUserId === userId;
 
@@ -37,7 +35,7 @@ export const FriendsList = ({ userId }: FriendsListProps) => {
               userId === friend.user_1_id
                 ? friend.user_2_username
                 : friend.user_1_username;
-            return { ...friend};
+            return { ...friend, username:username};
           })
         );
 

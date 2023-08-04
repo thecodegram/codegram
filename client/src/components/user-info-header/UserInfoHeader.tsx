@@ -69,6 +69,7 @@ export const UserInfoHeader = ({
     if (username) {
       fetchProfilePic();
     }
+    // eslint-disable-next-line
   }, [username, setCache]);
 
   return (
