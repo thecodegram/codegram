@@ -19,41 +19,6 @@ export const FriendsList = ({ userId }: FriendsListProps) => {
   const [ friendsData, setFriendsData ] = useState<FriendItem[]>([]);
   const showViewAllBtn = sessionUserId === userId;
 
-  const fetchProfilePic = useCallback(
-    async (username: string) => {
-      
-      if(loadingCache.has(username)){
-        return;
-      }
-      const currentCache = cache[username];
-      if (currentCache === undefined || currentCache === null) {
-        addUsernameToLoadingCache(username);
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
-            {
-              responseType: "blob",
-              withCredentials: true,
-            }
-          );
-          if (response.status !== 204) {
-            const profilePicURL = URL.createObjectURL(response.data);
-            setCache(username, profilePicURL);
-            return profilePicURL;
-          } else {
-            setCache(username, "");
-            return "";
-          }
-        } catch (error) {
-          console.error("Error fetching profile picture:", error);
-        }
-      } else {
-        return currentCache;
-      }
-    },
-    [cache, setCache, addUsernameToLoadingCache, loadingCache]
-  );
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -72,8 +37,7 @@ export const FriendsList = ({ userId }: FriendsListProps) => {
               userId === friend.user_1_id
                 ? friend.user_2_username
                 : friend.user_1_username;
-            const profilePic = await fetchProfilePic(username);
-            return { ...friend, profilePic: profilePic };
+            return { ...friend};
           })
         );
 
@@ -86,7 +50,7 @@ export const FriendsList = ({ userId }: FriendsListProps) => {
     if (userId) {
       fetchData();
     }
-  }, [userId, fetchProfilePic]);
+  }, [userId]);
   
   return (
     <article className={styles.friendsList}>
