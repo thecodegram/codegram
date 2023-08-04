@@ -78,7 +78,6 @@ const SignupPage = () => {
 
   const handleRecaptcha = (token: any) => {
     setRecaptchaToken(token); // store the recaptcha token
-    console.log(token);
   };
 
   const onGoogleFailure = (response: any) => {
@@ -94,7 +93,6 @@ const SignupPage = () => {
       },
       { withCredentials: true }
       );
-      console.log(res.data.status);
       if (res.data.status === "onboarding") {
         navigate("/onboarding");
       } else if (res.data.status === "dashboard") {
@@ -128,7 +126,7 @@ const SignupPage = () => {
           onSuccess={onGoogleSuccess}
           onFailure={onGoogleFailure}
           cookiePolicy={"single_host_origin"}
-          isSignedIn={true}
+          isSignedIn={false}
           render={(renderProps) => (
             <button
               type="button"

@@ -85,7 +85,6 @@ const LoginPage = () => {
       },
       { withCredentials: true }
       );
-      console.log(res.data.status);
       if (res.data.status === "onboarding") {
         navigate("/onboarding");
       } else if (res.data.status === "dashboard") {
@@ -119,6 +118,7 @@ const LoginPage = () => {
             onSuccess={onGoogleSuccess}
             onFailure={onGoogleFailure}
             cookiePolicy={'single_host_origin'}
+            isSignedIn={false}
             render={renderProps => (
                 <button
                     type="button"

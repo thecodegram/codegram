@@ -2,8 +2,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors'
 import session from 'express-session'
 import rateLimit from 'express-rate-limit';
-import { enforceLoggedIn } from './utils/middleware';
-import { setUpDB } from './db/db';
+import { enforceInternalUser, enforceLoggedIn } from './utils/middleware';
+import { pool, setUpDB } from './db/db';
 import { corsOptions } from './config/corsConfig';
 import { sessionOptions } from './config/sessionConfig';
 import { env } from './config/env';
@@ -15,6 +15,7 @@ const usersRouter = require('./routes/users-route')
 const authRouter = require('./routes/auth-route')
 const eventsRouter = require('./routes/events-route')
 const groupRouter = require('./routes/groups-route')
+const jobsRouter = require('./routes/private/jobs-route')
 
 // Create an Express.js app
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api/trigger-requests', [enforceLoggedIn], triggerRequestsRouter);
 app.use('/api/user', [enforceLoggedIn], usersRouter);
 app.use('/api/group', [enforceLoggedIn], groupRouter);
 app.use('/api/events', [enforceLoggedIn], eventsRouter);
+app.use('/api/secure/jobs', [enforceInternalUser], jobsRouter);
 app.use('/api/auth', authRouter);
 
 const scheduler = new Scheduler();
@@ -66,10 +68,10 @@ const scheduler = new Scheduler();
   }
 })();
 
-function shutdown() {
+async function shutdown() {
   console.log('Server is shutting down...');
-  scheduler.stop();
-
+  // scheduler.stop();
+  await pool.end();
   console.log("Server was shutdown");
   process.exit(0); // Exit the process gracefully
 }
@@ -78,9 +80,9 @@ process.on('SIGINT', shutdown); // Capturing SIGINT (Ctrl+C)
 process.on('SIGTERM', shutdown); // Capturing SIGTERM (kill command)
 process.on('SIGUSR2', shutdown); // Capturing SIGUSR2 - restart from nodemon
 
-process.on('beforeExit', (code) => {
+process.on('beforeExit', async (code) => {
   // Code to run just before the process exits
   console.log('Process is about to exit with code:', code);
 
-  shutdown();
+  await shutdown();
 });

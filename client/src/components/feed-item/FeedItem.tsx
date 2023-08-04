@@ -47,7 +47,7 @@ export const FeedItem = ({
   isLikedByCurrentUser,
   currentEventid,
 }: FeedItemProps) => {
-  const { cache, setCache } = useImageCache();
+  const { cache, setCache, loadingCache, addUsernameToLoadingCache } = useImageCache();
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(isLikedByCurrentUser || false);
   const [likesCount, setLikesCount] = useState(numOfLikes);
@@ -56,9 +56,13 @@ export const FeedItem = ({
   useEffect(() => {
     const fetchProfilePic = async () => {
       if (username) {
+        if(loadingCache.has(username)){
+          return;
+        }
         // this checks if username exists in cache and if  it exists, set profilePic to cached data and if not fetch data from API and then updates the cache
         const currentCache = cache[username];
         if (currentCache === undefined || currentCache === null) {
+          addUsernameToLoadingCache(username);
           try {
             const response = await axios.get(
               `${process.env.REACT_APP_API_URL}/api/user/${username}/profilePicture`,
@@ -80,7 +84,7 @@ export const FeedItem = ({
             console.error("Error fetching profile picture:", error);
           }
         } else {
-          setProfilePic(currentCache);
+          setProfilePic(currentCache.imageData);
         }
       }
     };
