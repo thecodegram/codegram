@@ -93,8 +93,6 @@ export const GroupProfileActivity = () => {
     };
 
     const scrollObserver = new IntersectionObserver((entries) => {
-      console.log("moved", !isDelayActive, entries?.[0]?.isIntersecting, !loading, !isEndOfOffset);
-      console.log(offset);
       if (
         !isDelayActive &&
         entries?.[0]?.isIntersecting &&
