@@ -23,7 +23,7 @@ const app = express();
 // Apply rate limiting middleware to all routes starting with '/api'
 const rateLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
-  max: 250, // limit each IP to 100 requests per windowMs
+  max: 600, // limit each IP to 600 requests per windowMs
 });
 
 const port = env.PORT || 8080;
@@ -60,7 +60,9 @@ const scheduler = new Scheduler();
       console.log(`Navigate to http://localhost:${port}/`);
     });
 
-    console.log("Starting updates collector scheduler");
+    // console.log("Starting updates collector scheduler");
+
+    console.log("Running latest codegram 3!");
     // scheduler.start();
 
     // run ranking job on startup

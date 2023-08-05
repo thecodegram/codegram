@@ -41,7 +41,11 @@ async function connectToMongo() {
 }
 
 const PSQL_CONNECTION_STRING = env.PSQL_CONNECTION_STRING;
-export const pool = new Pool({ connectionString: PSQL_CONNECTION_STRING });
+export const pool = new Pool({ 
+  connectionString: PSQL_CONNECTION_STRING,
+  idleTimeoutMillis: 30000,
+  max: 30
+});
 
 async function connectToPostgresAndCreateTables() {
   try {
