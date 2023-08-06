@@ -41,7 +41,16 @@ async function connectToMongo() {
 }
 
 const PSQL_CONNECTION_STRING = env.PSQL_CONNECTION_STRING;
-export const pool = new Pool({ connectionString: PSQL_CONNECTION_STRING });
+export const pool = new Pool({ 
+  connectionString: PSQL_CONNECTION_STRING,
+  idleTimeoutMillis: 60000,
+  idle_in_transaction_session_timeout: 5000,
+  max: 15,
+  ssl: {
+    rejectUnauthorized: false, // Set this to true if using a self-signed certificate and want to enforce SSL certificate verification
+    // Other SSL options can be specified here, such as ca, cert, key, etc., for client certificate authentication
+  }
+});
 
 async function connectToPostgresAndCreateTables() {
   try {

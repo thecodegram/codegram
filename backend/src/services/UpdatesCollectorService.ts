@@ -125,10 +125,10 @@ export async function getAndStoreVjudgeUpdates(username: string) {
             // something changed!
             if (oldValues.length < newValues.length) {
               console.log(
-                `User ${u.username} has solved something new on leetcode. (username: ${u.vjudge.username})`
+                `User ${u.username} has solved something new on vjudge. (username: ${u.vjudge.username})`
               );
               // 2-pointer approach to finding the different elements in 2 lists
-              for (var i = 0, j = 0; i < oldValues.length; ++i, ++j) {
+              for (var i = 0, j = i; i < oldValues.length; ++i, ++j) {
                 while (j < newValues.length && oldValues[i] !== newValues[j]) {
                   const update = generateVjudgeUpdateEvent(username, key, newValues[j]);
                   updates.push(update);

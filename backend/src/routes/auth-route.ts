@@ -192,7 +192,8 @@ router.post("/logout", (req, res) => {
       res.status(500).send("Internal Server Error");
     } else {
       // Redirect the user to the login page or any other desired destination
-      res.status(200).send("Logged out");
+      // res.status(200).send("Logged out");
+      res.redirect(200, '../login')
     }
   });
 });
@@ -211,7 +212,7 @@ router.get("/check", [enforceLoggedIn], async (req: Request, res: Response) => {
         .end();
     }
   } else {
-    res.status(401).end();
+    res.redirect(401, '/login');
   }
 });
 
