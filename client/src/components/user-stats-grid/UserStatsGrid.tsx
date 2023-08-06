@@ -72,6 +72,7 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
 
     // console.log("fetching data");
     fetchData();
+    // eslint-disable-next-line
   }, []);
 
   return (<div className={styles.statsGrid}>
