@@ -128,8 +128,9 @@ export class EventRepository {
         FETCH NEXT $4 ROWS ONLY;
       `
 
+    const client = await pool.connect();
     try {
-      const results = await pool.query(query, queryParams);
+      const results = await client.query(query, queryParams);
 
       return this.asEventModels(results.rows);
     } catch (e) {
@@ -173,12 +174,16 @@ export class EventRepository {
       OFFSET $2 ROWS
       FETCH NEXT $3 ROWS ONLY;`;
 
+    const client = await pool.connect();
     try {
-      const results = await pool.query(query, [id, offset, limit]);
+      const results = await client.query(query, [id, offset, limit]);
 
       return this.asEventModels(results.rows);
     } catch (e) {
       throw (e);
+    }
+    finally{
+      client.release();
     }
   }
   async toggleLike(user_id: number, event_id: number) {

@@ -212,7 +212,7 @@ router.get("/check", [enforceLoggedIn], async (req: Request, res: Response) => {
         .end();
     }
   } else {
-    res.status(401).end();
+    res.redirect(401, '/login');
   }
 });
 
