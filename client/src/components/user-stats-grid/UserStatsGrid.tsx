@@ -45,14 +45,13 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
         );
         const jsonData = await response.data;
 
-        const newData: StatsData = statsData
+        var newData = {...statsData}
         newData.total = jsonData.postgres.score
         if (jsonData?.mongo?.leetcode?.submitStats?.acSubmissionNum) {
           newData.vjudge = jsonData.postgres.score - jsonData?.mongo?.leetcode?.submitStats?.acSubmissionNum[0].count
 
           jsonData?.mongo?.leetcode?.submitStats?.acSubmissionNum.forEach(
             ({difficulty, count}: LeetcodeData) => {
-              console.log({difficulty, count})
               if (difficulty === 'All') {
                 newData.leetcode.all = count
               } else if (difficulty === 'Easy') {
@@ -65,17 +64,17 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
             })
         }
 
-        console.log(newData)
         setStatsData(newData)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
+    // console.log("fetching data");
     fetchData();
-  }, [username, statsData]);
+  }, []);
 
-  return <div className={styles.statsGrid}>
+  return (<div className={styles.statsGrid}>
         <div className={styles.card}>
           <p>{statsData.total || 0}</p>
           <h3>Total solved</h3>
@@ -108,5 +107,5 @@ export const UserStatsGrid = ({ username }: UserStatsGridProps) => {
             <h3>Total solved</h3>
           </div>
         </div>
-    </div>
+    </div>)
 }

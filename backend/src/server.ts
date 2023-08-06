@@ -73,7 +73,6 @@ const scheduler = new Scheduler();
 async function shutdown() {
   console.log('Server is shutting down...');
   // scheduler.stop();
-  await pool.end();
   console.log("Server was shutdown");
   process.exit(0); // Exit the process gracefully
 }
