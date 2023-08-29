@@ -152,7 +152,6 @@ const SignupPage = () => {
         <input
           type="text"
           name="email"
-          pattern="/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/"
           placeholder="Email"
           className={styles.inputText}
           value={email}
