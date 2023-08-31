@@ -2,8 +2,8 @@ import express, { Request, Response } from "express";
 import { User } from "../model/schemas/userSchema";
 import { UserRepository } from "../repository/UserRepository";
 import { isValidUsername } from "../utils/utils";
-import { sendWelcomeEmail } from "../services/EmailService";
-import { verifyRecaptcha } from "../services/RecaptchaService";
+import { emailService } from "../services/EmailService";
+import { recaptchaService } from "../services/RecaptchaService";
 import { enforceLoggedIn } from "../utils/middleware";
 import axios from "axios";
 const bcrypt = require("bcryptjs");
@@ -74,7 +74,7 @@ router.post("/googleSignIn", async (req: Request, res: Response) => {
 router.post("/login", async (req: Request, res: Response) => {
   const { username, password, recaptchaToken } = req.body;
 
-  const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+  const isRecaptchaValid = await recaptchaService.verifyRecaptcha(recaptchaToken);
   if (!isRecaptchaValid) {
     res.status(400).send({ error: "Invalid reCAPTCHA token." });
     return;
@@ -130,7 +130,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 
   console.log(username, email);
 
-  const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+  const isRecaptchaValid = await recaptchaService.verifyRecaptcha(recaptchaToken);
 
   if (!username) {
     res.status(400).json({ error: "username is empty" });
@@ -173,7 +173,7 @@ router.post("/signup", async (req: Request, res: Response) => {
       req.session.userId = userId;
       req.session.save();
 
-      await sendWelcomeEmail(email, username);
+      await emailService.sendWelcomeEmail(email, username);
 
       res.status(200).send("Registered");
     }

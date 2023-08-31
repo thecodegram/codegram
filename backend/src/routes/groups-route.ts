@@ -1,13 +1,10 @@
 import express, { Request, Response } from "express";
-import { GroupRepository } from "../repository/GroupRepository";
-import { UserRepository } from "../repository/UserRepository";
-import { NotificationRepository, NotificationTypes } from "../repository/NotificationRepository";
+import { groupRepository } from "../repository/GroupRepository";
+import { userRepository } from "../repository/UserRepository";
+import { notificationRepository, NotificationTypes } from "../repository/NotificationRepository";
 import { handleValidationErrors, validateUsername } from "../utils/middleware";
 
 const router = express.Router();
-const groupRepository = new GroupRepository()
-const userRepository = new UserRepository()
-const notificationRepository = new NotificationRepository()
 
 router.post("", [
   handleValidationErrors

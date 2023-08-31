@@ -166,6 +166,7 @@ export class UserRepository {
     }
 
     return leetcodeCount + vjudgeCount;
-  }
-  
+  } 
 }
+
+export const userRepository = new UserRepository();
