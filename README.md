@@ -26,7 +26,7 @@ A user will create an account and link external platforms they are using to Code
 ![CodeGram_architecture_and_models drawio (1)](https://github.com/peyz21/codegram/assets/64120482/68fe5c6b-59bd-48f7-88a3-386f871dfeb6)
 
 ## Technology Stack
-Node.js/Express, MongoDB, Postgres, Google App Engine, Google Firestore, Google Cloud Storage, React, Bootstrap
+Node.js/Express, MongoDB, Postgres, Google Cloud Run, Google Firestore, Google Cloud Storage, Docker, React, Bootstrap
 
 ### Internal Service
 Unfortunately, most platforms like LeetCode do not provide webhooks for user updates, so we wish to explore the option of having a microservice alongside the "main" back-end, which would be responsible for continuously (scheduled job) pulling the user data from other platforms (see [External Services](#external-services)) and sending update messages when a person has solved a new problem. As update workflows are event-driven, we are considering using a Pub/Sub system or message queues, which also gives us an easy way to expose our own webhooks. Both our servers will access their databases (more on that in the DB section).
