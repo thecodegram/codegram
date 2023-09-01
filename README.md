@@ -12,36 +12,6 @@
   - [Database](#database)
 - [Authentication](#authentication)
 
-
-## Iteration I
-
-### What was done
-
-- User auth (version 1, no jwt/encryption yet - please only use bad passwords)
-- Backend is connected to both MongoDB and Postgresql, defined schemas for both (Postgres is currently in a dev branch, we will only use it for features coming in iteration 2)
-- Ability to link Codegram's user with 
-LeetCode's and Vjudge's usernames. 
-- Onboarding page after sign up to add those.
-- Endpoints for querying latest users' data from LeetCode and Vjudge.
-From LeetCode there is general statistics endpoint (# of easy/medium/hard questions solved) as well as latest submissions. 
-- User can also change their leetcode and/or vjudge user (endpoint on backend, /onboarding on frontend) - can only change your own data
-- Dashboard page that shows user's latest data:
-    leetcode accepted statistics and latest solved
-- Deployed to GCP
-
-### Internal/external services
-- Internal service: MongoDB
-- External service: Leetcode and Vjudge APIs
-
-### TODO for iteration 2:
-
-- Implement a scheduler so updates are realtime and don't require a reload
-- Groups, Following and Likes
-- Dashboard should show the updates from everyone the person is following, not just the current user
-- Profile page
-- Potentially webhook so updates are subscribable
-
-
 ## Problem Statement
 Different platforms for technical interview preparation and competitive programming, such as [leetcode.com](https://leetcode.com) or [vjudge.net](https://vjudge.net) offer internal statistics on their users, but there is no unified way to view one's progress and achievements across all platforms. Further, many of those platforms lack social or competitive aspects to improving one's skills. Studies show that gamification boosts retention, meaning CodeGram will help programmers improve their skills.
 
@@ -56,11 +26,7 @@ A user will create an account and link external platforms they are using to Code
 ![CodeGram_architecture_and_models drawio (1)](https://github.com/peyz21/codegram/assets/64120482/68fe5c6b-59bd-48f7-88a3-386f871dfeb6)
 
 ## Technology Stack
-### Frontend framework
-React will be used. We are considering using Chart.js for data visualizations such as user stats, etc.
-
-### Backend
-We will use Node.js + Express on GCP as a PaaS for both services (see [Internal Service](#internal-service)).
+Node.js/Express, MongoDB, Postgres, Google Cloud Run, Google Firestore, Google Cloud Storage, Docker, React, Bootstrap
 
 ### Internal Service
 Unfortunately, most platforms like LeetCode do not provide webhooks for user updates, so we wish to explore the option of having a microservice alongside the "main" back-end, which would be responsible for continuously (scheduled job) pulling the user data from other platforms (see [External Services](#external-services)) and sending update messages when a person has solved a new problem. As update workflows are event-driven, we are considering using a Pub/Sub system or message queues, which also gives us an easy way to expose our own webhooks. Both our servers will access their databases (more on that in the DB section).
