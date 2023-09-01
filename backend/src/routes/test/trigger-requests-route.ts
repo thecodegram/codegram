@@ -6,7 +6,7 @@ import { getUserIDs } from '../../model/users';
 import { getSubmissionStats } from '../../api/vjudge';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { ExternalApiError } from '../../errors/external-api-error';
-import { getUpdates } from '../../services/UpdatesCollectorService';
+import { updatesCollectorService } from '../../services/UpdatesCollectorService';
 import { EventRepository } from '../../repository/EventRepository';
 import { isValidUsername } from '../../utils/utils';
 import { UserRepository } from '../../repository/UserRepository';
@@ -82,7 +82,7 @@ router.get('/updatesList/:username', [
   }
   else {
     try {
-      const updates = await getUpdates(username);
+      const updates = await updatesCollectorService.getUpdates(username);
 
       res.json(updates).send();
     }

@@ -5,9 +5,7 @@ import { User} from "../model/schemas/userSchema";
 
 export class SubmitsRepository {
     public async saveLeetcodeSubmissionStats(leetcodeRefreshData: LeetcodeRefreshDataModel) {
-    
         const user = await User.findOne({username:leetcodeRefreshData.codegramUsername}, {vjudge:0});
-        
         if(!user) {
             throw new UserNameNotFoundError(leetcodeRefreshData.codegramUsername, "leetcode");
         }
@@ -34,3 +32,5 @@ export class SubmitsRepository {
         await user.save();
     }
 }
+
+export const submitsRepository = new SubmitsRepository();

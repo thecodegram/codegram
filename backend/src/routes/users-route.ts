@@ -7,18 +7,14 @@ import { UserNameNotFoundError } from "../errors/username-not-found-error";
 import { UsernameAlreadyTakenError } from "../errors/username-already-taken-error";
 import { getSubmissionStats } from "../api/vjudge";
 import { getLatestAcceptedSubmits, getSubmitStats } from "../api/leetcode";
+import { imageRepository } from "../repository/ImageRepository";
 import {
-  uploadFile,
-  getFile,
-  deletePictureIfExists,
-} from "../repository/ImageBucket";
-import {
-  NotificationRepository,
-  NotificationTypes,
+  notificationRepository,
+  NotificationTypes 
 } from "../repository/NotificationRepository";
-import { FriendRepository } from "../repository/FriendRepository";
-import { UserRepository } from "../repository/UserRepository";
-import { GroupRepository } from "../repository/GroupRepository";
+import { friendRepository } from "../repository/FriendRepository";
+import { userRepository } from "../repository/UserRepository";
+import { groupRepository } from "../repository/GroupRepository";
 
 import sanitize from "sanitize-filename";
 import multer from "multer";
@@ -26,11 +22,6 @@ import fs from "fs";
 
 const upload = multer({ dest: "uploads/" });
 const router = express.Router();
-
-const userRepository = new UserRepository();
-const notificationRepository = new NotificationRepository();
-const friendRepository = new FriendRepository();
-const groupRepository = new GroupRepository();
 const bcrypt = require("bcryptjs");
 
 router.get(
@@ -154,7 +145,7 @@ router.put(
               req.session.save();
 
               if (user.profilePic) {
-                await deletePictureIfExists(user.profilePic);
+                await imageRepository.deleteImageIfExists(user.profilePic);
                 user.profilePic = undefined;
               }
             }
@@ -208,7 +199,7 @@ router.put(
             console.log("this is req.file:" + req.file);
             if (req.file) {
               if (user.profilePic) {
-                await deletePictureIfExists(user.profilePic);
+                await imageRepository.deleteImageIfExists(user.profilePic);
               }
               const filePath = req.file.path;
               const sanitizedOriginalName = sanitize(req.file.originalname);
@@ -217,7 +208,7 @@ router.put(
               );
               const fileName = `profile_pics/${username}/${sanitizedOriginalName}`;
               // Upload the file to GCS
-              await uploadFile(fileName, filePath);
+              await imageRepository.uploadImage(fileName, filePath);
               // Store the file name in the user document
               user.profilePic = fileName;
               try {
@@ -308,7 +299,7 @@ router.get(
       res.status(404).send("User not found");
     } else {
       if (userData.profilePic) {
-        const readStream = await getFile(userData.profilePic);
+        const readStream = await imageRepository.getImage(userData.profilePic);
 
         // we might need to adjust this depending on your image format
         res.setHeader("Content-Type", "image/jpeg");

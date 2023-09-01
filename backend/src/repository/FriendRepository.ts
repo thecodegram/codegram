@@ -178,3 +178,5 @@ export class FriendRepository {
     }
   }
 }
+
+export const friendRepository = new FriendRepository();

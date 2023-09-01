@@ -239,3 +239,5 @@ export class EventRepository {
     }
   }
 }
+
+export const eventRepository = new EventRepository();
