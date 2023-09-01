@@ -2,6 +2,20 @@ import { env } from "./env";
 import {FirestoreStore} from "@google-cloud/connect-firestore";
 import { Firestore } from '@google-cloud/firestore';
 
+var cookieConfig;
+if (env.ENVIRONMENT === 'DEV') {
+    cookieConfig = {
+        maxAge: 3600000, // 1 hour in milliseconds
+    }
+} else {
+    cookieConfig = {
+        maxAge: 3600000, // 1 hour in milliseconds
+        sameSite: 'none' as 'none',
+        secure: true,
+        domain: 'backend2-c2h4n4r2vq-uw.a.run.app',
+    }
+}
+
 export const sessionOptions = {
     name: 'mysession',
     secret: env.AUTH_SECRET_KEY!!,
@@ -11,10 +25,5 @@ export const sessionOptions = {
         dataset: new Firestore(),
         kind: 'express-sessions',
       }),
-    cookie: {
-        maxAge: 3600000, // 1 hour in milliseconds
-        // sameSite: 'none' as 'none',
-        // secure: true,
-        // domain: 'backend2-c2h4n4r2vq-uw.a.run.app',
-    }
+    cookie: cookieConfig
 }
