@@ -21,7 +21,6 @@ router.post("/googleSignIn", async (req: Request, res: Response) => {
     const response = await axios.get(
       `${GOOGLE_TOKENINFO_URL}?access_token=${access_token}`
     );
-    console.log(response.data);
     const { email_verified, email } = response.data;
 
     if (email_verified == "true") {
@@ -29,19 +28,23 @@ router.post("/googleSignIn", async (req: Request, res: Response) => {
       if (user) {
         const username = user.username;
         const postgresUser = await userRepository.getUser(username);
-        console.log(postgresUser)
 
         req.session.username = username;
         req.session.userId = postgresUser.id;
-        req.session.save();
+        req.session.save((err) => {
+          if (err) {
+            console.error("Error saving session:", err);
+            res.status(500).json({ error: "Server error" });
+            return;
+          }
 
-        if (!user.leetcode?.username && !user.vjudge?.username) {
-          res.status(200).json({ status: "onboarding" });
-        } else {
-          res.status(200).json({ status: "dashboard" });
-        }
-      } 
-      else {
+          if (!user.leetcode?.username && !user.vjudge?.username) {
+            res.status(200).json({ status: "onboarding" });
+          } else {
+            res.status(200).json({ status: "dashboard" });
+          }
+        });
+      } else {
         const newUser = new User({
           username: '',
           password: '',
@@ -53,21 +56,27 @@ router.post("/googleSignIn", async (req: Request, res: Response) => {
         const postgresId = await userRepository.saveUser(newUser._id.toString(), newUser.username);
         req.session.username = newUser.username;
         req.session.userId = postgresId;
-        req.session.save();
 
-        if (!newUser.leetcode?.username && !newUser.vjudge?.username) {
-          res.status(200).json({ status: "onboarding" });
-        } else {
-          res.status(200).json({ status: "dashboard" });
-        }
-        return;
+        req.session.save((err) => {
+          if (err) {
+            console.error("Error saving session:", err);
+            res.status(500).json({ error: "Server error" });
+            return;
+          }
+
+          if (!newUser.leetcode?.username && !newUser.vjudge?.username) {
+            res.status(200).json({ status: "onboarding" });
+          } else {
+            res.status(200).json({ status: "dashboard" });
+          }
+        });
       }
     } else {
-      res.status(200).json({ verified: false });
+      res.status(401).json({ verified: false });
       return;
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ error: "Server error" });
   }
 });
