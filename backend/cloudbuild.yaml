@@ -1,23 +1,4 @@
 steps:
-  - name: bash
-    args:
-      - cd
-      - backend
-    id: Navigate to backend folder
-  - name: gcr.io/cloud-builders/npm
-    args:
-      - install
-    id: Install packages
-  - name: gcr.io/cloud-builders/npm
-    args:
-      - run
-      - build
-    id: convert ts to js
-  - name: bash
-    args:
-      - cd
-      - ../
-    id: Go back to root
   - name: gcr.io/cloud-builders/docker
     args:
       - build
