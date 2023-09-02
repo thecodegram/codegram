@@ -2,3 +2,5 @@ node_modules
 .git
 .vscode
 .DS_Store
+.env
+gcloudkey.json

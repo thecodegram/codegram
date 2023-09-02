@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install --production
 
+# Convert TS to JS
+RUN npm run build
+
 # Copy the rest of the application files to the container
 COPY . .
 
