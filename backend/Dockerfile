@@ -8,10 +8,15 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --production
+RUN npm install --production \
+     && npm install typescript -g
+
 
 # Copy the rest of the application files to the container
 COPY . .
+
+# Convert TS to JS
+RUN npm run build
 
 # Expose the port your Node.js application is listening on
 EXPOSE 3000
