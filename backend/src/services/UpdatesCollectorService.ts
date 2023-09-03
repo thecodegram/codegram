@@ -120,7 +120,7 @@ export class UpdatesCollectorService {
             // go through all platformNames and check if there are updates for any of them
             for (var i = 0; i < keys.length; ++i) {
               const key: string = keys[i];
-              const oldValues: string[] = storedAcData[key as keyof typeof storedAcData] ?? [];
+              const oldValues: string[] = (storedAcData[key as keyof typeof storedAcData] ?? []).sort();
               const newValues: string[] = (latestData.acRecords[key] ? (latestData.acRecords[key].sort()) : []);
 
               // something changed!
