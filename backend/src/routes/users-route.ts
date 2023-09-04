@@ -5,8 +5,8 @@ import { getUserIDs, addUserID } from "../model/users";
 import { User } from "../model/schemas/userSchema";
 import { UserNameNotFoundError } from "../errors/username-not-found-error";
 import { UsernameAlreadyTakenError } from "../errors/username-already-taken-error";
-import { getSubmissionStats } from "../api/vjudge";
-import { getLatestAcceptedSubmits, getSubmitStats } from "../api/leetcode";
+import { vjudgeApi } from "../api/vjudge";
+import { leetcodeApi} from "../api/leetcode";
 import { imageRepository } from "../repository/ImageRepository";
 import {
   notificationRepository,
@@ -47,7 +47,7 @@ router.get(
       res.status(404).send("Leetcode username not found");
     } else {
       const leetcodeUsername = userData.leetcode.username;
-      const submitStats = await getLatestAcceptedSubmits(leetcodeUsername);
+      const submitStats = await leetcodeApi.getLatestAcceptedSubmits(leetcodeUsername);
 
       if (!submitStats) {
         res.status(404).send("User not found on leetcode");
@@ -165,7 +165,7 @@ router.put(
                   );
                 }
 
-                const vjudgeStats = await getSubmissionStats(
+                const vjudgeStats = await vjudgeApi.getSubmissionStats(
                   data.vjudgeUsername
                 );
                 // console.log(vjudgeStats);
@@ -188,7 +188,7 @@ router.put(
                     "leetcode"
                   );
                 }
-                const leetcodeStats = await getSubmitStats(
+                const leetcodeStats = await leetcodeApi.getSubmitStats(
                   data.leetcodeUsername
                 );
                 console.log("this is LC data: " + leetcodeStats);
