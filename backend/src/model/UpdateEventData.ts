@@ -1,4 +1,5 @@
 export interface UpdateEventData {
+    id: string,
     username: string;
     platform: string;
     problemTitle: string;
