@@ -1,23 +1,24 @@
 import express, { Request, Response } from 'express'
 
-import { getSubmitStats } from '../../api/leetcode'
+import { leetcodeApi } from '../../api/leetcode'
 import { validateUsername, handleValidationErrors } from '../../utils/middleware'
 import { getUserIDs } from '../../model/users';
-import { getSubmissionStats } from '../../api/vjudge';
+import { vjudgeApi } from '../../api/vjudge';
 import { UserNameNotFoundError } from '../../errors/username-not-found-error';
 import { ExternalApiError } from '../../errors/external-api-error';
-import { updatesCollectorService } from '../../services/UpdatesCollectorService';
 import { EventRepository } from '../../repository/EventRepository';
 import { isValidUsername } from '../../utils/utils';
 import { UserRepository } from '../../repository/UserRepository';
+import { allUpdatesCollectorService } from '../../services/updates-collection/AllUpdatesCollectorService';
+import { User } from '../../model/schemas/userSchema';
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
   try {
     const userIds = getUserIDs();
-    const promises: Promise<ReturnType<typeof getSubmitStats>>[] = Array.from(userIds).map(async (id) => {
-      const cur = await getSubmitStats(id);
+    const promises: Promise<ReturnType<typeof leetcodeApi.getSubmitStats>>[] = Array.from(userIds).map(async (id) => {
+      const cur = await leetcodeApi.getSubmitStats(id);
       console.log("cur:", cur);
       return cur;
     });
@@ -40,7 +41,7 @@ router.get('/leetcode/:userId', [
 ], async (req: Request, res: Response) => {
   const { userId } = req.params;
 
-  const data = await getSubmitStats(userId);
+  const data = await leetcodeApi.getSubmitStats(userId);
   console.log("data:", data);
 
   res.send(data);
@@ -55,7 +56,7 @@ router.get('/vjudge/:username', [
   const { username } = req.params;
 
   try {
-    const data = await getSubmissionStats(username);
+    const data = await vjudgeApi.getSubmissionStats(username);
     console.log("data:", data);
 
     res.send(data);
@@ -66,33 +67,6 @@ router.get('/vjudge/:username', [
       res.status(e.statusCode).send(e.message)
     } else {
       console.error(e);
-    }
-  }
-});
-
-router.get('/updatesList/:username', [
-  // Sanitize the userId variable
-  validateUsername('username'),
-  handleValidationErrors
-], async (req: Request, res: Response) => {
-  const { username } = req.params;
-
-  if (!username) {
-    res.status(400).send();
-  }
-  else {
-    try {
-      const updates = await updatesCollectorService.getUpdates(username);
-
-      res.json(updates).send();
-    }
-    catch (err) {
-      if (err instanceof UserNameNotFoundError) {
-        res.status(404).send("user not found");
-      }
-      else {
-        res.status(500).send("Oops! Something went wrong");
-      }
     }
   }
 });
