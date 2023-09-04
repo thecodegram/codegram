@@ -8,7 +8,7 @@
     "dev-start": "nodemon --exec ts-node src/server.ts",
     "build": "tsc && npm run copy-sql",
     "gcp-build": "npm install --save-dev && npm run build",
-    "copy-sql": "cp ./src/db/db_init.sql ./dist/db/db_init.sql",
+    "copy-sql": "cp ./src/db/db_init.sql ./dist/src/db/db_init.sql",
     "tsconfig": "tsc --init",
     "test": "mocha"
   },
