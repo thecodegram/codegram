@@ -10,7 +10,7 @@
     "gcp-build": "npm install --save-dev && npm run build",
     "copy-sql": "cp ./src/db/db_init.sql ./dist/db/db_init.sql",
     "tsconfig": "tsc --init",
-    "test": "tsc && jest --passWithNoTests"
+    "test": "mocha"
   },
   "keywords": [],
   "author": "",
@@ -44,8 +44,7 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "pg": "^8.11.1",
-    "sanitize-filename": "^1.6.3",
-    "ts-node": "^10.9.1"
+    "sanitize-filename": "^1.6.3"
   },
   "devDependencies": {
     "@types/chai": "^4.3.5",
@@ -62,6 +61,7 @@
     "jest": "^29.5.0",
     "mocha": "^10.2.0",
     "sinon": "^15.2.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   }
 }
