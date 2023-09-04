@@ -7,8 +7,6 @@
     "esModuleInterop": true
   },
   "include": [
-    "src", 
-    "src/db/db_init.sql",
-    "test"
+    "src"
   ]
 }
