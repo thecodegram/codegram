@@ -94,7 +94,6 @@ export class VjudgeUpdatesCollectorService implements IUpdatesCollectorService {
             return [];
           }
         })();
-        console.log(updates);
         return updates;
       } catch (e) {
         console.error(`Failed to load vjudge updates for user ${userId}. Error: ${e}`);

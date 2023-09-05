@@ -11,7 +11,6 @@ const whitelist = [
 
 export const corsOptions: CorsOptions = {
     origin: (origin, callback) => {
-        console.log(origin);
         if (whitelist.includes(origin || '')) {
             callback(null, true);
         } else {
