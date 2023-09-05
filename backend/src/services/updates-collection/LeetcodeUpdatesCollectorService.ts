@@ -1,4 +1,4 @@
-import { leetcodeApi} from "../../api/leetcode";
+import { leetcodeApi } from "../../api/leetcode";
 import { userUpdateEventEmitter } from "../../events/UserUpdateEventEmitter";
 import { User } from "../../model/schemas/userSchema";
 import { UpdateEventData } from "../../model/UpdateEventData";
@@ -10,7 +10,7 @@ export class LeetcodeUpdatesCollectorService implements IUpdatesCollectorService
   getPlatformName(): string {
     return "Leetcode";
   }
-  async getAndStoreUpdates(userId: string) : Promise<UpdateEventData[]> {
+  async getAndStoreUpdates(userId: string): Promise<UpdateEventData[]> {
     const u = await User.findOne({ _id: userId });
 
     if (!u) {
@@ -39,20 +39,21 @@ export class LeetcodeUpdatesCollectorService implements IUpdatesCollectorService
               );
 
               // once we have a list of problems that were solved since last check, emit an event for each of them
-              const updateEvents = updatesData.map((upd: any) => {
-                const updateEvent: UpdateEventData = {
-                  id: userId,
-                  username: username,
-                  platform: "leetcode",
-                  problemTitle: upd.title,
-                  problemTitleSlug: upd.titleSlug,
-                  // leetcode updates are with 1 second precision, but js are 1 millisecond
-                  timestamp: parseInt(upd.timestamp) * 1000
-                }
-                userUpdateEventEmitter.emit(updateEvent);
+              const updateEvents = await Promise.all(updatesData.map(
+                async (upd: any) => {
+                  const updateEvent: UpdateEventData = {
+                    id: userId,
+                    username: username,
+                    platform: "leetcode",
+                    problemTitle: upd.title,
+                    problemTitleSlug: upd.titleSlug,
+                    // leetcode updates are with 1 second precision, but js are 1 millisecond
+                    timestamp: parseInt(upd.timestamp) * 1000
+                  }
+                  await userUpdateEventEmitter.emit(updateEvent);
 
-                return updateEvent;
-              });
+                  return updateEvent;
+                }));
               refreshLeetcodeDataEventEmitter.emit({ codegramUsername: username, leetcodeData: newData });
 
               return updateEvents;
