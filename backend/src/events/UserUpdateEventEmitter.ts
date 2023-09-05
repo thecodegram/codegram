@@ -1,28 +1,40 @@
 import EventEmitter from "events";
-import { EventRepository } from "../repository/EventRepository";
+import { eventRepository } from "../repository/EventRepository";
 import { UpdateEventData } from "../model/UpdateEventData";
+import { PubSub } from '@google-cloud/pubsub';
 
 export class UserUpdateEventEmitter {
   private eventEmitter: EventEmitter;
   private readonly EVENT_NAME = "user-update";
-  private eventRepository: EventRepository;
+  private readonly pubSubClient = new PubSub();
 
   constructor() {
     this.eventEmitter = new EventEmitter();
-    this.eventRepository = new EventRepository();
-    //TODO: setup things for GCP Pub/Sub
-
     this.eventEmitter.on(
       this.EVENT_NAME,
       async (updateData: UpdateEventData) => {
-        await this.eventRepository.saveEvent(updateData);
+        await eventRepository.saveEvent(updateData);
       }
     );
   }
 
-  emit(data: UpdateEventData) {
+  async emit(data: UpdateEventData) {
     this.eventEmitter.emit(this.EVENT_NAME, data);
-    // TODO: send to pub sub?
+
+    // send update to PubSub for other integrations
+    const topicName = `update_events_user_${data.id}`;
+    const topic = this.pubSubClient.topic(topicName);
+
+    const [exists] = await topic.exists();
+
+    if(!exists) {
+      await topic.create();
+    }
+
+    const messageId = await topic.publishMessage({
+      data:JSON.stringify(data)
+    });
+    console.log(`Message ${messageId} published to ${topicName}`);
   }
 }
 

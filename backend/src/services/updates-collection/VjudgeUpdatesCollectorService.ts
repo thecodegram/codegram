@@ -11,6 +11,7 @@ export class VjudgeUpdatesCollectorService implements IUpdatesCollectorService {
   getPlatformName(): string {
     return "VJudge";
   }
+
   private generateVjudgeUpdateEvent(userId: string, username: string, platform: string, problemName: string): UpdateEventData {
     const updateData: UpdateEventData = {
       id: userId,
@@ -55,6 +56,8 @@ export class VjudgeUpdatesCollectorService implements IUpdatesCollectorService {
                 console.log(
                   `User ${userId} has solved something new on vjudge. (username: ${u.vjudge.username})`
                 );
+
+                const emittionPromises: Promise<any>[] = [];
                 // 2-pointer approach to finding the different elements in 2 lists
                 for (var i = 0, j = i; j < newValues.length; ++i, ++j) {
 
@@ -65,7 +68,7 @@ export class VjudgeUpdatesCollectorService implements IUpdatesCollectorService {
                     updates.push(update);
 
                     // store update to be displayable in feed
-                    userUpdateEventEmitter.emit(update);
+                    emittionPromises.push(userUpdateEventEmitter.emit(update));
                     // update submits data to know about this problem
                     storeVjudgeSubmissionEventEmitter.emit({
                       platform: platform,
@@ -76,6 +79,8 @@ export class VjudgeUpdatesCollectorService implements IUpdatesCollectorService {
                     ++j;
                   }
                 }
+
+                await Promise.all(emittionPromises);
               }
             }
             if (!updates.length) {
