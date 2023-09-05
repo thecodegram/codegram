@@ -22,19 +22,24 @@ export class UserUpdateEventEmitter {
     this.eventEmitter.emit(this.EVENT_NAME, data);
 
     // send update to PubSub for other integrations
-    const topicName = `update_events_user_${data.id}`;
-    const topic = this.pubSubClient.topic(topicName);
+    try {
+      const topicName = `update_events_user_${data.id}`;
+      const topic = this.pubSubClient.topic(topicName);
 
-    const [exists] = await topic.exists();
+      const [exists] = await topic.exists();
 
-    if(!exists) {
-      await topic.create();
+      if (!exists) {
+        await topic.create();
+      }
+
+      const message = Buffer.from(JSON.stringify(data));
+      const messageId = await topic.publishMessage({
+        data: message
+      });
+      console.log(`Message ${messageId} published to ${topicName}`);
+    } catch (e) {
+      console.error(e);
     }
-
-    const messageId = await topic.publishMessage({
-      data:JSON.stringify(data)
-    });
-    console.log(`Message ${messageId} published to ${topicName}`);
   }
 }
 

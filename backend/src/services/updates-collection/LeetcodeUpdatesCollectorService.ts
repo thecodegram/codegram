@@ -50,7 +50,6 @@ export class LeetcodeUpdatesCollectorService implements IUpdatesCollectorService
                     // leetcode updates are with 1 second precision, but js are 1 millisecond
                     timestamp: parseInt(upd.timestamp) * 1000
                   }
-                  console.log("emitting actuawwy");
                   await userUpdateEventEmitter.emit(updateEvent);
 
                   return updateEvent;
