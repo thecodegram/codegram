@@ -7,14 +7,18 @@ import { storeVjudgeSubmissionEventEmitter } from '../../../src/events/StoreVjud
 
 
 import { vjudgeUpdatesCollectorService as sut } from '../../../src/services/updates-collection/VjudgeUpdatesCollectorService';
+import { logMuter } from '../../testUtils/LogMuter';
 
-describe('getAndStoreVjudgeUpdates', function () {
+describe('vjudgeUpdatesCollectorService', function () {
   let findOneStub: sinon.SinonStub;
   let getVjudgeSubmissionStatsStub: sinon.SinonStub;
   let emitUserUpdateStub: sinon.SinonStub;
   let emitStoreVjudgeEventStub: sinon.SinonStub;
 
   beforeEach(() => {
+    // mute console
+    logMuter.muteLogs();
+    sinon.stub(console, 'error');
     //stub the methods 
     findOneStub = sinon.stub(User, 'findOne');
     getVjudgeSubmissionStatsStub = sinon.stub(vjudgeApi, 'getSubmissionStats');
@@ -22,7 +26,9 @@ describe('getAndStoreVjudgeUpdates', function () {
     emitStoreVjudgeEventStub = sinon.stub(storeVjudgeSubmissionEventEmitter, 'emit');
   });
 
-  afterEach(() => {
+  afterEach(function() {
+    logMuter.unmuteLogs();
+    
     // Restore the stubbed methods after each test
     sinon.restore();
   });
