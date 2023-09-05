@@ -23,7 +23,7 @@ export class UserUpdateEventEmitter {
 
     // send update to PubSub for other integrations
     try {
-      const topicName = `update_events_user_${data.id}`;
+      const topicName = `UPDATE_EVENTS`;
       const topic = this.pubSubClient.topic(topicName);
 
       const [exists] = await topic.exists();
