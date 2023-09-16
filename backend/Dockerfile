@@ -1,5 +1,5 @@
 # Use the official Node.js LTS (Long-Term Support)
-FROM node:18-slim
+FROM --platform=linux/amd64 node:18-slim
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
