@@ -1,5 +1,5 @@
-# Use the official Node.js LTS (Long-Term Support) image as the base image
-FROM node:14
+# Use the official Node.js LTS (Long-Term Support)
+FROM node:18
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY . .
 RUN npm run build
 
 # Expose the port your Node.js application is listening on
-EXPOSE 3000
+EXPOSE 8080
 
 # Define the command to start your Node.js application
 CMD ["node", "dist/server.js"]
