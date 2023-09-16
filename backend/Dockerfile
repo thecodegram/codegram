@@ -1,8 +1,8 @@
 # Use the official Node.js LTS (Long-Term Support)
-FROM node:18
+FROM node:18-slim
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
